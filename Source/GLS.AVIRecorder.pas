@@ -447,6 +447,9 @@ begin
 
     AVI_DPI := DPI;
 
+{$IFDEF CPUX64}
+    Result := True; // Workaround for compiler bug. (Result is set False after AVIMageCompressedStream)
+{$ENDIF}
   except
     CloseAVIFile(True);
     raise;
