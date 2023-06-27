@@ -60,6 +60,7 @@
         <VerInfo_Locale>1049</VerInfo_Locale>
         <DCC_N>false</DCC_N>
         <DCC_ImageBase>00400000</DCC_ImageBase>
+        <DCC_DcuOutput>..\lib\$(ProductVersion)\$(Platform)\$(Config)</DCC_DcuOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_HppOutput>..\include\$(Platform)</DCC_HppOutput>

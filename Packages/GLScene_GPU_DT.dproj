@@ -68,6 +68,7 @@
         <DCC_S>false</DCC_S>
         <DCC_N>false</DCC_N>
         <DCC_ImageBase>00400000</DCC_ImageBase>
+        <DCC_DcuOutput>..\lib\$(ProductVersion)\$(Platform)\$(Config)</DCC_DcuOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_UsePackage>rtl;vcl;GLScene_Parallel_RT;VclSmp;GLScene_RT;GLScene_GPU_RT;$(DCC_UsePackage)</DCC_UsePackage>

@@ -76,6 +76,7 @@
         <DCC_Description>GLScene FMOD Manager</DCC_Description>
         <RuntimeOnlyPackage>true</RuntimeOnlyPackage>
         <DCC_ImageBase>00400000</DCC_ImageBase>
+        <DCC_DcuOutput>..\lib\$(ProductVersion)\$(Platform)\$(Config)</DCC_DcuOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <DCC_Description>GLScene Sound Managers</DCC_Description>
