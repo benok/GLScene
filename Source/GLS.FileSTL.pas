@@ -1,9 +1,7 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.FileSTL;
-
 (*
   Support-code to load STL Files into TGLFreeForm-Components in GLScene.
   Note that you must manually add this unit to one of your project's uses
@@ -16,7 +14,6 @@ unit GLS.FileSTL;
   This class reads both, but exports only the "binary" version.
   Original Binary importer code by Paul M. Bearne, Text importer by Adem.
 *)
-
 interface
 
 uses
@@ -27,7 +24,8 @@ uses
   GLS.VectorTypes,
   GLS.VectorGeometry,
   GLS.VectorLists,
-  GLS.VectorFileObjects;
+  GLS.VectorFileObjects,
+  GLS.Utils;
 
 type
   TSTLHeader = packed record
@@ -47,7 +45,7 @@ type
 
 type
 
-  TglSTLVectorFile = class(TglVectorFile)
+  TGLSTLVectorFile = class(TGLVectorFile)
   public
     class function Capabilities: TGLDataFileCapabilities; override;
     procedure LoadFromStream(aStream: TStream); override;
@@ -79,7 +77,7 @@ const
 // ------------------ TGLSTLVectorFile ------------------
 // ------------------
 
-class function TglSTLVectorFile.Capabilities: TglDataFileCapabilities;
+class function TGLSTLVectorFile.Capabilities: TGLDataFileCapabilities;
 begin
    Result := [dfcRead, dfcWrite];
 end;
@@ -95,9 +93,9 @@ var
       raise Exception.Create('Invalid Normal')
     else
     begin
-      aNormal.X := StrToFloatDef(Sl[2], 0);
-      aNormal.Y := StrToFloatDef(Sl[3], 0);
-      aNormal.Z := StrToFloatDef(Sl[4], 0);
+      aNormal.X := GLStrToFloatDef(Sl[2], 0);
+      aNormal.Y := GLStrToFloatDef(Sl[3], 0);
+      aNormal.Z := GLStrToFloatDef(Sl[4], 0);
     end;
   end;
 
@@ -108,9 +106,9 @@ var
       raise Exception.Create('Invalid Vertex')
     else
     begin
-      aVertex.X := StrToFloatDef(Sl[1], 0);
-      aVertex.Y := StrToFloatDef(Sl[2], 0);
-      aVertex.Z := StrToFloatDef(Sl[3], 0);
+      aVertex.X := GLStrToFloatDef(Sl[1], 0);
+      aVertex.Y := GLStrToFloatDef(Sl[2], 0);
+      aVertex.Z := GLStrToFloatDef(Sl[3], 0);
     end;
   end;
 
@@ -121,7 +119,7 @@ var
   I: Integer;
   L: Integer;
   CurLine: string;
-  Mesh: TMeshObject;
+  Mesh: TGLMeshObject;
   DataFace: TSTLFace;
   Header: TSTLHeader;
   FileContent: TStringList;
@@ -173,7 +171,7 @@ var
 
 begin
   // create mesh object
-  Mesh := TMeshObject.CreateOwned(Owner.MeshObjects);
+  Mesh := TGLMeshObject.CreateOwned(Owner.MeshObjects);
   try
     Mesh.Mode := momTriangles;
     if IsBinary then
@@ -289,7 +287,7 @@ var
   I: Integer;
   DataFace: TSTLFace;
   Header: TSTLHeader;
-  List: TAffineVectorList;
+  List: TGLAffineVectorList;
 const
   cHeaderTag = 'STL export';
 begin

@@ -1,28 +1,27 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.File3DSSceneObjects;
 
 (* 3ds-specific scene objects. *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
   System.Classes,
   System.SysUtils,
   System.Math,
-  
+
   GLS.OpenGLTokens,
   GLS.OpenGLAdapter,
+  GLS.VectorTypes,
   GLS.VectorGeometry,
   GLS.Context,
   GLS.Scene,
   GLS.VectorFileObjects,
-  GLS.VectorTypes,
   GLS.PersistentClasses,
   GLS.Coordinates,
   GLS.RenderContextInfo,
@@ -70,7 +69,7 @@ type
 
   TGLFile3DSFreeForm = class(TGLFreeForm)
   private
-    FTransfMat, FScaleMat, ParentMatrix: TMatrix;
+    FTransfMat, FScaleMat, ParentMatrix: TGLMatrix;
 
     FS_Rot3DS: TGLCoordinates4;
     FRot3DS: TGLCoordinates4;
@@ -80,13 +79,13 @@ type
   protected
     procedure DefineProperties(Filer: TFiler); override;
   public
-    FRefMat: TMatrix;
+    FRefMat: TGLMatrix;
     constructor Create(AOWner: TComponent); override;
     destructor Destroy; override;
     procedure BuildList(var rci: TGLRenderContextInfo); override;
     procedure CoordinateChanged(Sender: TGLCustomCoordinates); override;
-    function AxisAlignedDimensionsUnscaled: TVector; override;
-    function BarycenterAbsolutePosition: TVector; override;
+    function AxisAlignedDimensionsUnscaled: TGLVector; override;
+    function BarycenterAbsolutePosition: TGLVector; override;
   published
     property S_Rot3DS: TGLCoordinates4 read FS_Rot3DS;
     property Rot3DS: TGLCoordinates4 read FRot3DS;
@@ -102,7 +101,7 @@ implementation
 
 function MakeRotationQuaternion(const axis: TAffineVector; angle: Single): TQuaternion;
 var
-  v: Tvector;
+  v: TGLVector;
   halfAngle, invAxisLengthMult: Single;
 begin
   halfAngle := (angle) / 2;
@@ -117,11 +116,11 @@ begin
   Result.RealPart := v.W;
 end;
 
-function QuaternionToRotateMatrix(const Quaternion: TQuaternion): TMatrix;
+function QuaternionToRotateMatrix(const Quaternion: TQuaternion): TGLMatrix;
 var
   wx, wy, wz, xx, yy, yz, xy, xz, zz, x2, y2, z2: Single;
-  quat: TVector;
-  m: TMatrix;
+  quat: TGLVector;
+  m: TGLMatrix;
 begin
   quat := VectorMake(Quaternion.ImagPart);
   quat.W := Quaternion.RealPart;
@@ -255,9 +254,9 @@ procedure TGLFile3DSCamera.DoRender(var rci: TGLRenderContextInfo; renderSelf, r
     //    glTranslatef(0, 0, 0.5);
     //    gluDisk(FQuadDisk[0], 0, 1, 6, 1);
     gl.Translatef(0, 0, -0.5);
-    rci.GLStates.InvertGLFrontFace;
+    rci.GLStates.InvertFrontFace;
     //    gluDisk(FQuadDisk[0], 0, 1, 6, 1);
-    rci.GLStates.InvertGLFrontFace;
+    rci.GLStates.InvertFrontFace;
   end;
 
   procedure BuildFace;
@@ -375,7 +374,7 @@ end;
 
 procedure TGLFile3DSFreeForm.ReadMesh(Stream: TStream);
 var
-  v: TVector;
+  v: TGLVector;
   virt: TGLBinaryReader;
 begin
   virt := TGLBinaryReader.Create(Stream);
@@ -395,7 +394,7 @@ end;
 procedure TGLFile3DSFreeForm.WriteMesh(Stream: TStream);
 var
   virt: TGLBinaryWriter;
-  v: TVector;
+  v: TGLVector;
 begin
   virt := TGLBinaryWriter.Create(Stream);
 
@@ -457,10 +456,10 @@ begin
   end;
 end;
 
-function TGLFile3DSFreeForm.AxisAlignedDimensionsUnscaled: TVector;
+function TGLFile3DSFreeForm.AxisAlignedDimensionsUnscaled: TGLVector;
 var
   dMin, dMax: TAffineVector;
-  mat: TMatrix;
+  mat: TGLMatrix;
 begin
   MeshObjects.GetExtents(dMin, dMax);
   mat := ParentMatrix;
@@ -476,10 +475,10 @@ begin
   Result.W := 0;
 end;
 
-function TGLFile3DSFreeForm.BarycenterAbsolutePosition: TVector;
+function TGLFile3DSFreeForm.BarycenterAbsolutePosition: TGLVector;
 var
   dMin, dMax: TAffineVector;
-  mat: TMatrix;
+  mat: TGLMatrix;
 begin
   MeshObjects.GetExtents(dMin, dMax);
   mat := ParentMatrix;
@@ -497,7 +496,10 @@ begin
   Result := LocalToAbsolute(Result);
 end;
 
+//--------------------------------------------
 initialization
+//--------------------------------------------
+
   RegisterClasses([TGLFile3DSLight, TGLFile3DSCamera, TGLFile3DSActor, TGLFile3DSFreeForm]);
 
 end.

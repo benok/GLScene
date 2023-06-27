@@ -1,17 +1,14 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.AsyncTimer;
-
 (*
    Asynchronous timer component (actual 1 ms resolution).
    This component is based on ThreadedTimer by Carlos Barbosa.
 *)
-
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   System.Classes,
@@ -26,11 +23,12 @@ const
 
 type
 
-  (*  Asynchronous timer component (actual 1 ms resolution, if CPU fast enough). 
+  (*  Asynchronous timer component
+    (actual 1 ms resolution, if CPU fast enough).
     Keep in mind timer resolution is obtained in-between events, but
     events are not triggered every x ms. For instance if you set the interval to
     5 ms, and your Timer event takes 1 ms to complete, Timer events will actually
-    be triggered every 5+1=6 ms (that's why it's "asynchronous"). 
+    be triggered every 5+1=6 ms (that's why it's "asynchronous").
     This component is based on ThreadedTimer by Carlos Barbosa. *)
   TGLAsyncTimer = class(TComponent)
   private

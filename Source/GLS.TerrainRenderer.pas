@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.TerrainRenderer;
 
 (*
@@ -12,14 +11,14 @@ unit GLS.TerrainRenderer;
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
   System.Classes,
-  System.SysUtils, 
+  System.SysUtils,
   System.Types,
-  
+
   GLS.OpenGLTokens,
   GLS.Scene,
   GLS.Coordinates,
@@ -68,9 +67,9 @@ type
     FLastTriangleCount: Integer;
     FTilesPerTexture: Single;
     FMaxCLODTriangles, FCLODPrecision: Integer;
-    FBufferVertices: TAffineVectorList;
-    FBufferTexPoints: TTexPointList;
-    FBufferVertexIndices: TIntegerList;
+    FBufferVertices: TGLAffineVectorList;
+    FBufferTexPoints: TGLTexPointList;
+    FBufferVertexIndices: TGLIntegerList;
     FMaterialLibrary: TGLMaterialLibrary;
     FOnGetTerrainBounds: TGetTerrainBoundsEvent;
     FOnPatchPostRender: TPatchPostRenderEvent;
@@ -110,11 +109,11 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure BuildList(var rci: TGLRenderContextInfo); override;
-    function RayCastIntersect(const rayStart, rayVector: TVector;
-      intersectPoint: PVector = nil; intersectNormal: PVector = nil): Boolean; override;
+    function RayCastIntersect(const rayStart, rayVector: TGLVector;
+      intersectPoint: PGLVector = nil; intersectNormal: PGLVector = nil): Boolean; override;
     (* Interpolates height for the given point.
        Expects a point expressed in absolute coordinates. *)
-    function InterpolatedHeight(const p: TVector): Single; overload;
+    function InterpolatedHeight(const p: TGLVector): Single; overload;
     function InterpolatedHeight(const p: TAffineVector): Single; overload;
     // Triangle count for the last render
     property LastTriangleCount: Integer read FLastTriangleCount;
@@ -242,9 +241,9 @@ begin
   FMaxCLODTriangles := 65536;
   FCLODPrecision := 100;
   FOcclusionTesselate := totTesselateIfVisible;
-  FBufferVertices := TAffineVectorList.Create;
-  FBufferTexPoints := TTexPointList.Create;
-  FBufferVertexIndices := TIntegerList.Create;
+  FBufferVertices := TGLAffineVectorList.Create;
+  FBufferTexPoints := TGLTexPointList.Create;
+  FBufferVertexIndices := TGLIntegerList.Create;
   TileManagement := [tmClearUsedFlags, tmMarkUsedTiles, tmReleaseUnusedTiles,
     tmAllocateNewTiles];
 end;
@@ -286,14 +285,14 @@ begin
     HeightDataSource.Clear;
 end;
 
-function TGLTerrainRenderer.RayCastIntersect(const rayStart, rayVector: TVector;
-  intersectPoint: PVector = nil; intersectNormal: PVector = nil): Boolean;
+function TGLTerrainRenderer.RayCastIntersect(const rayStart, rayVector: TGLVector;
+  intersectPoint: PGLVector = nil; intersectNormal: PGLVector = nil): Boolean;
 var
-  p1, d, p2, p3: TVector;
+  p1, d, p2, p3: TGLVector;
   step, i, h, minH, maxH, p1height: Single;
   startedAbove: Boolean;
   failSafe: Integer;
-  AbsX, AbsY, AbsZ: TVector;
+  AbsX, AbsY, AbsZ: TGLVector;
 begin
   Result := False;
   if Assigned(HeightDataSource) then
@@ -411,9 +410,9 @@ begin
   end;
 end;
 
-function TGLTerrainRenderer.InterpolatedHeight(const p: TVector): Single;
+function TGLTerrainRenderer.InterpolatedHeight(const p: TGLVector): Single;
 var
-  pLocal: TVector;
+  pLocal: TGLVector;
 begin
   if Assigned(HeightDataSource) then
   begin
@@ -432,7 +431,7 @@ end;
 
 procedure TGLTerrainRenderer.BuildList(var rci: TGLRenderContextInfo);
 var
-  vEye, vEyeDirection: TVector;
+  vEye, vEyeDirection: TGLVector;
   TilePos, AbsTilePos, Observer: TAffineVector;
   DeltaX, nbX, iX: Integer;
   DeltaY, nbY, iY: Integer;
@@ -441,7 +440,7 @@ var
   Patch, PrevPatch: TGLROAMPatch;
   PatchList, RowList, prevRow, buf: TList;
   PostRenderPatchList, postRenderHeightDataList: TList;
-  rcci: TRenderContextClippingInfo;
+  rcci: TGLRenderContextClippingInfo;
   CurrentMaterialName: String;
   MaxTilePosX, MaxTilePosY, MinTilePosX, MinTilePosY: Single;
   t_l, t_t, t_r, t_b: Single;

@@ -1,14 +1,13 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.Context;
 
 (* Prototypes and base implementation of TGLContext *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
@@ -23,18 +22,18 @@ uses
   VCL.Consts,
 
 {$IFDEF USE_SERVICE_CONTEXT}
-  GLSGenerics,
+  GLS.Generics,
 {$ENDIF}
 
   GLS.OpenGLTokens,
   GLS.OpenGLAdapter,
-  GLS.XOpenGL,
   GLS.VectorGeometry,
   GLS.Strings,
-  GLS.VectorTypes,
-  GLS.State,
-  GLS.PipelineTransformation,
   GLS.TextureFormat,
+  GLS.VectorTypes,
+  GLS.PipelineTransformation,
+  GLS.State,
+  GLS.XOpenGL,
   GLS.Logger;
 
 // Buffer ID's for Multiple-Render-Targets (using GL_ATI_draw_buffers)
@@ -810,14 +809,14 @@ type
     procedure SetUniform2f(const index: string; const val: TVector2f);
     function GetUniform3f(const index: string): TAffineVector;
     procedure SetUniform3f(const index: string; const val: TAffineVector);
-    function GetUniform4f(const index: string): TVector;
-    procedure SetUniform4f(const index: string; const val: TVector);
+    function GetUniform4f(const index: string): TGLVector;
+    procedure SetUniform4f(const index: string; const val: TGLVector);
     function GetUniformMatrix2fv(const index: string): TMatrix2f;
     procedure SetUniformMatrix2fv(const index: string; const val: TMatrix2f);
     function GetUniformMatrix3fv(const index: string): TMatrix3f;
     procedure SetUniformMatrix3fv(const index: string; const val: TMatrix3f);
-    function GetUniformMatrix4fv(const index: string): TMatrix;
-    procedure SetUniformMatrix4fv(const index: string; const val: TMatrix);
+    function GetUniformMatrix4fv(const index: string): TGLMatrix;
+    procedure SetUniformMatrix4fv(const index: string; const val: TGLMatrix);
     function GetUniformTextureHandle(const Index: string; const TextureIndex: Integer; const TextureTarget: TGLTextureTarget)
       : TGLuint;
     procedure SetUniformTextureHandle(const Index: string; const TextureIndex: Integer; const TextureTarget: TGLTextureTarget;
@@ -865,10 +864,10 @@ type
     property Uniform1f[const index: string]: Single read GetUniform1f write SetUniform1f;
     property Uniform2f[const index: string]: TVector2f read GetUniform2f write SetUniform2f;
     property Uniform3f[const index: string]: TAffineVector read GetUniform3f write SetUniform3f;
-    property Uniform4f[const index: string]: TVector read GetUniform4f write SetUniform4f;
+    property Uniform4f[const index: string]: TGLVector read GetUniform4f write SetUniform4f;
     property UniformMatrix2fv[const index: string]: TMatrix2f read GetUniformMatrix2fv write SetUniformMatrix2fv;
     property UniformMatrix3fv[const index: string]: TMatrix3f read GetUniformMatrix3fv write SetUniformMatrix3fv;
-    property UniformMatrix4fv[const index: string]: TMatrix read GetUniformMatrix4fv write SetUniformMatrix4fv;
+    property UniformMatrix4fv[const index: string]: TGLMatrix read GetUniformMatrix4fv write SetUniformMatrix4fv;
     property UniformTextureHandle[const index: string; const TextureIndex: Integer; const TextureTarget: TGLTextureTarget]
       : TGLuint read GetUniformTextureHandle write SetUniformTextureHandle;
     property UniformBuffer[const index: string]: TGLUniformBufferHandle write SetUniformBuffer;
@@ -1693,7 +1692,7 @@ begin
         for I := FHandles.Count - 1 downto 1 do
         begin
           p := RCItem(I);
-          if (p.FRenderingContext <> vCurrentGLContext) and (p.FHandle <> 0) and 
+          if (p.FRenderingContext <> vCurrentGLContext) and (p.FHandle <> 0) and
 		  (aList.IndexOf(p.FRenderingContext) > -1) then
           begin
             bShared := True;
@@ -3226,12 +3225,12 @@ begin
   gl.Uniform3f(GetUniformLocation(index), val.X, val.Y, val.Z);
 end;
 
-function TGLProgramHandle.GetUniform4f(const index: string): TVector;
+function TGLProgramHandle.GetUniform4f(const index: string): TGLVector;
 begin
   gl.GetUniformfv(GetHandle, GetUniformLocation(index), @Result);
 end;
 
-procedure TGLProgramHandle.SetUniform4f(const index: string; const val: TVector);
+procedure TGLProgramHandle.SetUniform4f(const index: string; const val: TGLVector);
 begin
   gl.Uniform4f(GetUniformLocation(index), val.X, val.Y, val.Z, val.W);
 end;
@@ -3256,12 +3255,12 @@ begin
   gl.UniformMatrix3fv(GetUniformLocation(index), 1, False, @val);
 end;
 
-function TGLProgramHandle.GetUniformMatrix4fv(const index: string): TMatrix;
+function TGLProgramHandle.GetUniformMatrix4fv(const index: string): TGLMatrix;
 begin
   gl.GetUniformfv(GetHandle, GetUniformLocation(index), @Result);
 end;
 
-procedure TGLProgramHandle.SetUniformMatrix4fv(const index: string; const val: TMatrix);
+procedure TGLProgramHandle.SetUniformMatrix4fv(const index: string; const val: TGLMatrix);
 begin
   gl.UniformMatrix4fv(GetUniformLocation(index), 1, False, @val);
 end;

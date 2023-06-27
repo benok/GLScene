@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.Portal;
 
 (*
@@ -12,7 +11,7 @@ unit GLS.Portal;
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   System.Classes,
@@ -105,7 +104,7 @@ end;
 procedure TGLPortalMeshObjectList.BuildList(var mrci: TGLRenderContextInfo);
 var
   i: Integer;
-  startSector: TMeshObject;
+  startSector: TGLMeshObject;
 begin
   for i := 0 to Count - 1 do
     with TGLSectorMeshObject(Items[i]) do

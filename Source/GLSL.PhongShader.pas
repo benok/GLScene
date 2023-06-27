@@ -1,14 +1,13 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLSL.PhongShader;
 
 (*  An ARBvp1.0 + ARBfp1.0 shader that implements phong shading. *)
 
 interface
 
-{$I GLScene.inc }
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
@@ -30,7 +29,7 @@ uses
 type
   TGLPhongShader = class(TGLCustomAsmShader)
   private
-    FLightIDs: TIntegerList;
+    FLightIDs: TGLIntegerList;
     FDesignTimeEnabled: Boolean;
     FAmbientPass: Boolean;
     procedure SetDesignTimeEnabled(const Value: Boolean);
@@ -185,7 +184,7 @@ begin
 
     Add('END');
   end;
-  FLightIDs := TIntegerList.Create;
+  FLightIDs := TGLIntegerList.Create;
 end;
 
 function TGLPhongShader.ShaderSupported: Boolean;
@@ -215,7 +214,7 @@ end;
 
 procedure TGLPhongShader.DoAmbientPass(var rci: TGLRenderContextInfo);
 var
-  ambient, materialAmbient: TVector;
+  ambient, materialAmbient: TGLVector;
 begin
   rci.GLStates.Disable(stLighting);
 
@@ -227,7 +226,7 @@ end;
 
 procedure TGLPhongShader.DoLightPass(lightID: Cardinal);
 var
-  LightParam: TVector;
+  LightParam: TGLVector;
 begin
   Self.ApplyShaderPrograms();
 

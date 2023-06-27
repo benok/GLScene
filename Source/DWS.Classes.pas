@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics rendering engine GLScene http://glscene.org
 //
-
 unit DWS.Classes;
 
 (* DelphiWebScript symbol creation for base Delphi classes. *)
@@ -273,16 +272,6 @@ end;
 
 
 // ----------
-// ---------- Global procedures/functions ----------
-// ----------
-
-procedure Register;
-begin
-  RegisterComponents('GLScene DWS2', [Tdws2ClassesUnit]);
-end;
-
-
-// ----------
 // ---------- TdwsClassesUnit ----------
 // ----------
 
@@ -389,5 +378,15 @@ begin
   AddClassTPersistent(SymbolTable);
   AddClassTComponent(SymbolTable);
 end;
+
+// ----------
+// ---------- Global procedures/functions ----------
+// ----------
+
+procedure Register;
+begin
+  RegisterComponents('GLScene DWS2', [Tdws2ClassesUnit]);
+end;
+
 
 end.

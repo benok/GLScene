@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.File3DPDF;
 
 (* 3D PDF converter of GLScene's models *)
@@ -28,7 +27,7 @@ type
      Used for converting to IDTF -> U3D -> 3D PDF *)
   TGLIDTFVectorFile = class(TGLVectorFile)
   private
-    procedure BuildNormals(m: TMeshObject);
+    procedure BuildNormals(m: TGLMeshObject);
   public
     class function Capabilities: TGLDataFileCapabilities; override;
     procedure SaveToStream(aStream: TStream); override;
@@ -192,7 +191,9 @@ begin
 end;
 
 
-{ TGLIDTFVectorFile }
+//=============================
+//    TGLIDTFVectorFile
+//=============================
 
 class function TGLIDTFVectorFile.Capabilities: TGLDataFileCapabilities;
 begin
@@ -200,7 +201,7 @@ begin
 end;
 
     // build normals
-procedure TGLIDTFVectorFile.BuildNormals(m: TMeshObject);
+procedure TGLIDTFVectorFile.BuildNormals(m: TGLMeshObject);
 var
   i, j: Integer;
   v1, v2, v3, v4, n: TAffineVector;
@@ -255,11 +256,11 @@ end;
 procedure TGLIDTFVectorFile.SaveToStream(aStream: TStream);
 var
   S: String;
-  Mesh: TMeshObject;
+  Mesh: TGLMeshObject;
   FaceCount, ModelPositionCount, NormalCount, I, J: Integer;
   FacePositionList, NormalList, ModelPositionList, ModelNormalList, FaceShadingList: String;
   Lines: TStringList;
-  Indicies: TIntegerList;
+  Indicies: TGLIntegerList;
 
   function FormatVector(const AVector: TAffineVector): string;
   begin
@@ -268,8 +269,7 @@ var
 begin
   // ++ todo: save more than one mesh
   Mesh:= Owner.MeshObjects[0];
-//  BuildNormals(Mesh);
-
+  // BuildNormals(Mesh);
 
   // count
   NormalList:= '';
@@ -308,7 +308,7 @@ begin
   // points
 
   // normals
-//  FMeshObject.BuildNormals(FMeshObject.Vertices., momFaceGroups);  ++
+  //  FMeshObject.BuildNormals(FMeshObject.Vertices., momFaceGroups);  ++
   NormalCount:= Mesh.Normals.Count;
   NormalList:= '';
   for I:= 0 to Pred(Mesh.Normals.Count) do
@@ -330,7 +330,9 @@ begin
 end;
 
 
-{ TGLU3DVectorFile }
+//==================================
+//      TGLU3DVectorFile
+//==================================
 
 class function TGLU3DVectorFile.Capabilities: TGLDataFileCapabilities;
 begin

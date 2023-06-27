@@ -1,14 +1,13 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.AnimatedSprite;
 
 (* A sprite that uses a scrolling texture for animation. *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
@@ -673,7 +672,7 @@ procedure TGLAnimatedSprite.BuildList(var rci: TGLRenderContextInfo);
 var
   vx, vy: TAffineVector;
   w, h, temp: Single;
-  mat: TMatrix;
+  mat: TGLMatrix;
   u0, v0, u1, v1: Single;
   x0, y0, x1, y1, TexWidth, TexHeight: Integer;
   Anim: TGLSpriteAnimation;

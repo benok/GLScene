@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit SDL.Window;
 
 (*
@@ -15,7 +14,7 @@ unit SDL.Window;
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   System.Classes,
@@ -23,12 +22,12 @@ uses
   System.SyncObjs,
 
   GLS.OpenGLTokens,
+  GLS.VectorGeometry,
   GLS.OpenGLAdapter,
   GLS.VectorTypes,
   GLS.State,
   GLS.Context,
-  GLS.VectorGeometry,
-  Import.SDL2;
+  SDL.Import;
 
 type
   (* Pixel Depth options.
@@ -43,13 +42,14 @@ type
     voResizable: window should be resizable
     voFullScreen: requires a full screen "window" (screen resolution may be changed)
     voStencilBuffer: requires a stencil buffer (8bits, use along voOpenGL) *)
-  TSDLWindowOption = (voDoubleBuffer, voHardwareAccel, voOpenGL, voResizable, 
-    voFullScreen,  voStencilBuffer);
+  TSDLWindowOption = (voDoubleBuffer, voHardwareAccel, voOpenGL, voResizable,
+    voFullScreen, voStencilBuffer);
   TSDLWindowOptions = set of TSDLWindowOption;
   TSDLEvent = procedure(sender: TObject; const event: TSDL_Event) of object;
 
 const
-  cDefaultSDLWindowOptions = [voDoubleBuffer, voHardwareAccel, voOpenGL, voResizable];
+  cDefaultSDLWindowOptions = [voDoubleBuffer, voHardwareAccel, voOpenGL,
+    voResizable];
 
 type
   (* A basic SDL-based window (non-visual component).
@@ -157,12 +157,12 @@ type
       write FOnEventPollDone;
   end;
 
-// Generic SDL or SDLWindow exception
-ESDLError = class(Exception);
+  // Generic SDL or SDLWindow exception
+  ESDLError = class(Exception);
 
-// -----------------------------------------------------------------------------
-// Get Environment Routines
-//------------------------------------------------------------------------------
+  // -----------------------------------------------------------------------------
+  // Get Environment Routines
+  // ------------------------------------------------------------------------------
 
 function _putenv(const variable: PAnsiChar): Integer; cdecl;
 
@@ -188,6 +188,7 @@ procedure Register;
 
 // ---------------------------------------------------------------------
 implementation
+
 // ---------------------------------------------------------------------
 
 var
@@ -209,7 +210,8 @@ begin
     raise ESDLError.Create(SDL_GetError);
 end;
 
-function _putenv(const variable: PAnsiChar): Integer; cdecl; external 'MSVCRT.DLL';
+function _putenv(const variable: PAnsiChar): Integer; cdecl;
+  external 'MSVCRT.DLL';
 
 function SDL_putenv(const variable: PAnsiChar): Integer;
 begin
@@ -367,10 +369,10 @@ begin
   if voOpenGL in Options then
     SetSDLGLAttributes;
 
-  {
+ (*
     SDL_WM_SetCaption(PAnsiChar(AnsiString(FCaption)), nil);
     FSDLSurface := SDL_SetVideoMode(Width, Height, cPixelDepthToBpp[PixelDepth], videoFlags);
-  }
+ *)
 
   FSDLWindow := SDL_CreateWindow(PChar(AnsiString(FCaption)),
     SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, Width, Height,
@@ -584,4 +586,3 @@ initialization
 vSDLCS := TCriticalSection.Create;
 
 end.
-

@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.Language;
 
 (*
@@ -12,11 +11,11 @@ unit GLS.Language;
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
-  System.Classes, 
-  System.IniFiles, 
+  System.Classes,
+  System.IniFiles,
   System.SysUtils,
   GLS.Utils;
 
@@ -75,7 +74,7 @@ type
     property Language: TGLLanguageExt read FLanguage write SetLanguage;
   end;
 
-//-----------------------------------------------------------------------
+//------------------------------------------------------------
 implementation
 //-----------------------------------------------------------------------
 
@@ -94,7 +93,7 @@ var
   S: TStringList;
   I: integer;
 begin
-  If Language = '' then
+  if Language = '' then
     Exit;
   if not FileExists(string(Language)) then
   begin
@@ -291,7 +290,7 @@ end;
 
 // ------------------------------------------------------------------------------
 initialization
-// ------------------------------------------------------------------------------
+// -----------------------------------------------------------
 
 RegisterClass(TGLSLanguage);
 

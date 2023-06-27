@@ -1,21 +1,20 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.FileMD2;
 
 (* Quake2 MD2 vector file format implementation. *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   System.Classes,
   System.SysUtils,
   GLS.VectorFileObjects,
   GLS.ApplicationFileIO,
-  FormatMD2;
+  Formats.MD2;
 
 type
   (* The MD2 vector file (Quake2 actor file).

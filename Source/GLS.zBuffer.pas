@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.zBuffer;
 
 (*
@@ -25,7 +24,7 @@ unit GLS.zBuffer;
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
@@ -48,7 +47,6 @@ uses
   GLS.VectorTypes,
   GLS.Coordinates,
   GLS.PersistentClasses;
-
 
 type
   EZBufferException = class(Exception);
@@ -134,7 +132,7 @@ type
     Fsoft: boolean;
     FTolerance: single;
     FColor: TGLColor;
-    SCol: TPixel32;
+    SCol: TGLPixel32;
     //stepX, stepY :single;
     FTexturePrepared: Boolean;
     FTexHandle: TGLTextureHandle;
@@ -357,7 +355,7 @@ end;
 procedure TGLzBuffer.DoCalcVectors;
 var
   axs: TAffineVector;
-  Hnorm, hcvec: TVector;
+  Hnorm, hcvec: TGLVector;
   vec: TAffineVector;
   w, h: integer;
   wrp: single;
@@ -485,7 +483,7 @@ function TGLzBuffer.PixelToWorld(const x, y: Integer): TAffineVector;
 var
   z, dst: single;
   fy: integer;
-  camvec: TVector;
+  camvec: TGLVector;
 begin
   // if (Cardinal(x)<Cardinal(FWidth)) and (Cardinal(y)<Cardinal(FWidth)) then begin       //xres,yres?
   if (x < FWidth) and (y < FHeight) then
@@ -509,7 +507,7 @@ end;
 function TGLzBuffer.WorldToPixel(const aPoint: TAffineVector; out pixX, pixY:
   integer; out pixZ: single): boolean;
 var
-  camPos: TVector;
+  camPos: TGLVector;
   x, y, z, v0, v1, zscal: single;
 begin
   //---Takes x,y,z world coordinate.
@@ -546,7 +544,7 @@ end;
 function TGLzBuffer.WorldToPixelZ(const aPoint: TAffineVector; out pixX, pixY:
   integer; out pixZ: single): boolean; //OVERLOAD
 var
-  camPos: TVector;
+  camPos: TGLVector;
   x, y, z, v0, v1, zscal: single;
 begin
   //---Takes x,y,z world coordinate.
@@ -585,7 +583,7 @@ end;
 function TGLzBuffer.WorldToPixelZ(const aPoint: TAffineVector; out pixX, pixY:
   single; out pixZ: single): boolean; //OVERLOAD
 var
-  camPos: TVector;
+  camPos: TGLVector;
   x, y, z, invZ, v0, v1, zscal: single;
 begin
   //---Takes x,y,z world coordinate. (aPoint)
@@ -625,7 +623,7 @@ end;
 function TGLzBuffer.OrthWorldToPixelZ(const aPoint: TAffineVector; out pixX,
   pixY: single; out pixZ: single): boolean;
 var
-  camPos: TVector;
+  camPos: TGLVector;
   x, y, z: single;
 begin
   campos := cam.AbsolutePosition;

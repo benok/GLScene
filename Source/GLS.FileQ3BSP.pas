@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.FileQ3BSP;
 
 (*
@@ -12,7 +11,7 @@ unit GLS.FileQ3BSP;
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   System.Classes,
@@ -24,7 +23,7 @@ uses
   GLS.VectorGeometry,
   GLS.VectorTypes,
   GLS.VectorLists,
-  FormatQ3BSP,
+  Formats.Q3BSP,
   GLS.MeshBSP,
   GLS.Texture,
   GLS.Graphics,
@@ -46,7 +45,7 @@ var
   // Q3 lightmaps are quite dark, we brighten them a lot by default
   vQ3BSPLightmapGammaCorrection: Single = 2.5;
   vQ3BSPLightmapBrightness: Single = 2; // scaling factor, 1.0 = unchanged
-  vGLFileQ3BSPLoadMaterials: boolean = True; // Mrqzzz : Flag to avoid loading materials (useful for IDE Extentions like GlaredX)
+  vGLFileQ3BSPLoadMaterials: boolean = True; // Flag to avoid loading materials (useful for IDE Extentions)
 
 // ------------------------------------------------------------------
 implementation

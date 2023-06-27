@@ -1,14 +1,13 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.BitmapFont;
 
 (* Bitmap Fonts management classes *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpengL,
@@ -19,8 +18,11 @@ uses
   Vcl.StdCtrls,
   
   GLS.OpenGLTokens,
-  GLS.Scene,
+  GLS.TextureFormat,
+  GLS.VectorTypes,
   GLS.VectorGeometry,
+
+  GLS.Scene,
   GLS.Context,
   GLS.Texture,
   GLS.State,
@@ -29,8 +31,6 @@ uses
   GLS.Color,
   GLS.BaseClasses,
   GLS.RenderContextInfo,
-  GLS.TextureFormat,
-  GLS.VectorTypes,
   GLS.PersistentClasses;
 
 type
@@ -189,13 +189,13 @@ type
        Enable states are also possibly altered. *)
     procedure RenderString(var ARci: TGLRenderContextInfo;
       const aText: UnicodeString; aAlignment: TAlignment;
-      aLayout: TTextLayout; const aColor: TColorVector;
-      aPosition: PVector = nil; aReverseY: boolean = False); overload; virtual;
+      aLayout: TTextLayout; const aColor: TGLColorVector;
+      aPosition: PGLVector = nil; aReverseY: boolean = False); overload; virtual;
     (* A simpler canvas-style TextOut helper for RenderString.
        The rendering is reversed along Y by default, to allow direct use
        with TGLCanvas *)
     procedure TextOut(var rci: TGLRenderContextInfo; X, Y: Single;
-      const Text: UnicodeString; const Color: TColorVector); overload;
+      const Text: UnicodeString; const Color: TGLColorVector); overload;
     procedure TextOut(var rci: TGLRenderContextInfo; X, Y: Single;
       const Text: UnicodeString; const Color: TColor); overload;
     function TextWidth(const Text: UnicodeString): Integer;
@@ -832,7 +832,7 @@ end;
 
 procedure TGLCustomBitmapFont.RenderString(var ARci: TGLRenderContextInfo;
   const aText: UnicodeString; aAlignment: TAlignment; aLayout: TTextLayout;
-  const aColor: TColorVector; aPosition: PVector = nil;
+  const aColor: TGLColorVector; aPosition: PGLVector = nil;
   aReverseY: boolean = False);
 
   function AlignmentAdjustement(p: Integer): Single;
@@ -875,7 +875,7 @@ var
   i, chi: Integer;
   pch: PCharInfo;
   TopLeft, BottomRight: TTexPoint;
-  vTopLeft, vBottomRight: TVector;
+  vTopLeft, vBottomRight: TGLVector;
   deltaV, spaceDeltaH: Single;
   currentChar: WideChar;
 begin
@@ -964,9 +964,9 @@ begin
 end;
 
 procedure TGLCustomBitmapFont.TextOut(var rci: TGLRenderContextInfo; X, Y: Single;
-  const Text: UnicodeString; const Color: TColorVector);
+  const Text: UnicodeString; const Color: TGLColorVector);
 var
-  V: TVector;
+  V: TGLVector;
 begin
   V.X := X;
   V.Y := Y;

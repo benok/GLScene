@@ -21,7 +21,7 @@ object RTrackBarEdit: TRTrackBarEdit
     Left = 152
     Top = 0
     Width = 41
-    Height = 21
+    Height = 28
     TabOrder = 1
     Text = '0'
     OnChange = EditChange

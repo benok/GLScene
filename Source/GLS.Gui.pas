@@ -1,14 +1,13 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.Gui;
 
 (* Windows management classes and structures *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
@@ -18,12 +17,13 @@ uses
 
   GLS.OpenGLTokens,
   GLS.VectorTypes,
+  GLS.VectorGeometry,
+
   GLS.Scene,
   GLS.BitmapFont,
   GLS.Material,
   GLS.Context,
   GLS.PersistentClasses,
-  GLS.VectorGeometry,
   GLS.Coordinates,
   GLS.BaseClasses;
 
@@ -118,7 +118,6 @@ type
   end;
 
   TGLGuiComponentName = string;
-
   TGLGuiComponentList = class;
 
   TGLGuiComponent = class(TCollectionItem)
@@ -572,7 +571,6 @@ begin
     begin
       TmpComponent := FGuiComponents.Items[xc];
       Data.WriteString(TmpComponent.FName);
-
       Data.WriteInteger(TmpComponent.FElements.Count);
 
       for YC := 0 to TmpComponent.FElements.Count - 1 do
@@ -601,7 +599,6 @@ begin
         end;
 
         Data.WriteInteger(Alignments);
-
         for TmpAlignment := GLAlTopLeft to GLAlBorder do
         begin
           if TmpAlignment = TmpElement.FAlign then

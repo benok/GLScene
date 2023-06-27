@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.Console;
 
 (*
@@ -39,7 +38,7 @@ unit GLS.Console;
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.Windows,
@@ -47,6 +46,9 @@ uses
   System.SysUtils,
   System.TypInfo,
   Vcl.Graphics,
+
+  GLS.VectorTypes,
+  GLS.Strings,
 
   GLS.Scene,
   GLS.Coordinates,
@@ -58,9 +60,7 @@ uses
   GLS.Context,
   GLS.Texture,
   GLS.Utils,
-  GLS.Strings,
-  GLS.Material,
-  GLS.VectorTypes;
+  GLS.Material;
 
 const
   CONSOLE_MAX_COMMANDS = 120;
@@ -160,10 +160,10 @@ type
     procedure SortCommands(const Ascending: Boolean = True);
     function CommandExists(const Command: string): Boolean;
     function GetCommandIndex(const Command: string): Integer;
-    // General list stuff.
+    // General list stuff
     function LastConsoleCommand: TGLConsoleCommand;
     function Add: TGLConsoleCommand; overload;
-    // Standard stuff.
+    // Standard stuff
     constructor Create(const AOwner: TGLCustomConsole);
     destructor Destroy; override;
     property Items[const Index: Integer]: TGLConsoleCommand read GetItems;

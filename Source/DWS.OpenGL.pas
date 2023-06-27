@@ -1,17 +1,14 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics rendering engine GLScene http://glscene.org
 //
-
 unit DWS.OpenGL;
-
 (*
    DelphiWebScript symbol creation for OpenGL procedures and functions.
    This unit is still under development.
 *)
-
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   System.Classes,
@@ -288,7 +285,7 @@ begin
   RegisterComponents('GLScene DWS', [TdwsOpenGLUnit]);
 end;
 
-function GetMatrixFromInfo(Info : IInfo) : TMatrix;
+function GetMatrixFromInfo(Info : IInfo) : TGLMatrix;
 var
   i : Integer;
 begin
@@ -1051,7 +1048,7 @@ begin
   TGLPushMatrix.Create(SymbolTable, 'glPushMatrix', [], '');
   TGLPopMatrix.Create(SymbolTable, 'glPopMatrix', [], '');
   TGLLoadIdentity.Create(SymbolTable, 'glLoadIdentity', [], '');
-  TGLLoadMatrixf.Create(SymbolTable, 'glLoadMatrixf', ['m', 'TMatrix'], '');
+  TGLLoadMatrixf.Create(SymbolTable, 'glLoadMatrixf', ['m', 'TGLMatrix'], '');
   TGLTranslatef.Create(SymbolTable, 'glTranslatef', ['x', 'Float', 'y', 'Float', 'z', 'Float'], '');
   TGLRotatef.Create(SymbolTable, 'glRotatef', ['angle', 'Float', 'x', 'Float', 'y', 'Float', 'z', 'Float'], '');
   TGLScalef.Create(SymbolTable, 'glScalef', ['x', 'Float', 'y', 'Float', 'z', 'Float'], '');
@@ -2114,7 +2111,7 @@ end;
 
 procedure TGLLoadMatrixf.Execute;
 var
-  m: TMatrix;
+  m: TGLMatrix;
 begin
   m := GetMatrixFromInfo(Info.Vars['m']);
   glLoadMatrixf(@m[0]);

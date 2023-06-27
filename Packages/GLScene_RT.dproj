@@ -7,7 +7,7 @@
         <TargetedPlatforms>3</TargetedPlatforms>
         <AppType>Package</AppType>
         <FrameworkType>VCL</FrameworkType>
-        <ProjectVersion>19.0</ProjectVersion>
+        <ProjectVersion>19.4</ProjectVersion>
         <Platform Condition="'$(Platform)'==''">Win32</Platform>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Config)'=='Base' or '$(Base)'!=''">
@@ -74,14 +74,14 @@
         <DCC_S>false</DCC_S>
         <DCC_N>false</DCC_N>
         <RuntimeOnlyPackage>true</RuntimeOnlyPackage>
-        <DCC_DcuOutput>..\lib\$(ProductVersion)\$(Platform)\$(Config)</DCC_DcuOutput>
-        <DCC_BpiOutput>..\lib\$(ProductVersion)\$(Platform)\$(Config)</DCC_BpiOutput>
-        <DCC_ObjOutput>..\lib\$(ProductVersion)\$(Platform)\$(Config)</DCC_ObjOutput>
-        <DCC_HppOutput>..\include\$(Platform)</DCC_HppOutput>
+        <DCC_HppOutputARM>true</DCC_HppOutputARM>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win32)'!=''">
         <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
         <DCC_Namespace>Data.Win;Datasnap.Win;Web.Win;Soap.Win;Xml.Win;Bde;$(DCC_Namespace)</DCC_Namespace>
+        <DCC_BpiOutput>..\lib\$(Platform)</DCC_BpiOutput>
+        <DCC_ObjOutput>..\lib\$(Platform)</DCC_ObjOutput>
+        <DCC_HppOutput>..\include\$(Platform)</DCC_HppOutput>
         <DCC_UsePackage>vclimg;vcl;rtl;VclSmp;$(DCC_UsePackage)</DCC_UsePackage>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Win64)'!=''">
@@ -89,6 +89,9 @@
         <VerInfo_Keys>CompanyName=;FileDescription=$(MSBuildProjectName);FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProgramID=com.embarcadero.$(MSBuildProjectName);ProductName=$(MSBuildProjectName);ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <DCC_UsePackage>vclimg;vcl;rtl;VclSmp;$(DCC_UsePackage)</DCC_UsePackage>
         <BT_BuildType>Debug</BT_BuildType>
+        <DCC_BpiOutput>..\lib\$(Platform)</DCC_BpiOutput>
+        <DCC_ObjOutput>..\lib\$(Platform)</DCC_ObjOutput>
+        <DCC_HppOutput>..\include\$(Platform)</DCC_HppOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1)'!=''">
         <DCC_LocalDebugSymbols>false</DCC_LocalDebugSymbols>
@@ -101,6 +104,9 @@
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_1_Win64)'!=''">
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <DCC_BpiOutput>..\lib\$(Platform)</DCC_BpiOutput>
+        <DCC_HppOutput>..\include\$(Platform)</DCC_HppOutput>
+        <DCC_ObjOutput>..\lib\$(Platform)</DCC_ObjOutput>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2)'!=''">
         <DCC_GenerateStackFrames>true</DCC_GenerateStackFrames>
@@ -112,12 +118,19 @@
         <DCC_DebugDCUs>true</DCC_DebugDCUs>
         <DCC_RangeChecking>true</DCC_RangeChecking>
         <DCC_IntegerOverflowCheck>true</DCC_IntegerOverflowCheck>
+        <DCC_HppOutput>..\include\$(Platform)</DCC_HppOutput>
+        <DCC_BpiOutput>..\lib\$(Platform)</DCC_BpiOutput>
+        <DCC_ObjOutput>..\lib\$(Platform)</DCC_ObjOutput>
         <DCC_CBuilderOutput>All</DCC_CBuilderOutput>
-        <VerInfo_Keys>CompanyName=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
-        <DCC_Description>GLScene Engine</DCC_Description>
+        <VerInfo_Keys>CompanyName=;FileVersion=2023.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductVersion=1.0.0.0;Comments=;ProgramID=com.embarcadero.$(MSBuildProjectName);FileDescription=$(MSBuildProjectName);ProductName=$(MSBuildProjectName)</VerInfo_Keys>
+        <DCC_Description>GLScene Platform</DCC_Description>
+        <VerInfo_MajorVer>2023</VerInfo_MajorVer>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Cfg_2_Win64)'!=''">
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
+        <DCC_BpiOutput>..\lib\$(Platform)</DCC_BpiOutput>
+        <DCC_HppOutput>..\include\$(Platform)</DCC_HppOutput>
+        <DCC_ObjOutput>..\lib\$(Platform)</DCC_ObjOutput>
     </PropertyGroup>
     <ItemGroup>
         <DelphiCompile Include="$(MainSource)">
@@ -127,31 +140,33 @@
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="vclimg.dcp"/>
         <DCCReference Include="xmlrtl.dcp"/>
-        <DCCReference Include="..\Source\Format3DSConst.pas"/>
-        <DCCReference Include="..\Source\Format3DSTypes.pas"/>
-        <DCCReference Include="..\Source\Format3DSUtils.pas"/>
-        <DCCReference Include="..\Source\FormatDDSImage.pas"/>
-        <DCCReference Include="..\Source\FormatDXTC.pas"/>
-        <DCCReference Include="..\Source\Format3DS.pas"/>
-        <DCCReference Include="..\Source\FormatHDRImage.pas"/>
-        <DCCReference Include="..\Source\FormatQ3BSP.pas"/>
-        <DCCReference Include="..\Source\FormatB3D.pas"/>
-        <DCCReference Include="..\Source\FormatGL2.pas"/>
-        <DCCReference Include="..\Source\FormatLWO.pas"/>
-        <DCCReference Include="..\Source\FormatMD2.pas"/>
-        <DCCReference Include="..\Source\FormatMD3.pas"/>
-        <DCCReference Include="..\Source\FormatOCT.pas"/>
-        <DCCReference Include="..\Source\FormatTGA.pas"/>
-        <DCCReference Include="..\Source\FormatX.pas"/>
-        <DCCReference Include="..\Source\FormatVFW.pas"/>
-        <DCCReference Include="..\Source\FormatVRML.pas"/>
+        <DCCReference Include="..\Source\Formats.m3DSConst.pas"/>
+        <DCCReference Include="..\Source\Formats.m3DSTypes.pas"/>
+        <DCCReference Include="..\Source\Formats.m3DSUtils.pas"/>
+        <DCCReference Include="..\Source\Formats.DXTC.pas"/>
+        <DCCReference Include="..\Source\Formats.m3DS.pas"/>
+        <DCCReference Include="..\Source\Formats.DDSImage.pas"/>
+        <DCCReference Include="..\Source\Formats.VFW.pas"/>
+        <DCCReference Include="..\Source\Formats.Q3BSP.pas"/>
+        <DCCReference Include="..\Source\Formats.GL2.pas"/>
+        <DCCReference Include="..\Source\Formats.LWO.pas"/>
+        <DCCReference Include="..\Source\Formats.MD2.pas"/>
+        <DCCReference Include="..\Source\Formats.MD3.pas"/>
+        <DCCReference Include="..\Source\Formats.B3D.pas"/>
+        <DCCReference Include="..\Source\Formats.HDRImage.pas"/>
+        <DCCReference Include="..\Source\Formats.OCT.pas"/>
+        <DCCReference Include="..\Source\Formats.TGA.pas"/>
+        <DCCReference Include="..\Source\Formats.X.pas"/>
+        <DCCReference Include="..\Source\Formats.VRML.pas"/>
         <DCCReference Include="..\Source\GLS.AVIRecorder.pas"/>
         <DCCReference Include="..\Source\GLS.AnimatedSprite.pas"/>
-        <DCCReference Include="..\Source\GLS.AnimationUtils.pas"/>
+        <DCCReference Include="..\Source\GLS.ApplicationFileIO.pas"/>
         <DCCReference Include="..\Source\GLS.AsyncHDS.pas"/>
         <DCCReference Include="..\Source\GLS.AsyncTimer.pas"/>
         <DCCReference Include="..\Source\GLS.Atmosphere.pas"/>
-        <DCCReference Include="..\Source\GLS.MeshBSP.pas"/>
+        <DCCReference Include="..\Source\GLS.ArchiveManager.pas"/>
+        <DCCReference Include="..\Source\GLS.AnimationUtils.pas"/>
+        <DCCReference Include="..\Source\GLS.BaseClasses.pas"/>
         <DCCReference Include="..\Source\GLS.BaseMeshSilhouette.pas"/>
         <DCCReference Include="..\Source\GLS.Behaviours.pas"/>
         <DCCReference Include="..\Source\GLS.BitmapFont.pas"/>
@@ -165,6 +180,9 @@
         <DCCReference Include="..\Source\GLS.CompositeImage.pas"/>
         <DCCReference Include="..\Source\GLS.Console.pas"/>
         <DCCReference Include="..\Source\GLS.Context.pas"/>
+        <DCCReference Include="..\Source\GLS.Coordinates.pas"/>
+        <DCCReference Include="..\Source\GLS.CrossXML.pas"/>
+        <DCCReference Include="..\Source\GLS.CurvesAndSurfaces.pas"/>
         <DCCReference Include="..\Source\GLS.DCE.pas"/>
         <DCCReference Include="..\Source\GLS.DynamicTexture.pas"/>
         <DCCReference Include="..\Source\GLS.EParticleMasksManager.pas"/>
@@ -181,8 +199,8 @@
         <DCCReference Include="..\Source\GLS.FileB3D.pas"/>
         <DCCReference Include="..\Source\GLS.FileBMP.pas"/>
         <DCCReference Include="..\Source\GLS.FileDDS.pas"/>
+        <DCCReference Include="..\Source\GLS.FileDXF.pas"/>
         <DCCReference Include="..\Source\GLS.FileGL2.pas"/>
-        <DCCReference Include="..\Source\GLS.FileGLB.pas"/>
         <DCCReference Include="..\Source\GLS.FileGLTF.pas"/>
         <DCCReference Include="..\Source\GLS.FileGRD.pas"/>
         <DCCReference Include="..\Source\GLS.FileGTS.pas"/>
@@ -198,11 +216,8 @@
         <DCCReference Include="..\Source\GLS.FileMS3D.pas"/>
         <DCCReference Include="..\Source\GLS.FileNMF.pas"/>
         <DCCReference Include="..\Source\GLS.FileNurbs.pas"/>
-        <DCCReference Include="..\Source\GLS.FileO3TC.pas"/>
-        <DCCReference Include="..\Source\GLS.FileO3TCImage.pas"/>
         <DCCReference Include="..\Source\GLS.FileOBJ.pas"/>
         <DCCReference Include="..\Source\GLS.FileOCT.pas"/>
-        <DCCReference Include="..\Source\GLS.FilePAK.pas"/>
         <DCCReference Include="..\Source\GLS.FilePLY.pas"/>
         <DCCReference Include="..\Source\GLS.FilePNG.pas"/>
         <DCCReference Include="..\Source\GLS.FileQ3BSP.pas"/>
@@ -210,18 +225,21 @@
         <DCCReference Include="..\Source\GLS.FileSMD.pas"/>
         <DCCReference Include="..\Source\GLS.FileSTL.pas"/>
         <DCCReference Include="..\Source\GLS.FileTGA.pas"/>
+        <DCCReference Include="..\Source\GLS.FileTIN.pas"/>
         <DCCReference Include="..\Source\GLS.FileVfsPAK.pas"/>
         <DCCReference Include="..\Source\GLS.FileVRML.pas"/>
         <DCCReference Include="..\Source\GLS.FileWAV.pas"/>
         <DCCReference Include="..\Source\GLS.FileX.pas"/>
         <DCCReference Include="..\Source\GLS.FireFX.pas"/>
         <DCCReference Include="..\Source\GLS.FileZLIB.pas"/>
+        <DCCReference Include="..\Source\GLS.FileDEL.pas"/>
+        <DCCReference Include="..\Source\GLS.FileVOR.pas"/>
         <DCCReference Include="..\Source\GLS.FullScreenViewer.pas"/>
-        <DCCReference Include="..\Source\GLS.PolygonTesselation.pas"/>
+        <DCCReference Include="..\Source\GLS.Keyboard.pas"/>
         <DCCReference Include="..\Source\GLS.GameMenu.pas"/>
         <DCCReference Include="..\Source\GLS.GeomObjects.pas"/>
         <DCCReference Include="..\Source\GLS.GeometryBB.pas"/>
-        <DCCReference Include="..\Source\GLS.Keyboard.pas"/>
+        <DCCReference Include="..\Source\GLS.Generics.pas"/>
         <DCCReference Include="..\Source\GLS.Gizmo.pas"/>
         <DCCReference Include="..\Source\GLS.GizmoEx.pas"/>
         <DCCReference Include="..\Source\GLS.Graph.pas"/>
@@ -230,25 +248,29 @@
         <DCCReference Include="..\Source\GLS.HUDObjects.pas"/>
         <DCCReference Include="..\Source\GLS.HeightData.pas"/>
         <DCCReference Include="..\Source\GLS.HeightTileFileHDS.pas"/>
-        <DCCReference Include="..\Source\GLSL.LineShaders.pas"/>
         <DCCReference Include="..\Source\GLS.ImageUtils.pas"/>
         <DCCReference Include="..\Source\GLS.Imposter.pas"/>
         <DCCReference Include="..\Source\GLS.Isolines.pas"/>
         <DCCReference Include="..\Source\GLS.Isosurface.pas"/>
         <DCCReference Include="..\Source\GLS.Joystick.pas"/>
+        <DCCReference Include="..\Source\GLS.Language.pas"/>
         <DCCReference Include="..\Source\GLS.LensFlare.pas"/>
         <DCCReference Include="..\Source\GLS.LinePFX.pas"/>
+        <DCCReference Include="..\Source\GLS.Logger.pas"/>
         <DCCReference Include="..\Source\GLS.Manager.pas"/>
         <DCCReference Include="..\Source\GLS.Material.pas"/>
         <DCCReference Include="..\Source\GLS.MaterialEx.pas"/>
         <DCCReference Include="..\Source\GLS.MaterialMultiProxy.pas"/>
         <DCCReference Include="..\Source\GLS.MaterialScript.pas"/>
+        <DCCReference Include="..\Source\GLS.Memo.pas"/>
         <DCCReference Include="..\Source\GLS.Mesh.pas"/>
+        <DCCReference Include="..\Source\GLS.MeshBSP.pas"/>
         <DCCReference Include="..\Source\GLS.MeshBuilder.pas"/>
         <DCCReference Include="..\Source\GLS.MeshCSG.pas"/>
         <DCCReference Include="..\Source\GLS.MeshLines.pas"/>
         <DCCReference Include="..\Source\GLS.MeshUtils.pas"/>
         <DCCReference Include="..\Source\GLS.Mirror.pas"/>
+        <DCCReference Include="..\Source\GLS.ModuleLoader.pas"/>
         <DCCReference Include="..\Source\GLS.Movement.pas"/>
         <DCCReference Include="..\Source\GLS.MultiPolygon.pas"/>
         <DCCReference Include="..\Source\GLS.MultiProxy.pas"/>
@@ -263,31 +285,35 @@
         <DCCReference Include="..\Source\GLS.Particles.pas"/>
         <DCCReference Include="..\Source\GLS.Perlin.pas"/>
         <DCCReference Include="..\Source\GLS.PerlinPFX.pas"/>
+        <DCCReference Include="..\Source\GLS.PolygonTesselation.pas"/>
         <DCCReference Include="..\Source\GLS.Portal.pas"/>
         <DCCReference Include="..\Source\GLSL.PostEffects.pas"/>
         <DCCReference Include="..\Source\GLS.ProcTextures.pas"/>
         <DCCReference Include="..\Source\GLS.ProxyObjects.pas"/>
-        <DCCReference Include="..\Source\GLS.ROAMPatch.pas"/>
         <DCCReference Include="..\Source\GLS.Ragdoll.pas"/>
         <DCCReference Include="..\Source\GLS.RandomHDS.pas"/>
+        <DCCReference Include="..\Source\GLS.RGBE.pas"/>
         <DCCReference Include="..\Source\GLS.RenderContextInfo.pas"/>
-        <DCCReference Include="..\Source\GLS.ArchiveManager.pas"/>
-        <DCCReference Include="..\Source\GLS.Generics.pas"/>
+        <DCCReference Include="..\Source\GLS.ROAMPatch.pas"/>
         <DCCReference Include="..\Source\GLSL.AsmShader.pas"/>
-        <DCCReference Include="..\Source\GLSL.ShaderCombiner.pas"/>
-        <DCCReference Include="..\Source\GLSL.CustomShader.pas"/>
-        <DCCReference Include="..\Source\GLSL.MultiMaterialShader.pas"/>
-        <DCCReference Include="..\Source\GLSL.PhongShader.pas"/>
-        <DCCReference Include="..\Source\GLSL.TextureShaders.pas"/>
-        <DCCReference Include="..\Source\GLSL.UserShader.pas"/>
         <DCCReference Include="..\Source\GLSL.BumpShaders.pas"/>
         <DCCReference Include="..\Source\GLSL.DiffuseSpecularShader.pas"/>
-        <DCCReference Include="..\Source\GLSL.ShapeShaders.pas"/>
-        <DCCReference Include="..\Source\GLSL.ShaderParameter.pas"/>
+        <DCCReference Include="..\Source\GLSL.CustomShader.pas"/>
+        <DCCReference Include="..\Source\GLSL.LineShaders.pas"/>
+        <DCCReference Include="..\Source\GLSL.MultiMaterialShader.pas"/>
         <DCCReference Include="..\Source\GLSL.PostShaders.pas"/>
         <DCCReference Include="..\Source\GLSL.ProjectedTextures.pas"/>
+        <DCCReference Include="..\Source\GLSL.PhongShader.pas"/>
+        <DCCReference Include="..\Source\GLSL.ShaderCombiner.pas"/>
+        <DCCReference Include="..\Source\GLSL.TextureShaders.pas"/>
+        <DCCReference Include="..\Source\GLSL.UserShader.pas"/>
+        <DCCReference Include="..\Source\GLSL.ShapeShaders.pas"/>
+        <DCCReference Include="..\Source\GLSL.ShaderParameter.pas"/>
         <DCCReference Include="..\Source\GLSL.Shader.pas"/>
-        <DCCReference Include="..\Source\GLS.Language.pas"/>
+        <DCCReference Include="..\Source\GLS.PAKArchive.pas"/>
+        <DCCReference Include="..\Source\GLS.ProjectedTextures.pas"/>
+        <DCCReference Include="..\Source\GLS.PersistentClasses.pas"/>
+        <DCCReference Include="..\Source\GLS.RandomLib.pas"/>
         <DCCReference Include="..\Source\GLS.Scene.pas"/>
         <DCCReference Include="..\Source\GLS.SceneForm.pas"/>
         <DCCReference Include="..\Source\GLS.Screen.pas"/>
@@ -299,21 +325,17 @@
         <DCCReference Include="..\Source\GLS.SimpleNavigation.pas"/>
         <DCCReference Include="..\Source\GLS.SkyDome.pas"/>
         <DCCReference Include="..\Source\GLS.SmoothNavigator.pas"/>
-        <DCCReference Include="..\Source\GLS.Sound.pas"/>
+        <DCCReference Include="..\Source\GLS.SoundManager.pas"/>
         <DCCReference Include="..\Source\GLS.SoundFileObjects.pas"/>
         <DCCReference Include="..\Source\GLS.SpacePartition.pas"/>
         <DCCReference Include="..\Source\GLS.State.pas"/>
         <DCCReference Include="..\Source\GLS.SpaceText.pas"/>
-        <DCCReference Include="..\Source\GLS.FileDXF.pas"/>
-        <DCCReference Include="..\Source\GLS.FileTIN.pas"/>
-        <DCCReference Include="..\Source\GLS.Memo.pas"/>
-        <DCCReference Include="..\Source\GLS.OpenGLVCL.pas"/>
-        <DCCReference Include="..\Source\GLS.ProjectedTextures.pas"/>
+        <DCCReference Include="..\Source\GLS.SceneViewer.pas"/>
+        <DCCReference Include="..\Source\GLS.SmartObjects.pas"/>
         <DCCReference Include="..\Source\GLS.TerrainRenderer.pas"/>
         <DCCReference Include="..\Source\GLS.TexLensFlare.pas"/>
         <DCCReference Include="..\Source\GLS.Texture.pas"/>
         <DCCReference Include="..\Source\GLS.TextureCombiners.pas"/>
-        <DCCReference Include="..\Source\GLS.TextureFormat.pas"/>
         <DCCReference Include="..\Source\GLS.TextureImageEditors.pas"/>
         <DCCReference Include="..\Source\GLS.TexturedHDS.pas"/>
         <DCCReference Include="..\Source\GLS.ThorFX.pas"/>
@@ -323,50 +345,42 @@
         <DCCReference Include="..\Source\GLS.Tree.pas"/>
         <DCCReference Include="..\Source\GLS.Triangulation.pas"/>
         <DCCReference Include="..\Source\GLS.Utils.pas"/>
-        <DCCReference Include="..\Source\GLS.VectorFileObjects.pas"/>
-        <DCCReference Include="..\Source\GLS.VerletClothify.pas"/>
-        <DCCReference Include="..\Source\GLS.VerletHairClasses.pas"/>
-        <DCCReference Include="..\Source\GLS.VerletSkeletonColliders.pas"/>
-        <DCCReference Include="..\Source\GLS.VerletTypes.pas"/>
         <DCCReference Include="..\Source\GLS.WaterPlane.pas"/>
-        <DCCReference Include="..\Source\GLS.SceneViewer.pas"/>
         <DCCReference Include="..\Source\GLS.Windows.pas"/>
         <DCCReference Include="..\Source\GLS.WindowsContext.pas"/>
         <DCCReference Include="..\Source\GLS.WindowsFont.pas"/>
         <DCCReference Include="..\Source\GLS.zBuffer.pas"/>
-        <DCCReference Include="..\Source\GLS.OpenGLAdapter.pas"/>
-        <DCCReference Include="..\Source\GLS.OpenGLTokens.pas"/>
-        <DCCReference Include="..\Source\GLS.ApplicationFileIO.pas"/>
-        <DCCReference Include="..\Source\GLS.BaseClasses.pas"/>
-        <DCCReference Include="..\Source\GLS.Coordinates.pas"/>
-        <DCCReference Include="..\Source\GLS.CurvesAndSurfaces.pas"/>
-        <DCCReference Include="..\Source\GLS.PersistentClasses.pas"/>
-        <DCCReference Include="..\Source\GLS.PipelineTransformation.pas"/>
-        <DCCReference Include="..\Source\GLS.Polynomials.pas"/>
-        <DCCReference Include="..\Source\GLS.CrossXML.pas"/>
         <DCCReference Include="..\Source\GLS.Silhouette.pas"/>
-        <DCCReference Include="..\Source\GLS.PlugInManager.pas"/>
-        <DCCReference Include="..\Source\GLS.VectorRecTypes.pas"/>
-        <DCCReference Include="..\Source\GLS.VectorGeometry.pas"/>
-        <DCCReference Include="..\Source\GLS.Logger.pas"/>
-        <DCCReference Include="..\Source\GLS.RGBE.pas"/>
-        <DCCReference Include="..\Source\GLS.VectorLists.pas"/>
-        <DCCReference Include="..\Source\GLS.VectorTypes.pas"/>
         <DCCReference Include="..\Source\GLS.ScriptBase.pas"/>
-        <DCCReference Include="..\Source\GLS.Spline.pas"/>
-        <DCCReference Include="..\Source\GLS.Strings.pas"/>
         <DCCReference Include="..\Source\GLS.XCollection.pas"/>
         <DCCReference Include="..\Source\GLS.XOpenGL.pas"/>
-        <None Include="..\Source\GLScene.inc"/>
-        <BuildConfiguration Include="Debug">
-            <Key>Cfg_2</Key>
-            <CfgParent>Base</CfgParent>
-        </BuildConfiguration>
+        <DCCReference Include="..\Source\GLS.InitOpenGL.pas"/>
+        <DCCReference Include="..\Source\GLS.OpenGLAdapter.pas"/>
+        <DCCReference Include="..\Source\GLS.OpenGLTokens.pas"/>
+        <DCCReference Include="..\Source\GLS.PipelineTransformation.pas"/>
+        <DCCReference Include="..\Source\GLS.Polynomials.pas"/>
+        <DCCReference Include="..\Source\PasGLTF.pas"/>
+        <DCCReference Include="..\Source\PasJSON.pas"/>
+        <DCCReference Include="..\Source\PasDblStrUtils.pas"/>
+        <DCCReference Include="..\Source\GLS.Spline.pas"/>
+        <DCCReference Include="..\Source\GLS.Strings.pas"/>
+        <DCCReference Include="..\Source\GLS.TextureFormat.pas"/>
+        <DCCReference Include="..\Source\GLS.VectorLists.pas"/>
+        <DCCReference Include="..\Source\GLS.VectorGeometry.pas"/>
+        <DCCReference Include="..\Source\GLS.VectorTypes.pas"/>
+        <DCCReference Include="..\Source\GLS.VectorFileObjects.pas"/>
+        <DCCReference Include="..\Source\GLS.VerletTypes.pas"/>
+        <DCCReference Include="..\Source\GLS.VerletClothify.pas"/>
+        <DCCReference Include="..\Source\GLS.VectorTypesExt.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
         <BuildConfiguration Include="Release">
             <Key>Cfg_1</Key>
+            <CfgParent>Base</CfgParent>
+        </BuildConfiguration>
+        <BuildConfiguration Include="Debug">
+            <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>
         </BuildConfiguration>
     </ItemGroup>
@@ -379,10 +393,16 @@
                     <Source Name="MainSource">GLScene_RT.dpk</Source>
                 </Source>
                 <Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k260.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp260.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k260.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
-                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp260.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\GLScene_DT.bpl">GLScene Engine</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\GLScene_Cg_DT.bpl">GLScene Cg Shaders</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\GLScene_GPU_DT.bpl">GLScene GPU Computing</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\GBComps.bpl">Geoblock - Components</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\GEdgeIO.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\GEdgeIO.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\GEdgeIODB.bpl">File C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\GEdgeIODB.bpl not found</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcboffice2k280.bpl">Embarcadero C++Builder Office 2000 Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\bcbofficexp280.bpl">Embarcadero C++Builder Office XP Servers Package</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dcloffice2k280.bpl">Microsoft Office 2000 Sample Automation Server Wrapper Components</Excluded_Packages>
+                    <Excluded_Packages Name="$(BDSBIN)\dclofficexp280.bpl">Microsoft Office XP Sample Automation Server Wrapper Components</Excluded_Packages>
                 </Excluded_Packages>
             </Delphi.Personality>
             <Platforms>
@@ -390,14 +410,14 @@
                 <Platform value="Win64">True</Platform>
             </Platforms>
             <Deployment Version="3">
-                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\17.0\Bpl\Win64\GLScene_RT.bpl" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="Win64">
+                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\GLScene_RT.bpl" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win32">
                         <RemoteName>GLScene_RT.bpl</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
                 </DeployFile>
-                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\20.0\Bpl\GLScene_RT.bpl" Configuration="Debug" Class="ProjectOutput">
-                    <Platform Name="Win32">
+                <DeployFile LocalName="C:\Users\Public\Documents\Embarcadero\Studio\22.0\Bpl\Win64\GLScene_RT.bpl" Configuration="Debug" Class="ProjectOutput">
+                    <Platform Name="Win64">
                         <RemoteName>GLScene_RT.bpl</RemoteName>
                         <Overwrite>true</Overwrite>
                     </Platform>
@@ -410,6 +430,16 @@
                         <Operation>0</Operation>
                     </Platform>
                 </DeployClass>
+                <DeployClass Name="AndroidClasses">
+                    <Platform Name="Android">
+                        <RemoteDir>classes</RemoteDir>
+                        <Operation>64</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>classes</RemoteDir>
+                        <Operation>64</Operation>
+                    </Platform>
+                </DeployClass>
                 <DeployClass Name="AndroidClassesDexFile">
                     <Platform Name="Android">
                         <RemoteDir>classes</RemoteDir>
@@ -418,6 +448,10 @@
                 </DeployClass>
                 <DeployClass Name="AndroidFileProvider">
                     <Platform Name="Android">
+                        <RemoteDir>res\xml</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
                         <RemoteDir>res\xml</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -433,6 +467,10 @@
                         <RemoteDir>library\lib\armeabi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>library\lib\armeabi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
                 </DeployClass>
                 <DeployClass Name="AndroidLibnativeArmeabiv7aFile">
                     <Platform Name="Android64">
@@ -445,11 +483,19 @@
                         <RemoteDir>library\lib\mips</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>library\lib\mips</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
                 </DeployClass>
                 <DeployClass Name="AndroidLibnativeX86File"/>
                 <DeployClass Name="AndroidServiceOutput">
                     <Platform Name="Android">
                         <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>library\lib\arm64-v8a</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
@@ -464,9 +510,17 @@
                         <RemoteDir>res\drawable</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
                 </DeployClass>
                 <DeployClass Name="AndroidSplashStyles">
                     <Platform Name="Android">
+                        <RemoteDir>res\values</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
                         <RemoteDir>res\values</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -476,9 +530,17 @@
                         <RemoteDir>res\values-v21</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\values-v21</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
                 </DeployClass>
                 <DeployClass Name="Android_Colors">
                     <Platform Name="Android">
+                        <RemoteDir>res\values</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
                         <RemoteDir>res\values</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -488,15 +550,37 @@
                         <RemoteDir>res\drawable</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
                 </DeployClass>
                 <DeployClass Name="Android_LauncherIcon144">
                     <Platform Name="Android">
                         <RemoteDir>res\drawable-xxhdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-xxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="Android_LauncherIcon192">
+                    <Platform Name="Android">
+                        <RemoteDir>res\drawable-xxxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-xxxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
                 </DeployClass>
                 <DeployClass Name="Android_LauncherIcon36">
                     <Platform Name="Android">
+                        <RemoteDir>res\drawable-ldpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
                         <RemoteDir>res\drawable-ldpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -506,9 +590,17 @@
                         <RemoteDir>res\drawable-mdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-mdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
                 </DeployClass>
                 <DeployClass Name="Android_LauncherIcon72">
                     <Platform Name="Android">
+                        <RemoteDir>res\drawable-hdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
                         <RemoteDir>res\drawable-hdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -518,9 +610,17 @@
                         <RemoteDir>res\drawable-xhdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-xhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
                 </DeployClass>
                 <DeployClass Name="Android_NotificationIcon24">
                     <Platform Name="Android">
+                        <RemoteDir>res\drawable-mdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
                         <RemoteDir>res\drawable-mdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -530,9 +630,17 @@
                         <RemoteDir>res\drawable-hdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-hdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
                 </DeployClass>
                 <DeployClass Name="Android_NotificationIcon48">
                     <Platform Name="Android">
+                        <RemoteDir>res\drawable-xhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
                         <RemoteDir>res\drawable-xhdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -542,9 +650,17 @@
                         <RemoteDir>res\drawable-xxhdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-xxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
                 </DeployClass>
                 <DeployClass Name="Android_NotificationIcon96">
                     <Platform Name="Android">
+                        <RemoteDir>res\drawable-xxxhdpi</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
                         <RemoteDir>res\drawable-xxxhdpi</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -554,9 +670,17 @@
                         <RemoteDir>res\drawable-small</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-small</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
                 </DeployClass>
                 <DeployClass Name="Android_SplashImage470">
                     <Platform Name="Android">
+                        <RemoteDir>res\drawable-normal</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
                         <RemoteDir>res\drawable-normal</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -566,15 +690,27 @@
                         <RemoteDir>res\drawable-large</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-large</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
                 </DeployClass>
                 <DeployClass Name="Android_SplashImage960">
                     <Platform Name="Android">
                         <RemoteDir>res\drawable-xlarge</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>res\drawable-xlarge</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
                 </DeployClass>
                 <DeployClass Name="Android_Strings">
                     <Platform Name="Android">
+                        <RemoteDir>res\values</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
                         <RemoteDir>res\values</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
@@ -599,6 +735,10 @@
                         <Operation>1</Operation>
                         <Extensions>.framework</Extensions>
                     </Platform>
+                    <Platform Name="OSXARM64">
+                        <Operation>1</Operation>
+                        <Extensions>.framework</Extensions>
+                    </Platform>
                     <Platform Name="Win32">
                         <Operation>0</Operation>
                     </Platform>
@@ -609,6 +749,10 @@
                         <Extensions>.dylib</Extensions>
                     </Platform>
                     <Platform Name="OSX64">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
+                    <Platform Name="OSXARM64">
                         <Operation>1</Operation>
                         <Extensions>.dylib</Extensions>
                     </Platform>
@@ -638,6 +782,10 @@
                         <Operation>1</Operation>
                         <Extensions>.dylib</Extensions>
                     </Platform>
+                    <Platform Name="OSXARM64">
+                        <Operation>1</Operation>
+                        <Extensions>.dylib</Extensions>
+                    </Platform>
                     <Platform Name="Win32">
                         <Operation>0</Operation>
                         <Extensions>.bpl</Extensions>
@@ -645,6 +793,9 @@
                 </DeployClass>
                 <DeployClass Name="File">
                     <Platform Name="Android">
+                        <Operation>0</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
                         <Operation>0</Operation>
                     </Platform>
                     <Platform Name="iOSDevice32">
@@ -662,8 +813,37 @@
                     <Platform Name="OSX64">
                         <Operation>0</Operation>
                     </Platform>
+                    <Platform Name="OSXARM64">
+                        <Operation>0</Operation>
+                    </Platform>
                     <Platform Name="Win32">
                         <Operation>0</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iOS_AppStore1024">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_AppIcon152">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_AppIcon167">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
                 <DeployClass Name="iPad_Launch1024">
@@ -837,6 +1017,56 @@
                     </Platform>
                     <Platform Name="iOSSimulator">
                         <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\LaunchScreenImage.imageset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Notification40">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_Setting58">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPad_SpotLight80">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_AppIcon120">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_AppIcon180">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
@@ -1034,8 +1264,71 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
+                <DeployClass Name="iPhone_Notification40">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Notification60">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Setting58">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Setting87">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Spotlight120">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
+                <DeployClass Name="iPhone_Spotlight80">
+                    <Platform Name="iOSDevice64">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="iOSSimulator">
+                        <RemoteDir>..\$(PROJECTNAME).launchscreen\Assets\AppIcon.appiconset</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                </DeployClass>
                 <DeployClass Name="ProjectAndroidManifest">
                     <Platform Name="Android">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
@@ -1076,10 +1369,18 @@
                         <RemoteDir>Contents\Resources</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
+                    <Platform Name="OSXARM64">
+                        <RemoteDir>Contents\Resources</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
                 </DeployClass>
                 <DeployClass Required="true" Name="ProjectOutput">
                     <Platform Name="Android">
                         <RemoteDir>library\lib\armeabi-v7a</RemoteDir>
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="Android64">
+                        <RemoteDir>library\lib\arm64-v8a</RemoteDir>
                         <Operation>1</Operation>
                     </Platform>
                     <Platform Name="iOSDevice32">
@@ -1098,6 +1399,9 @@
                         <Operation>1</Operation>
                     </Platform>
                     <Platform Name="OSX64">
+                        <Operation>1</Operation>
+                    </Platform>
+                    <Platform Name="OSXARM64">
                         <Operation>1</Operation>
                     </Platform>
                     <Platform Name="Win32">
@@ -1138,16 +1442,17 @@
                         <Operation>1</Operation>
                     </Platform>
                 </DeployClass>
-                <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>
-                <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="Android64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="iOSDevice32" Name="$(PROJECTNAME).app"/>
-                <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="iOSDevice64" Name="$(PROJECTNAME).app"/>
+                <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
                 <ProjectRoot Platform="Linux64" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="OSX32" Name="$(PROJECTNAME)"/>
-                <ProjectRoot Platform="Android" Name="$(PROJECTNAME)"/>
                 <ProjectRoot Platform="OSX64" Name="$(PROJECTNAME)"/>
-                <ProjectRoot Platform="iOSSimulator" Name="$(PROJECTNAME).app"/>
-                <ProjectRoot Platform="Android64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="OSXARM64" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="Win32" Name="$(PROJECTNAME)"/>
+                <ProjectRoot Platform="Win64" Name="$(PROJECTNAME)"/>
             </Deployment>
             <ModelSupport>False</ModelSupport>
         </BorlandProject>

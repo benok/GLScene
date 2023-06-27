@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.FileQ3MD3;
 
 (* Helper classes and methods for Quake3 MD3 actors *)
@@ -12,12 +11,13 @@ uses
   System.Classes,
   System.SysUtils,
 
+  GLS.VectorTypes,
   GLS.VectorGeometry,
   GLS.VectorFileObjects,
   GLS.VectorLists,
   GLS.Material,
   GLS.PersistentClasses,
-  FormatMD3;
+  Formats.MD3;
 
 type
   (* This class is used to extract the tag transform information
@@ -31,7 +31,7 @@ type
   public
     procedure LoadFromFile(const FileName: String);
     procedure LoadFromStream(AStream: TStream);
-    function GetTransform(const TagName: string; Frame: Integer): TMatrix;
+    function GetTransform(const TagName: string; Frame: Integer): TGLMatrix;
     property TagCount: Integer read FNumTags;
     property FrameCount: Integer read FNumFrames;
     property Tags[index: Integer]: TMD3Tag read GetTag;
@@ -175,12 +175,12 @@ var
   SkinStrings, temp: TStrings;
   i, j: Integer;
   libmat: TGLLibMaterial;
-  mesh: TMeshObject;
+  mesh: TGLMeshObject;
   texture, textureNoDir: string;
   textureFound, meshFound: Boolean;
 
   function GetMeshObjectByName(MeshObjects: TGLMeshObjectList;
-    const Name: string; out mesh: TMeshObject): Boolean;
+    const Name: string; out mesh: TGLMeshObject): Boolean;
   var
     i: Integer;
   begin
@@ -305,7 +305,7 @@ begin
 end;
 
 function TMD3TagList.GetTransform(const TagName: string;
-  Frame: Integer): TMatrix;
+  Frame: Integer): TGLMatrix;
 var
   TagIdx, i, j: Integer;
   Tag: TMD3Tag;

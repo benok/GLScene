@@ -1,5 +1,5 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
 
 unit GLS.MultiPolygon;
@@ -7,7 +7,7 @@ unit GLS.MultiPolygon;
 (* Object with support for complex polygons. 
    When the tesselator finds an intersection of edges it wants us to give him some storage
    for this new vertex, and he wants a pointer (see tessCombine). The pointers taken from
-   TAffineVectorList become invalid after enlarging the capacity (makes a ReAllocMem), which
+   TGLAffineVectorList become invalid after enlarging the capacity (makes a ReAllocMem), which
    can happen implicitly while adding. The TGLVectorPool keeps all pointers valid until the
    destruction itself.
    Reactivated the TGLVectorPool object. The GLS.VectorLists are not suitable for this job.
@@ -17,7 +17,7 @@ unit GLS.MultiPolygon;
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
@@ -93,14 +93,14 @@ type
     procedure GetExtents(var min, max: TAffineVector);
   end;
 
-  TGLPolygonList = class(TPersistentObjectList)
+  TGLPolygonList = class(TGLPersistentObjectList)
   private
-    FAktList: TAffineVectorList;
-    function GetList(I: Integer): TAffineVectorList;
+    FAktList: TGLAffineVectorList;
+    function GetList(I: Integer): TGLAffineVectorList;
   public
     procedure Add;
-    property AktList: TAffineVectorList read FAktList;
-    property List[I: Integer]: TAffineVectorList read GetList;
+    property AktList: TGLAffineVectorList read FAktList;
+    property List[I: Integer]: TGLAffineVectorList read GetList;
   end;
 
   (* Multipolygon is defined with multiple contours.
@@ -121,7 +121,7 @@ type
     FContours: TGLContours;
     FOutline: TGLPolygonList;
     FContoursNormal: TAffineVector;
-    FAxisAlignedDimensionsCache: TVector;
+    FAxisAlignedDimensionsCache: TGLVector;
     procedure SetContours(const Value: TGLContours);
     function GetPath(i: Integer): TGLContourNodes;
     procedure SetPath(i: Integer; const value: TGLContourNodes);
@@ -139,12 +139,12 @@ type
     procedure Assign(Source: TPersistent); override;
     procedure AddNode(const i: Integer; const coords: TGLCoordinates); overload;
     procedure AddNode(const i: Integer; const X, Y, Z: TGLfloat); overload;
-    procedure AddNode(const i: Integer; const value: TVector); overload;
+    procedure AddNode(const i: Integer; const value: TGLVector); overload;
     procedure AddNode(const i: Integer; const value: TAffineVector); overload;
     property Path[i: Integer]: TGLContourNodes read GetPath write SetPath;
     property Outline: TGLPolygonList read GetOutline;
     property ContoursNormal: TAffineVector read FContoursNormal write SetContoursNormal;
-    function AxisAlignedDimensionsUnscaled: TVector; override;
+    function AxisAlignedDimensionsUnscaled: TGLVector; override;
     procedure StructureChanged; override;
   published
     property Contours: TGLContours read FContours write SetContours;
@@ -167,7 +167,7 @@ type
   end;
 
   (* Page oriented pointer array, with persistent pointer target memory.
-    In TVectorList a pointer to a vector will not be valid any more after
+    In TGLVectorList a pointer to a vector will not be valid any more after
     a call to SetCapacity, which might be done implicitely during Add.
     The TGLVectorPool keeps memory in its original position during its
     whole lifetime. *)
@@ -235,14 +235,14 @@ end;
 
 procedure TGLPolygonList.Add;
 begin
-  FAktList := TAffineVectorList.Create;
+  FAktList := TGLAffineVectorList.Create;
   inherited Add(FAktList);
 end;
 
 
-function TGLPolygonList.GetList(i: Integer): TAffineVectorList;
+function TGLPolygonList.GetList(i: Integer): TGLAffineVectorList;
 begin
-  Result := TAffineVectorList(Items[i]);
+  Result := TGLAffineVectorList(Items[i]);
 end;
 
 // ------------------
@@ -422,7 +422,7 @@ begin
 end;
 
 
-procedure TGLMultiPolygonBase.AddNode(const i: Integer; const value: TVector);
+procedure TGLMultiPolygonBase.AddNode(const i: Integer; const value: TGLVector);
 begin
   Path[i].AddNode(value);
 end;
@@ -758,7 +758,7 @@ begin
 end;
 
 
-function TGLMultiPolygonBase.AxisAlignedDimensionsUnscaled: TVector;
+function TGLMultiPolygonBase.AxisAlignedDimensionsUnscaled: TGLVector;
 var
   dMin, dMax: TAffineVector;
 begin

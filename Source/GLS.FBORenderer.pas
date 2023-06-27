@@ -1,23 +1,25 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.FBORenderer;
 
 (* Implements FBO support *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
   Winapi.OpenGLext,
   System.Classes,
   System.SysUtils,
-  
+
   GLS.OpenGLTokens,
+  GLS.TextureFormat,
+  GLS.VectorTypes,
   GLS.VectorGeometry,
+
   GLS.PersistentClasses,
   GLS.PipelineTransformation,
   GLS.Scene,
@@ -27,8 +29,6 @@ uses
   GLS.Material,
   GLS.RenderContextInfo,
   GLS.State,
-  GLS.TextureFormat,
-  GLS.VectorTypes,
   GLS.MultiSampleImage,
   GLS.Logger;
 
@@ -196,7 +196,7 @@ type
     FPostGenerateMipmap: Boolean;
     FMaxSize: Integer;
     FMaxAttachment: Integer;
-    FStoreCamera: array[0..2] of TVector;
+    FStoreCamera: array[0..2] of TGLVector;
     FOnSetTextureTargets: TSetTextureTargetsEvent;
     // implementing IGLMaterialLibrarySupported
     function GetMaterialLibrary: TGLAbstractMaterialLibrary;
@@ -808,7 +808,7 @@ end;
 procedure TGLFrameBuffer.Render(var rci: TGLRenderContextInfo; baseObject:
   TGLBaseSceneObject);
 var
-  backColor: TColorVector;
+  backColor: TGLColorVector;
   buffer: TGLSceneBuffer;
 begin
   Bind;
@@ -1278,7 +1278,7 @@ procedure TGLFBORenderer.RenderToFBO(var ARci: TGLRenderContextInfo);
 
 type
   TGLStoredStates = record
-    ColorClearValue: TColorVector;
+    ColorClearValue: TGLColorVector;
     ColorWriteMask: TGLColorMask;
     Tests: TGLStates;
   end;
@@ -1306,7 +1306,7 @@ type
   end;
 
 var
-  backColor: TColorVector;
+  backColor: TGLColorVector;
   buffer: TGLSceneBuffer;
   savedStates: TGLStoredStates;
   w, h: Integer;

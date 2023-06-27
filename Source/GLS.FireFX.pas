@@ -1,14 +1,13 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.FireFX;
 
 (*  Fire special effect *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
@@ -34,15 +33,15 @@ uses
   GLS.TextureFormat;
 
 type
-  PFireParticle = ^TFireParticle;
-  TFireParticle = record
-    Position: TVector;
-    Speed: TVector;
+  PGLFireParticle = ^TGLFireParticle;
+  TGLFireParticle = record
+    Position: TGLVector;
+    Speed: TGLVector;
     Alpha: Single;
     TimeToLive, LifeLength: Single;
   end;
-  TFireParticleArray = array[0..MAXINT shr 6] of TFireParticle;
-  PFireParticleArray = ^TFireParticleArray;
+  TGLFireParticleArray = array[0..MAXINT shr 6] of TGLFireParticle;
+  PGLFireParticleArray = ^TGLFireParticleArray;
 
   TGLBFireFX = class;
 
@@ -52,7 +51,7 @@ type
   TGLFireFXManager = class(TGLCadenceAbleComponent)
   private
     FClients: TList;
-    FFireParticles: PFireParticleArray;
+    FFireParticles: PGLFireParticleArray;
     FFireDir, FInitialDir: TGLCoordinates;
     FCadencer: TGLCadencer;
     FMaxParticles, FParticleLife: Integer;
@@ -79,7 +78,7 @@ type
     procedure Notification(AComponent: TComponent; Operation: TOperation); override;
     procedure CalcFire(deltaTime: Double; ParticleInterval, ParticleLife: Single;
       FireAlpha: Single);
-    procedure AffParticle3d(Color2: TColorVector; const mat: TMatrix);
+    procedure AffParticle3d(Color2: TGLColorVector; const mat: TGLMatrix);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -95,8 +94,7 @@ type
        by ringVectorX/Y, which should be of unit length (but you may not
        make them of unit length if you want "elliptic" rings). *)
     procedure RingExplosion(minInitialSpeed, maxInitialSpeed, lifeBoostFactor: Single;
-      const ringVectorX, ringVectorY: TAffineVector;
-      nbParticles: Integer = -1);
+      const ringVectorX, ringVectorY: TAffineVector; nbParticles: Integer = -1);
     // Current Nb of particles.
     property ParticleCount: Integer read NP;
     procedure DoProgress(const progressTime: TGLProgressTimes); override;
@@ -168,6 +166,7 @@ type
     procedure Assign(Source: TPersistent); override;
     class function FriendlyName: string; override;
     class function FriendlyDescription: string; override;
+   // Old - procedure Render(sceneBuffer: TGLSceneBuffer; var rci: TGLRenderContextInfo); override;
     procedure Render(var rci: TGLRenderContextInfo); override;
   published
    // Refers the collision manager.
@@ -347,7 +346,7 @@ begin
       FMaxParticles := val
     else
       FMaxParticles := 0;
-    ReallocMem(FFireParticles, MaxParticles * Sizeof(TFireParticle));
+    ReallocMem(FFireParticles, MaxParticles * Sizeof(TGLFireParticle));
     if NP > MaxParticles then
       NP := MaxParticles;
   end;
@@ -386,7 +385,7 @@ procedure TGLFireFXManager.FireInit;
 begin
   IntervalDelta := 0;
   NP := 0;
-  ReallocMem(FFireParticles, FMaxParticles * Sizeof(TFireParticle));
+  ReallocMem(FFireParticles, FMaxParticles * Sizeof(TGLFireParticle));
 end;
 
 
@@ -394,7 +393,7 @@ procedure TGLFireFXManager.IsotropicExplosion(minInitialSpeed, maxInitialSpeed, 
   nbParticles: Integer = -1);
 var
   n: Integer;
-  tmp, refPos: TVector;
+  tmp, refPos: TGLVector;
 begin
   if nbParticles < 0 then
     n := MaxInt
@@ -425,11 +424,10 @@ end;
 
 
 procedure TGLFireFXManager.RingExplosion(minInitialSpeed, maxInitialSpeed, lifeBoostFactor: Single;
-  const ringVectorX, ringVectorY: TAffineVector;
-  nbParticles: Integer = -1);
+  const ringVectorX, ringVectorY: TAffineVector; nbParticles: Integer = -1);
 var
   n: Integer;
-  tmp, refPos: TVector;
+  tmp, refPos: TGLVector;
   fx, fy, d: Single;
 begin
   if nbParticles < 0 then
@@ -467,7 +465,7 @@ procedure TGLFireFXManager.CalcFire(deltaTime: Double;
 var
   N, I: Integer;
   Fdelta: Single;
-  tmp, refPos: TVector;
+  tmp, refPos: TGLVector;
 begin
   // Process live stuff
   N := 0;
@@ -526,9 +524,9 @@ begin
   end;
 end;
 
-procedure TGLFireFXManager.AffParticle3d(Color2: TColorVector; const mat: TMatrix);
+procedure TGLFireFXManager.AffParticle3d(Color2: TGLColorVector; const mat: TGLMatrix);
 var
-  vx, vy: TVector;
+  vx, vy: TGLVector;
   i: Integer;
 begin
   for i := 0 to 2 do
@@ -653,11 +651,11 @@ procedure TGLBFireFX.Render(var rci: TGLRenderContextInfo);
 var
   n: Integer;
   i: Integer;
-  innerColor: TVector;
+  innerColor: TGLVector;
   lastTr: TAffineVector;
-  distList: TSingleList;
+  distList: TGLSingleList;
   objList: TList;
-  fp: PFireParticle;
+  fp: PGLFireParticle;
 begin
   if Manager = nil then
     Exit;
@@ -682,7 +680,7 @@ begin
 
   if n > 1 then
   begin
-    distList := TSingleList.Create;
+    distList := TGLSingleList.Create;
     objList := TList.Create;
     for i := 0 to n - 1 do
     begin
@@ -696,7 +694,7 @@ begin
       SetVector(innerColor, Manager.FInnerColor.Color);
       for i := n - 1 downto 0 do
       begin
-        fp := PFireParticle(objList[i]);
+        fp := PGLFireParticle(objList[i]);
         gl.Translatef(fp^.Position.X - lastTr.X,
                       fp^.Position.Y - lastTr.Y,
                       fp^.Position.Z - lastTr.Z);

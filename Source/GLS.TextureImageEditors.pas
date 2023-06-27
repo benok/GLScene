@@ -1,5 +1,5 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
 
 unit GLS.TextureImageEditors;
@@ -8,7 +8,7 @@ unit GLS.TextureImageEditors;
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   System.Classes,
@@ -207,6 +207,7 @@ begin
       buf := InputDlg(TGLProcTextureNoise.FriendlyName, 'Minimum Cut', IntToStr(MinCut));
       MinCut := StrToIntDef(buf, 0);
       buf := InputDlg(TGLProcTextureNoise.FriendlyName, 'Noise Sharpness', FloatToStr(NoiseSharpness));
+      //By PAL, this has to be StrToFloatDef using Windows locale because comes from a Dialog
       NoiseSharpness := StrToFloatDef(buf, 0.9);
       buf := InputDlg(TGLProcTextureNoise.FriendlyName, 'Random Seed', IntToStr(NoiseRandSeed));
       NoiseRandSeed := StrToIntDef(buf, 0);

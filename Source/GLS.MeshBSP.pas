@@ -1,17 +1,16 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.MeshBSP;
 
 (*
-  Mesh support using Binary Space Partion
+  Meshes support using Binary Space Partition
   The classes of this unit are designed to operate within a TGLBaseMesh.
 *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   System.Classes,
@@ -29,14 +28,14 @@ uses
 type
 
   TBSPCullingSphere = record
-    position: TVector;
+    position: TGLVector;
     radius: Single;
   end;
 
   TBSPRenderContextInfo = record
     // Local coordinates of the camera (can be a vector or point)
-    cameraLocal: TVector;
-    rci: PRenderContextInfo;
+    cameraLocal: TGLVector;
+    rci: PGLRenderContextInfo;
     faceGroups: TList;
     cullingSpheres: array of TBSPCullingSphere;
   end;
@@ -62,11 +61,11 @@ type
 
   TFGBSPNode = class;
 
-  (* A BSP mesh object. 
+  (* A BSP mesh object.
     Stores the geometry information, BSP rendering options and offers some
     basic BSP utility methods. Geometry information is indexed in the facegroups,
     the 1st facegroup (of index 0) being the root node of the BSP tree. *)
-  TBSPMeshObject = class(TMeshObject)
+  TBSPMeshObject = class(TGLMeshObject)
   private
     FRenderSort: TBSPRenderSort;
     FClusterVisibility: TBSPClusterVisibility;
@@ -85,7 +84,7 @@ type
       of tree balancing (structurally speaking, not polygon-wise). *)
     function AverageDepth: Single;
     // Traverses the tree to the given point and returns the node index.
-    function FindNodeByPoint(const aPoint: TVector): TFGBSPNode;
+    function FindNodeByPoint(const aPoint: TGLVector): TFGBSPNode;
     (*  Rendering sort mode.
       This sort mode can currently *not* blend with the sort by materials
       flag, default mode is rsBackToFront.
@@ -102,7 +101,7 @@ type
       write FUseClusterVisibility;
   end;
 
-  (*  A node in the BSP tree. 
+  (*  A node in the BSP tree.
     The description does not explicitly differentiates nodes and leafs,
     nodes are referred by their index. *)
   TFGBSPNode = class(TFGVertexIndexList)
@@ -142,7 +141,7 @@ type
       const maxTrianglesPerLeaf: Integer = MaxInt);
     (*  Goes through all triangle edges, looking for tjunctions.
       The candidates are indices of points to lookup a tjunction vertices. *)
-    procedure FixTJunctions(const tJunctionsCandidates: TIntegerList);
+    procedure FixTJunctions(const tJunctionsCandidates: TGLIntegerList);
     (*  BSP node split plane.
       Divides space between positive and negative half-space, positive
       half-space being the one were the evaluation of an homogeneous
@@ -278,10 +277,10 @@ var
   renderNode: Boolean;
   camNode: TFGBSPNode;
 
-  procedure AbsoluteSphereToLocal(const absPos: TVector; absRadius: Single;
+  procedure AbsoluteSphereToLocal(const absPos: TGLVector; absRadius: Single;
     var local: TBSPCullingSphere);
   var
-    v: TVector;
+    v: TGLVector;
   begin
     local.position := Owner.Owner.AbsoluteToLocal(absPos);
     SetVector(v, absRadius, absRadius, absRadius, 0);
@@ -386,14 +385,14 @@ var
   i, j, n: Integer;
   nodeParents: array of Integer;
   remapIndex: array of Integer;
-  indicesToCheck: TIntegerList;
+  indicesToCheck: TGLIntegerList;
   node: TFGBSPNode;
 begin
   n := faceGroups.Count;
   if n = 0 then
     Exit;
   SetLength(nodeParents, n);
-  indicesToCheck := TIntegerList.Create;
+  indicesToCheck := TGLIntegerList.Create;
   try
     // build nodes parent information
     FillChar(nodeParents[0], SizeOf(Integer) * n, 255);
@@ -500,7 +499,7 @@ begin
   end;
 end;
 
-function TBSPMeshObject.FindNodeByPoint(const aPoint: TVector): TFGBSPNode;
+function TBSPMeshObject.FindNodeByPoint(const aPoint: TGLVector): TFGBSPNode;
 
   function Traverse(nodeIndex: Integer): Integer;
   var
@@ -645,7 +644,7 @@ var
   ns, np, nn: Integer;
   evalPlane: THmgPlane;
   bestEval, eval: Single;
-  vertices: TAffineVectorList;
+  vertices: TGLAffineVectorList;
 begin
   Result := NullHmgVector;
   bestEval := 1E30;
@@ -690,7 +689,7 @@ procedure TFGBSPNode.EvaluateSplitPlane(const splitPlane: THmgPlane;
 var
   i, n, inci, lookupIdx: Integer;
   a, b, c: Boolean;
-  vertices: TAffineVectorList;
+  vertices: TGLAffineVectorList;
 const
   // case resolution lookup tables (node's tris unaccounted for)
   cTriangleSplit: array [0 .. 7] of Integer = (0, 1, 1, 1, 1, 1, 1, 0);
@@ -762,7 +761,7 @@ end;
 function TFGBSPNode.AddLerpIfDistinct(iA, iB, iMid: Integer): Integer;
 var
   midNormal: TAffineVector;
-  midColor: TColorVector;
+  midColor: TGLColorVector;
   midTexCoord: TAffineVector;
   midLightmapTexCoord: TAffineVector;
   f: Single;
@@ -827,8 +826,8 @@ procedure TFGBSPNode.PerformSplit(const splitPlane: THmgPlane;
   const maxTrianglesPerLeaf: Integer = MaxInt);
 var
   fgPos, fgNeg: TFGBSPNode;
-  fgPosIndices, fgNegIndices: TIntegerList;
-  indices: TIntegerList;
+  fgPosIndices, fgNegIndices: TGLIntegerList;
+  indices: TGLIntegerList;
 
   procedure SplitTriangleMid(strayID, strayNext, strayPrev: Integer;
     eNext, ePrev: Single);
@@ -880,7 +879,7 @@ var
 var
   i, i1, i2, i3, se1, se2, se3: Integer;
   e1, e2, e3: Single;
-  vertices: TAffineVectorList;
+  vertices: TGLAffineVectorList;
   subSplitPlane: THmgPlane;
 begin
   Assert((PositiveSubNodeIndex = 0) and (NegativeSubNodeIndex = 0));
@@ -894,7 +893,7 @@ begin
   fgNegIndices := fgNeg.VertexIndices;
   // initiate split
   Self.FSplitPlane := splitPlane;
-  indices := TIntegerList.Create;
+  indices := TGLIntegerList.Create;
   vertices := Owner.Owner.vertices;
   i := 0;
   while i < VertexIndices.Count do
@@ -1035,10 +1034,10 @@ begin
   end;
 end;
 
-procedure TFGBSPNode.FixTJunctions(const tJunctionsCandidates: TIntegerList);
+procedure TFGBSPNode.FixTJunctions(const tJunctionsCandidates: TGLIntegerList);
 
   function FindTJunction(iA, iB, iC: Integer;
-    candidatesList: TIntegerList): Integer;
+    candidatesList: TGLIntegerList): Integer;
   var
     i, k: Integer;
     vertices: PAffineVectorArray;
@@ -1093,10 +1092,10 @@ procedure TFGBSPNode.FixTJunctions(const tJunctionsCandidates: TIntegerList);
 var
   i, tj: Integer;
   indices: PIntegerArray;
-  mark: TIntegerList;
+  mark: TGLIntegerList;
 begin
   Assert(Mode in [fgmmTriangles, fgmmFlatTriangles]);
-  mark := TIntegerList.Create;
+  mark := TGLIntegerList.Create;
   mark.AddSerie(1, 0, VertexIndices.Count);
   indices := VertexIndices.List;
   i := 0;
@@ -1153,7 +1152,6 @@ end;
 initialization
 // ------------------------------------------------------------------
 
-// class registrations
 RegisterClasses([TBSPMeshObject, TFGBSPNode]);
 
 end.

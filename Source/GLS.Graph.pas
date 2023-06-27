@@ -1,14 +1,13 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.Graph;
 
 (* Graph plotting objects for GLScene *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
@@ -17,17 +16,18 @@ uses
   
   GLS.Scene,
   GLS.OpenGLTokens,
+  GLS.VectorTypes,
+  GLS.VectorGeometry,
+
   GLS.Context,
   GLS.XOpenGL,
-  GLS.VectorGeometry,
   GLS.Material,
   GLS.Objects,
   GLS.VectorLists,
   GLS.Color,
   GLS.BaseClasses,
   GLS.RenderContextInfo,
-  GLS.State,
-  GLS.VectorTypes;
+  GLS.State;
 
 type
 
@@ -63,9 +63,9 @@ type
   end;
 
   TGLHeightFieldGetHeightEvent = procedure(const x, y: Single; var z: Single;
-    var Color: TColorVector; var TexPoint: TTexPoint) of object;
+    var Color: TGLColorVector; var TexPoint: TTexPoint) of object;
   TGLHeightFieldGetHeight2Event = procedure(Sender: TObject; const x, y: Single;
-    var z: Single; var Color: TColorVector; var TexPoint: TTexPoint) of object;
+    var z: Single; var Color: TGLColorVector; var TexPoint: TTexPoint) of object;
 
   TGLHeightFieldOption = (hfoTextureCoordinates, hfoTwoSided);
   TGLHeightFieldOptions = set of TGLHeightFieldOption;
@@ -96,9 +96,9 @@ type
     procedure SetOnGetHeight2(const val: TGLHeightFieldGetHeight2Event);
     procedure SetColorMode(const val: TGLHeightFieldColorMode);
     procedure DefaultHeightField(const x, y: Single; var z: Single;
-      var Color: TColorVector; var TexPoint: TTexPoint);
+      var Color: TGLColorVector; var TexPoint: TTexPoint);
     procedure Height2Field(const x, y: Single; var z: Single;
-      var Color: TColorVector; var texPoint: TTexPoint);
+      var Color: TGLColorVector; var texPoint: TTexPoint);
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -136,6 +136,7 @@ type
     this enhances perspective and quality, at the expense of computing
     power. *)
   TGLXYZGridLinesStyle = (glsLine, glsSegments);
+
   // An XYZ Grid object. Renders an XYZ grid using lines
   TGLXYZGrid = class(TGLLineBase)
   private
@@ -167,8 +168,7 @@ type
     property Parts: TGLXYZGridParts read FParts write SetParts default [gpX, gpY];
     property LinesStyle: TGLXYZGridLinesStyle read FLinesStyle write SetLinesStyle
       default glsSegments;
-    (* Adjusts lines smoothing (or antialiasing).
-      Obsolete, now maps to Antialiased property. *)
+    // Adjusts lines smoothing (or antialiasing). Obsolete, now maps to Antialiased property
     property LinesSmoothing: Boolean write SetLinesSmoothing stored False;
   end;
 
@@ -180,14 +180,12 @@ implementation
 // ------------------ TGLSamplingScale ------------------
 // ------------------
 
-
 constructor TGLSamplingScale.Create(AOwner: TPersistent);
 begin
   inherited Create(AOwner);
   FStep := 0.1;
 end;
 
- 
 destructor TGLSamplingScale.Destroy;
 begin
   inherited Destroy;
@@ -215,7 +213,6 @@ begin
   NotifyChange(Self);
 end;
 
-
 procedure TGLSamplingScale.SetMax(const val: Single);
 begin
   FMax := val;
@@ -224,13 +221,11 @@ begin
   NotifyChange(Self);
 end;
 
-
 procedure TGLSamplingScale.SetOrigin(const val: Single);
 begin
   FOrigin := val;
   NotifyChange(Self);
 end;
-
 
 procedure TGLSamplingScale.SetStep(const val: Single);
 begin
@@ -240,7 +235,6 @@ begin
     FStep := 1;
   NotifyChange(Self);
 end;
-
 
 function TGLSamplingScale.StepBase: Single;
 begin
@@ -257,18 +251,15 @@ begin
     Result := FMin;
 end;
 
-
 function TGLSamplingScale.MaxStepCount: Integer;
 begin
   Result := Round(0.5 + (Max - Min) / Step);
 end;
 
-
 function TGLSamplingScale.IsValid: Boolean;
 begin
   Result := (Max <> Min);
 end;
-
 
 procedure TGLSamplingScale.SetBaseStepMaxToVars(var Base, Step, Max: Single;
   samplingEnabled: Boolean = True);
@@ -298,14 +289,12 @@ begin
   FOptions := [hfoTwoSided];
 end;
 
-
 destructor TGLHeightField.Destroy;
 begin
   FXSamplingScale.Free;
   FYSamplingScale.Free;
   inherited Destroy;
 end;
-
 
 procedure TGLHeightField.Assign(Source: TPersistent);
 begin
@@ -320,7 +309,6 @@ begin
   inherited Assign(Source);
 end;
 
-
 procedure TGLHeightField.NotifyChange(Sender: TObject);
 begin
   if Sender is TGLSamplingScale then
@@ -328,18 +316,17 @@ begin
   inherited NotifyChange(Sender);
 end;
 
-
 procedure TGLHeightField.BuildList(var rci: TGLRenderContextInfo);
 type
   TRowData = packed record
-    Color: TColorVector;
+    Color: TGLColorVector;
     Z: Single;
     TexPoint: TTexPoint;
     Normal: TAffineVector;
   end;
-
   TRowDataArray = array [0 .. Maxint shr 6] of TRowData;
   PRowData = ^TRowDataArray;
+
 const
   cHFCMtoEnum: array [hfcmEmission .. hfcmAmbientAndDiffuse] of Cardinal =
     (GL_EMISSION, GL_AMBIENT, GL_DIFFUSE, GL_AMBIENT_AND_DIFFUSE);
@@ -505,18 +492,15 @@ begin
   end;
 end;
 
-
 procedure TGLHeightField.SetXSamplingScale(const val: TGLSamplingScale);
 begin
   FXSamplingScale.Assign(val);
 end;
 
-
 procedure TGLHeightField.SetYSamplingScale(const val: TGLSamplingScale);
 begin
   FYSamplingScale.Assign(val);
 end;
-
 
 procedure TGLHeightField.SetOptions(const val: TGLHeightFieldOptions);
 begin
@@ -527,13 +511,11 @@ begin
   end;
 end;
 
-
 procedure TGLHeightField.SetOnGetHeight(const val: TGLHeightFieldGetHeightEvent);
 begin
   FOnGetHeight := val;
   StructureChanged;
 end;
-
 
 procedure TGLHeightField.SetOnGetHeight2(const val
   : TGLHeightFieldGetHeight2Event);
@@ -541,7 +523,6 @@ begin
   FOnGetHeight2 := val;
   StructureChanged;
 end;
-
 
 procedure TGLHeightField.SetColorMode(const val: TGLHeightFieldColorMode);
 begin
@@ -552,18 +533,16 @@ begin
   end;
 end;
 
-
 procedure TGLHeightField.DefaultHeightField(const x, y: Single; var z: Single;
-  var color: TColorVector; var texPoint: TTexPoint);
+  var color: TGLColorVector; var texPoint: TTexPoint);
 begin
   z := VectorNorm(x, y);
   z := cos(z * 12) / (2 * (z * 6.28 + 1));
   color := clrGray80;
 end;
 
-
 procedure TGLHeightField.Height2Field(const x, y: Single; var z: Single;
-  var color: TColorVector; var texPoint: TTexPoint);
+  var color: TGLColorVector; var texPoint: TTexPoint);
 begin
   FOnGetHeight2(Self, x, y, z, color, texPoint);
 end;
@@ -582,7 +561,6 @@ begin
   FLinesStyle := glsSegments;
 end;
 
-
 destructor TGLXYZGrid.Destroy;
 begin
   FXSamplingScale.Free;
@@ -590,7 +568,6 @@ begin
   FZSamplingScale.Free;
   inherited Destroy;
 end;
-
 
 procedure TGLXYZGrid.Assign(Source: TPersistent);
 begin
@@ -615,12 +592,10 @@ begin
   FYSamplingScale.Assign(val);
 end;
 
-
 procedure TGLXYZGrid.SetZSamplingScale(const val: TGLSamplingScale);
 begin
   FZSamplingScale.Assign(val);
 end;
-
 
 procedure TGLXYZGrid.SetParts(const val: TGLXYZGridParts);
 begin

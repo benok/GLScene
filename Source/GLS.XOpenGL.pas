@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.XOpenGL;
 
 (*
@@ -15,16 +14,17 @@ unit GLS.XOpenGL;
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGLext,
+
+  GLS.VectorTypes,
   GLS.OpenGLTokens,
   GLS.State;
 
 type
-  TMapTexCoordMode = (mtcmUndefined, mtcmNull, mtcmMain, mtcmDual, mtcmSecond,
-    mtcmArbitrary);
+  TMapTexCoordMode = (mtcmUndefined, mtcmNull, mtcmMain, mtcmDual, mtcmSecond, mtcmArbitrary);
 
   TGLMultitextureCoordinator = class
   private

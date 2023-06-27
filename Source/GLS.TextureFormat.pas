@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.TextureFormat;
 
 (* Texture formats and functions *)
@@ -11,32 +10,33 @@ interface
 uses
   Winapi.OpenGL,
   Winapi.OpenGLext,
+
   GLS.OpenGLTokens,
   GLS.Strings;
 
 type
   // Texture addressing rules
-  TGLSeparateTextureWrap = (twRepeat, twClampToEdge, twClampToBorder,
+  TglSeparateTextureWrap = (twRepeat, twClampToEdge, twClampToBorder,
     twMirrorRepeat, twMirrorClampToEdge, twMirrorClampToBorder);
 
   (* Specifies the texture comparison mode for currently bound depth textures.
     That is, a texture whose internal format is tfDEPTH_COMPONENT* *)
-  TGLTextureCompareMode = (tcmNone, tcmCompareRtoTexture);
+  TglTextureCompareMode = (tcmNone, tcmCompareRtoTexture);
 
   // Filtering quality
-  TGLTextureFilteringQuality = (tfIsotropic, tfAnisotropic);
+  TglTextureFilteringQuality = (tfIsotropic, tfAnisotropic);
 
-  TGLTextureTarget =
+  TglTextureTarget =
   (
     ttNoShape, ttTexture1D, ttTexture2D, ttTexture3D, ttTexture1DArray,
     ttTexture2DArray, ttTextureRect, ttTextureBuffer, ttTextureCube,
     ttTexture2DMultisample, ttTexture2DMultisampleArray, ttTextureCubeArray
   );
 
-  TGLTextureSwizzle = (tswRed, tswGreen, tswBlue, tswAlpha, tswZero, tswOne);
-  TSwizzleVector = array[0..3] of TGLTextureSwizzle;
+  TglTextureSwizzle = (tswRed, tswGreen, tswBlue, tswAlpha, tswZero, tswOne);
+  TglSwizzleVector = array[0..3] of TglTextureSwizzle;
 
-  TGLInternalFormat = (
+  TglInternalFormat = (
     tfALPHA4,
     tfALPHA8,
     tfALPHA12,
@@ -205,15 +205,14 @@ type
       tcStandard : use standard compression, average quality, average rate
       tcHighQuality : choose a high-quality, low-speed compression
       tcHighSpeed : choose a high-speed, low-quality compression *)
-  TGLInternalCompression = (tcDefault, tcNone, tcStandard, tcHighQuality,
-    tcHighSpeed);
+  TglInternalCompression = (tcDefault, tcNone, tcStandard, tcHighQuality, tcHighSpeed);
 
 var
-  vDefaultTextureFormat: TGLInternalFormat = tfRGBA8;
-  vDefaultTextureCompression: TGLInternalCompression = tcNone;
+  vDefaultTextureFormat: TglInternalFormat = tfRGBA8;
+  vDefaultTextureCompression: TglInternalCompression = tcNone;
 
 const
-  cDefaultSwizzleVector: TSwizzleVector = (tswRed, tswGreen, tswBlue, tswAlpha);
+  cDefaultSwizzleVector: TglSwizzleVector = (tswRed, tswGreen, tswBlue, tswAlpha);
 
 // Give a openGL texture format from GLScene texture format
 function InternalFormatToOpenGLFormat(intFormat: TGLInternalFormat): Cardinal;
@@ -225,11 +224,10 @@ function GetTextureElementSize(colorFormat: Cardinal; dataType: Cardinal):
   Integer; overload;
 // Give compatible openGL image format and data type
 procedure FindCompatibleDataFormat(intFormat: TGLInternalFormat; out dFormat:
-  TGLuint; out dType: TGLUint);
+  Cardinal; out dType: Cardinal);
 (* Give a compressed openGL texture format from GLScene texture format
   if format is have not compression than return same openGL format *)
-function CompressedInternalFormatToOpenGL(intFormat: TGLInternalFormat):
-  Integer;
+function CompressedInternalFormatToOpenGL(intFormat: TGLInternalFormat): Integer;
 // True if texture target supported
 function IsTargetSupported(glTarget: Cardinal): Boolean; overload;
 function IsTargetSupported(target: TGLTextureTarget): Boolean; overload;
@@ -262,7 +260,6 @@ implementation
 uses
   GLS.Context;
 
-
 type
 
   TFormatDesc = record
@@ -283,7 +280,7 @@ type
 
 const
   // InternalFormat, ColorFormat, DataType
-  cTextureFormatToOpenGL: array[low(TGLInternalFormat)..high(TGLInternalFormat)] of TFormatDesc =
+  cTextureFormatToOpenGL: array[low(TglInternalFormat)..high(TglInternalFormat)] of TFormatDesc =
   (
     (IntFmt: GL_ALPHA4; ClrFmt: GL_ALPHA; DataFmt: GL_UNSIGNED_BYTE; RBit: 0; GBit: 0; BBit: 0; ABit: 4; LBit: 0; DBit: 0; Sign: False; Flt: False; Fix: False; Comp: False),
     (IntFmt: GL_ALPHA8; ClrFmt: GL_ALPHA; DataFmt: GL_UNSIGNED_BYTE; RBit: 0; GBit: 0; BBit: 0; ABit: 8; LBit: 0; DBit: 0; Sign: False; Flt: False; Fix: False; Comp: False),
@@ -547,7 +544,7 @@ begin
   end;
 end;
 
-function CompressedInternalFormatToOpenGL(intFormat: TGLInternalFormat):
+function CompressedInternalFormatToOpenGL(intFormat: TglInternalFormat):
   Integer;
 begin
   Result := GL_COMPRESSED_RGBA;
@@ -565,14 +562,14 @@ begin
   end;
 end;
 
-procedure FindCompatibleDataFormat(intFormat: TGLInternalFormat; out dFormat:
+procedure FindCompatibleDataFormat(intFormat: TglInternalFormat; out dFormat:
   Cardinal; out dType: Cardinal);
 begin
   dFormat := cTextureFormatToOpenGL[intFormat].ClrFmt;
   dType := cTextureFormatToOpenGL[intFormat].DataFmt;
 end;
 
-function IsTargetSupported(target: TGLTextureTarget): Boolean;
+function IsTargetSupported(target: TglTextureTarget): Boolean;
 begin
   Result := IsTargetSupported(DecodeTextureTarget(target));
 end;
@@ -600,7 +597,7 @@ begin
   else
     begin
       Result := false;
-      Assert(False, strErrorEx + strUnknownType);
+      // Assert(False, strErrorEx + strUnknownType);
     end;
   end;
 end;
@@ -722,7 +719,7 @@ begin
   end
 end;
 
-function IsFloatFormat(intFormat: TGLInternalFormat): boolean;
+function IsFloatFormat(intFormat: TglInternalFormat): boolean;
 begin
   Result := cTextureFormatToOpenGL[intFormat].Flt;
 end;
@@ -742,7 +739,7 @@ begin
   Result := cTextureFormatToOpenGL[OpenGLFormatToInternalFormat(glFormat)].DBit > 0;
 end;
 
-function IsCompressedFormat(intFormat: TGLInternalFormat): boolean;
+function IsCompressedFormat(intFormat: TglInternalFormat): boolean;
 begin
   Result := cTextureFormatToOpenGL[intFormat].Comp;
 end;
@@ -752,7 +749,7 @@ begin
   Result := cTextureFormatToOpenGL[OpenGLFormatToInternalFormat(glFormat)].Comp;
 end;
 
-function GetGenericCompressedFormat(const intFormat: TGLInternalFormat;
+function GetGenericCompressedFormat(const intFormat: TglInternalFormat;
   const colorFormat: Cardinal; out internalFormat: Cardinal): Boolean;
 
 begin
@@ -788,8 +785,8 @@ begin
   Result := true;
 end;
 
-function GetUncompressedFormat(const intFormat: TGLInternalFormat;
-  out internalFormat: TGLInternalFormat; out colorFormat: Cardinal): Boolean;
+function GetUncompressedFormat(const intFormat: TglInternalFormat;
+  out internalFormat: TglInternalFormat; out colorFormat: Cardinal): Boolean;
 begin
   Result := false;
   if not IsCompressedFormat(intFormat) then
@@ -887,9 +884,9 @@ begin
   Result := colorFormat <> 0;
 end;
 
-function DecodeTextureTarget(const TextureTarget: TGLTextureTarget): Cardinal;
+function DecodeTextureTarget(const TextureTarget: TglTextureTarget): Cardinal;
 const
-  cTargetToEnum: array[TGLTextureTarget] of Cardinal =
+  cTargetToEnum: array[TglTextureTarget] of Cardinal =
   (
     0,
     GL_TEXTURE_1D,
@@ -905,11 +902,11 @@ const
     GL_TEXTURE_CUBE_MAP_ARRAY
   );
 begin
-  Assert(TextureTarget <> ttNoShape);
+ // Assert(TextureTarget <> ttNoShape);
   Result := cTargetToEnum[TextureTarget];
 end;
 
-function EncodeGLTextureTarget(const glTarget: Cardinal): TGLTextureTarget;
+function EncodeGLTextureTarget(const glTarget: Cardinal): TglTextureTarget;
 begin
   case glTarget of
     GL_TEXTURE_1D: Result := ttTexture1d;
@@ -930,7 +927,7 @@ begin
   end;
 end;
 
-function IsTargetSupportMipmap(const TextureTarget: TGLTextureTarget): Boolean;
+function IsTargetSupportMipmap(const TextureTarget: TglTextureTarget): Boolean;
 begin
   Result := (TextureTarget <> ttTextureRect)
     and (TextureTarget <> ttTexture2DMultisample)

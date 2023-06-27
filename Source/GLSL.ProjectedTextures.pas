@@ -1,5 +1,5 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
 
 unit GLSL.ProjectedTextures;
@@ -21,7 +21,7 @@ unit GLSL.ProjectedTextures;
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   System.Classes,
@@ -56,7 +56,7 @@ type
     FUseQuadraticAttenuation: boolean;
   protected
     ProjectedTexturesObject: TGLSLProjectedTextures;
-    TexMatrix: TMatrix;
+    TexMatrix: TGLMatrix;
     procedure SetupTexMatrix;
     procedure SetStyle(val: TGLSLProjectedTexturesStyle);
     procedure SetUseAttenuation(val: boolean);
@@ -191,7 +191,7 @@ end;
 
 procedure TGLSLTextureEmitter.SetupTexMatrix;
 const
-  cBaseMat: TMatrix = (V:((X:0.5; Y:0;   Z:0; W:0),
+  cBaseMat: TGLMatrix = (V:((X:0.5; Y:0;   Z:0; W:0),
                           (X:0;   Y:0.5; Z:0; W:0),
                           (X:0;   Y:0;   Z:1; W:0),
                           (X:0.5; Y:0.5; Z:0; W:1)));

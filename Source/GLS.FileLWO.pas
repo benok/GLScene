@@ -1,14 +1,13 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.FileLWO;
 
 (*  Support-code to load Lightwave LWO Files (v6.0+, partial support).*)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   System.Classes,
@@ -16,7 +15,7 @@ uses
   System.Math,
   GLS.VectorFileObjects,
   GLS.VectorLists,
-  FormatLWO;
+  Formats.LWO;
 
 type
   TGLLWOVectorFile = class(TGLVectorFile)
@@ -25,9 +24,9 @@ type
     FPnts: TLWPnts;
     procedure AddLayr(Layr: TLWLayr; LWO: TLWObjectFile);
     procedure AddSurf(Surf: TLWSurf; LWO: TLWObjectFile);
-    procedure AddPnts(Pnts: TLWPnts; Mesh: TMeshObject);
-    procedure AddPols(Pols: TLWPols; Mesh: TMeshObject);
-    procedure AddVMap(VMap: TLWVMap; Mesh: TMeshObject);
+    procedure AddPnts(Pnts: TLWPnts; Mesh: TGLMeshObject);
+    procedure AddPols(Pols: TLWPols; Mesh: TGLMeshObject);
+    procedure AddVMap(VMap: TLWVMap; Mesh: TGLMeshObject);
   public
     procedure LoadFromStream(aStream: TStream); override;
   end;
@@ -68,11 +67,11 @@ type
 procedure TGLLWOVectorFile.AddLayr(Layr: TLWLayr; LWO: TLWObjectFile);
 var
   Idx: Integer;
-  Mesh: TMeshObject;
+  Mesh: TGLMeshObject;
   Pnts: TLWPnts;
 begin
   // Add mesh
-  Mesh := TMeshObject.CreateOwned(Owner.MeshObjects);
+  Mesh := TGLMeshObject.CreateOwned(Owner.MeshObjects);
 
   with Mesh do
   begin
@@ -108,7 +107,7 @@ begin
   FPnts := nil;
 end;
 
-procedure TGLLWOVectorFile.AddPnts(Pnts: TLWPnts; Mesh: TMeshObject);
+procedure TGLLWOVectorFile.AddPnts(Pnts: TLWPnts; Mesh: TGLMeshObject);
 var
   i: Integer;
 begin
@@ -125,7 +124,7 @@ begin
   end;
 end;
 
-procedure TGLLWOVectorFile.AddPols(Pols: TLWPols; Mesh: TMeshObject);
+procedure TGLLWOVectorFile.AddPols(Pols: TLWPols; Mesh: TGLMeshObject);
 var
   Idx: Integer;
   i, j, k, PolyIdx, NormIdx: Integer;
@@ -363,7 +362,7 @@ begin
 
 end;
 
-procedure TGLLWOVectorFile.AddVMap(VMap: TLWVMap; Mesh: TMeshObject);
+procedure TGLLWOVectorFile.AddVMap(VMap: TLWVMap; Mesh: TGLMeshObject);
 var
   i: integer;
 begin

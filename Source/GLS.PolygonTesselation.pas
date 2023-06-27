@@ -1,44 +1,46 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.PolygonTesselation;
 
-(* Code to generate triangle strips and fans for polygons. *)
+(* Code to generate triangle strips and fans for polygons *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
   System.SysUtils,
-  
+
   GLS.OpenGLAdapter,
   GLS.OpenGLTokens,
-  GLS.PersistentClasses,
   GLS.VectorTypes,
+  GLS.VectorGeometry,
   GLS.VectorFileObjects,
-  GLS.VectorLists,
-  GLS.VectorGeometry;
+  GLS.VectorLists;
 
 (* Tesselates the polygon outlined by the Vertexes. And adds them to the first
    facegroup of the Mesh. *)
-procedure DoTesselate(Vertexes: TAffineVectorList; Mesh: TGLBaseMesh;
+procedure DoTesselate(Vertexes: TGLAffineVectorList; Mesh: TGLBaseMesh;
   normal: PAffineVector = nil; invertNormals: Boolean = False);
 
 //---------------------------------------------------------------------------
 implementation
 //---------------------------------------------------------------------------
 
+{$IFDEF USE_MULTITHREAD}
+threadvar
+{$ELSE}
 var
-  TessMesh: TMeshObject;
+{$ENDIF}
+  TessMesh: TGLMeshObject;
   TessFace: TFGIndexTexCoordList;
-  TessExtraVertices: Integer;
+  TessVerticesCount, TessExtraVertices: Integer;
   TessVertices: PAffineVectorArray;
 
 procedure DoTessBegin(mode: Cardinal);
-{$IFDEF Win32} stdcall;{$ENDIF}{$IFDEF UNIX} cdecl;{$ENDIF}
+{$IFDEF MSWINDOWS} stdcall;{$ELSE} cdecl;{$ENDIF}
 begin
   TessFace := TFGIndexTexCoordList.CreateOwned(TessMesh.FaceGroups);
   case mode of
@@ -49,18 +51,18 @@ begin
 end;
 
 procedure DoTessVertex3fv(v: PAffineVector);
-{$IFDEF Win32} stdcall;{$ENDIF}{$IFDEF UNIX} cdecl;{$ENDIF}
+{$IFDEF MSWINDOWS} stdcall;{$ELSE} cdecl;{$ENDIF}
 begin
   TessFace.Add(TessMesh.Vertices.Add(v^), 0, 0);
 end;
 
 procedure DoTessEnd;
-{$IFDEF Win32} stdcall;{$ENDIF}{$IFDEF UNIX} cdecl;{$ENDIF}
+{$IFDEF MSWINDOWS} stdcall;{$ELSE} cdecl;{$ENDIF}
 begin
 end;
 
 procedure DoTessError(errno: Cardinal);
-{$IFDEF Win32} stdcall;{$ENDIF}{$IFDEF UNIX} cdecl;{$ENDIF}
+{$IFDEF MSWINDOWS} stdcall;{$ELSE} cdecl;{$ENDIF}
 begin
   Assert(False, IntToStr(errno) + ': ' + string(gluErrorString(errno)));
 end;
@@ -68,17 +70,25 @@ end;
 function AllocNewVertex: PAffineVector;
 begin
   Inc(TessExtraVertices);
+
+  // Allocate more memory if needed
+  if TessExtraVertices > TessVerticesCount then
+  begin
+    TessVerticesCount := TessVerticesCount * 2;
+    Reallocmem(TessVertices, TessVerticesCount * SizeOf(TAffineVector));
+  end;
+
   Result := @TessVertices[TessExtraVertices - 1];
 end;
 
 procedure DoTessCombine(coords: PDoubleVector; vertex_data: Pointer; weight: PGLFloat; var outData: Pointer);
-{$IFDEF Win32} stdcall;{$ENDIF}{$IFDEF UNIX} cdecl;{$ENDIF}
+{$IFDEF MSWINDOWS} stdcall;{$ELSE} cdecl;{$ENDIF}
 begin
   outData := AllocNewVertex;
   SetVector(PAffineVector(outData)^, coords[0], coords[1], coords[2]);
 end;
 
-procedure DoTesselate(Vertexes: TAffineVectorList; Mesh: TGLBaseMesh; normal: PAffineVector = nil; invertNormals: Boolean = False);
+procedure DoTesselate(Vertexes: TGLAffineVectorList; Mesh: TGLBaseMesh; normal: PAffineVector = nil; invertNormals: Boolean = False);
 var
   Tess: PGLUTesselator;
   i: Integer;
@@ -87,15 +97,17 @@ begin
   // Select or Create FaceGroup
   if Mesh.MeshObjects.Count = 0 then
   begin
-    TessMesh := TMeshObject.CreateOwned(Mesh.MeshObjects);
+    TessMesh := TGLMeshObject.CreateOwned(Mesh.MeshObjects);
     Mesh.MeshObjects[0].Mode := momFaceGroups;
   end
   else
     TessMesh := Mesh.MeshObjects[0];
 
+  // vertices count.
+  TessVerticesCount := Vertexes.Count;
   // allocate extra buffer used by GLU in complex polygons.
-  GetMem(TessVertices, Vertexes.Count * SizeOf(TAffineVector));
 
+  GetMem(TessVertices, TessVerticesCount * SizeOf(TAffineVector));
   // make a Tessellation GLU object.
   Tess := gluNewTess;
 
@@ -142,7 +154,7 @@ begin
   gluDeleteTess(tess);
 
   // deallocate extra buffer used by GLU in complex polygons.
-  FreeMem(TessVertices, Vertexes.Count * SizeOf(TAffineVector));
+  FreeMem(TessVertices, TessVerticesCount * SizeOf(TAffineVector));
 end;
 
 end.

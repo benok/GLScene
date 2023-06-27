@@ -1,14 +1,13 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.Imposter;
 
 (* Imposter building and rendering implementation for GLScene *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
@@ -37,17 +36,17 @@ uses
 type
   (* Imposter rendering options.
      Following options are supported:
-      impoBlended : the imposters are transparently blended during renders,
-     this will smooth their edges but requires them to be rendered sorted
-     from back to front
-      impoAlphaTest : alpha test is used to eliminate transparent pixels,
-     the alpha treshold is adjusted by the AlphaTreshold property
+     impoBlended : the imposters are transparently blended during renders,
+      this will smooth their edges but requires them to be rendered sorted
+      from back to front
+     impoAlphaTest : alpha test is used to eliminate transparent pixels,
+      the alpha treshold is adjusted by the AlphaTreshold property
       impoNearestFiltering : use nearest texture filtering (the alternative
-     is linear filtering)
-      impoPerspectiveCorrection : activates a special imposter rendering
-     projection suitable for distorting the sprites when seen from a level
-     angle of view with a wide focal camera (think trees/grass when walking
-     in a forest), if not active, the imposter sprites are camera-facing *)
+      is linear filtering)
+     impoPerspectiveCorrection : activates a special imposter rendering
+      projection suitable for distorting the sprites when seen from a level
+      angle of view with a wide focal camera (think trees/grass when walking
+      in a forest), if not active, the imposter sprites are camera-facing *)
   TImposterOption = (impoBlended, impoAlphaTest, impoNearestFiltering,
     impoPerspectiveCorrection);
   TImposterOptions = set of TImposterOption;
@@ -73,22 +72,22 @@ type
     FAspectRatio: Single;
     FModulated: Boolean;
   protected
-    FVx, FVy: TVector;
-    FStaticOffset: TVector;
-    FQuad: array[0..3] of TVector;
+    FVx, FVy: TGLVector;
+    FStaticOffset: TGLVector;
+    FQuad: array[0..3] of TGLVector;
     FStaticScale: Single;
     procedure PrepareTexture(var rci: TGLRenderContextInfo); virtual;
-    procedure RenderQuad(const texExtents, objPos: TVector; size: Single);
+    procedure RenderQuad(const texExtents, objPos: TGLVector; size: Single);
   public
     constructor Create(aBuilder: TGLImposterBuilder); virtual;
     destructor Destroy; override;
     procedure BeginRender(var rci: TGLRenderContextInfo); virtual;
     procedure Render(var rci: TGLRenderContextInfo;
-      const objPos, localCameraPos: TVector;
+      const objPos, localCameraPos: TGLVector;
       size: Single); virtual;
     procedure EndRender(var rci: TGLRenderContextInfo); virtual;
     procedure RenderOnce(var rci: TGLRenderContextInfo;
-      const objPos, localCameraPos: TVector;
+      const objPos, localCameraPos: TGLVector;
       size: Single);
     property AspectRatio: Single read FAspectRatio write FAspectRatio;
     property Builder: TGLImposterBuilder read FBuilder;
@@ -116,7 +115,7 @@ type
   private
     FBackColor: TGLColor;
     FBuildOffset: TGLCoordinates;
-    FImposterRegister: TPersistentObjectList;
+    FImposterRegister: TGLPersistentObjectList;
     FRenderPoint: TGLRenderPoint;
     FImposterOptions: TImposterOptions;
     FAlphaTreshold: Single;
@@ -130,7 +129,7 @@ type
     procedure SetBuildOffset(AValue: TGLCoordinates);
     procedure SetImposterReference(AValue: TImposterReference);
     procedure InitializeImpostorTexture(const TextureSize: TPoint);
-    property ImposterRegister: TPersistentObjectList read FImposterRegister;
+    property ImposterRegister: TGLPersistentObjectList read FImposterRegister;
     procedure UnregisterImposter(imposter: TImposter);
     function CreateNewImposter: TImposter; virtual;
     procedure PrepareImposters(Sender: TObject; var rci: TGLRenderContextInfo);
@@ -245,7 +244,7 @@ type
   TStaticImposter = class(TImposter)
   public
     procedure Render(var rci: TGLRenderContextInfo;
-      const objPos, localCameraPos: TVector;
+      const objPos, localCameraPos: TGLVector;
       size: Single); override;
   end;
 
@@ -418,7 +417,7 @@ end;
 
 procedure TImposter.BeginRender(var rci: TGLRenderContextInfo);
 var
-  mat: TMatrix;
+  mat: TGLMatrix;
   filter: Cardinal;
   fx, fy, yOffset, cosAlpha, dynScale: Single;
 begin
@@ -500,17 +499,17 @@ begin
 end;
 
 procedure TImposter.Render(var rci: TGLRenderContextInfo;
-  const objPos, localCameraPos: TVector;
+  const objPos, localCameraPos: TGLVector;
   size: Single);
 const
-  cQuadTexExtents: TVector = (X:0; Y:0; Z:1; W:1);
+  cQuadTexExtents: TGLVector = (X:0; Y:0; Z:1; W:1);
 begin
   RenderQuad(cQuadTexExtents, objPos, size);
 end;
 
-procedure TImposter.RenderQuad(const texExtents, objPos: TVector; size: Single);
+procedure TImposter.RenderQuad(const texExtents, objPos: TGLVector; size: Single);
 var
-  pos: TVector;
+  pos: TGLVector;
 begin
   VectorCombine(objPos, FQuad[0], size, pos);
   gl.TexCoord2f(texExtents.Z, texExtents.W);
@@ -533,7 +532,7 @@ begin
 end;
 
 procedure TImposter.RenderOnce(var rci: TGLRenderContextInfo;
-  const objPos, localCameraPos: TVector;
+  const objPos, localCameraPos: TGLVector;
   size: Single);
 begin
   BeginRender(rci);
@@ -548,7 +547,7 @@ end;
 constructor TGLImposterBuilder.Create(AOwner: TComponent);
 begin
   inherited;
-  FImposterRegister := TPersistentObjectList.Create;
+  FImposterRegister := TGLPersistentObjectList.Create;
   FBackColor := TGLColor.CreateInitialized(Self, clrTransparent);
   FBuildOffset := TGLCoordinates.CreateInitialized(Self, NullHmgPoint, CsPoint);
   FImposterOptions := cDefaultImposterOptions;
@@ -931,14 +930,14 @@ end;
 // ----------
 
 procedure TStaticImposter.Render(var rci: TGLRenderContextInfo;
-  const objPos, localCameraPos: TVector;
+  const objPos, localCameraPos: TGLVector;
   size: Single);
 var
   azimuthAngle: Single;
   i: Integer;
   x, y: Word;
   bestCorona: TGLStaticImposterBuilderCorona;
-  texExtents: TVector;
+  texExtents: TGLVector;
   tdx, tdy: Single;
   siBuilder: TGLStaticImposterBuilder;
 begin // inherited; exit;
@@ -1121,11 +1120,11 @@ procedure TGLStaticImposterBuilder.Render(var rci: TGLRenderContextInfo;
 var
   i, coronaIdx, curSample: Integer;
   radius: Single;
-  cameraDirection, cameraOffset: TVector;
+  cameraDirection, cameraOffset: TGLVector;
   xDest, xSrc, yDest, ySrc: Integer;
   corona: TGLStaticImposterBuilderCorona;
   fx, fy, yOffset: Single;
-  LM: TMatrix;
+  LM: TGLMatrix;
 begin
   FTextureSize := ComputeOptimalTextureSize;
   if (FTextureSize.X <= 0) and (FTextureSize.Y <= 0) then
@@ -1303,8 +1302,8 @@ procedure TGLDynamicImposterBuilder.DoRender(var rci : TGLRenderContextInfo;
 var
   i, size, Left, Top, Width, Height : Integer;
   imposter : TGLImposter;
-  mat, projection, modelview : TMatrix;
-  BackColor, pos, temp : TVector;
+  mat, projection, modelview : TGLMatrix;
+  BackColor, pos, temp : TGLVector;
   rad : Single;
   AABB : TAABB;
 begin
@@ -1455,7 +1454,7 @@ end;
 procedure TGLImposter.DoRender(var ARci: TGLRenderContextInfo;
   ARenderSelf, ARenderChildren: Boolean);
 var
-  camPos: TVector;
+  camPos: TGLVector;
   imposter: TImposter;
 begin
   if ARenderSelf and Assigned(Builder) and Assigned(ImpostoredObject) then
@@ -1504,15 +1503,15 @@ begin
 end;
 
 {
-function TGLImposter.AxisAlignedDimensionsUnscaled : TVector;
+function TGLImposter.AxisAlignedDimensionsUnscaled : TGLVector;
 begin
    Result:=NullHMGVector;
 end;
 
-function TGLImposter.CalcError(NewMatrix : TMatrix) : Single;
+function TGLImposter.CalcError(NewMatrix : TGLMatrix) : Single;
 var
    i : Integer;
-   mat : TMatrix;
+   mat : TGLMatrix;
    err : Single;
 begin
    err:=0;

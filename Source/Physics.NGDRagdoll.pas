@@ -1,10 +1,9 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit Physics.NGDRagdoll;
 
-(* The Ragdoll extension by using Newton Game Dynamics Engine (ODE) *)
+(* The Ragdoll extension using Newton Game Dynamics Engine *)
 
 interface
 
@@ -14,7 +13,7 @@ uses
   GLS.VectorGeometry,
   GLS.VectorTypes,
   GLS.VectorFileObjects,
-  Import.NGD;
+  NGD.Import;
 
 type
   TNewtonRagdoll = class
@@ -31,9 +30,9 @@ type
     Actor: TGLActor;
     Bodies: TList;
     Joints: array of PNewtonJoint;
-    Norm_matrices: array of TMatrix;
+    Norm_matrices: array of TGLMatrix;
     Envelopes: array of record kind: byte;
-    Mat: TMatrix;
+    Mat: TGLMatrix;
     Pt: TVector3f;
     W, D, H, Mass: single;
   end;
@@ -43,17 +42,16 @@ property SlideLimit: single read FSlideLimit write SetSlideLimit;
 property AngleLimit: single read FAngleLimit write SetAngleLimit;
 property ERP: single read FERP write SetERP;
 
-constructor Create(model: TGLActor; world: PNewtonWorld;
-  min_env_size: single = 0.8; slide_limit: single = 0.5; erp_: single = 0.8;
-  angle_limit: single = 15; full: boolean = true);
+constructor Create(model: TGLActor; world: PNewtonWorld; min_env_size: single = 0.8;
+  slide_limit: single = 0.5; erp_: single = 0.8; angle_limit: single = 15; full: boolean = true);
 procedure Conform;
 destructor Destroy; override;
 procedure LoadFromFile(filename: string);
 procedure SaveToFile(filename: string);
-function TranslatePos(n: integer; add: boolean): TVector;
+function TranslatePos(n: integer; add: boolean): TGLVector;
 end;
 
-function GetBoneParent(actor: TGLActor; bone: integer): integer;
+function GetBoneParent(Actor: TGLActor; bone: integer): integer;
 
 // --------------------------------------------
 implementation
@@ -61,13 +59,13 @@ implementation
 
 function TNewtonRagdoll.TranslatePos;
 begin
-  with envelopes[n] do
+  with Envelopes[n] do
     if add then
-      Result := VectorAdd(Mat.w, VectorAdd(VectorScale(Mat.X, pt.X),
-        VectorAdd(VectorScale(Mat.Y, pt.Y), VectorScale(Mat.Z, pt.Z))))
+      Result := VectorAdd(Mat.W, VectorAdd(VectorScale(Mat.X, Pt.X),
+        VectorAdd(VectorScale(Mat.Y, Pt.Y), VectorScale(Mat.Z, Pt.Z))))
     else
-      Result := VectorSubtract(Mat.w, VectorAdd(VectorScale(Mat.X, pt.X),
-        VectorAdd(VectorScale(Mat.Y, pt.Y), VectorScale(Mat.Z, pt.Z))));
+      Result := VectorSubtract(Mat.W, VectorAdd(VectorScale(Mat.X, Pt.X),
+        VectorAdd(VectorScale(Mat.Y, Pt.Y), VectorScale(Mat.Z, Pt.Z))));
 end;
 
 function GetBoneParent;
@@ -75,18 +73,18 @@ var
   i, j: integer;
 begin
   Result := 0;
-  for i := 0 to actor.Skeleton.BoneCount - 2 do
-    if actor.Skeleton.BoneByID(i) <> nil then
-      for j := 0 to actor.Skeleton.BoneByID(i).Count - 1 do
-        if actor.Skeleton.BoneByID(i).Items[j].BoneID = bone then
+  for i := 0 to Actor.Skeleton.BoneCount - 2 do
+    if Actor.Skeleton.BoneByID(i) <> nil then
+      for j := 0 to Actor.Skeleton.BoneByID(i).Count - 1 do
+        if Actor.Skeleton.BoneByID(i).Items[j].BoneID = bone then
         begin
           Result := i;
           Exit;
         end;
 end;
 
-procedure NewtonApplyForceAndTorqueCallback(const body: PNewtonBody;
-  timestep: single; threadIndex: integer); cdecl;
+procedure NewtonApplyForceAndTorqueCallback(const body: PNewtonBody; timestep: single;
+  threadIndex: integer); cdecl;
 var
   m: single;
   i: TVector3f;
@@ -97,8 +95,8 @@ begin
   NewtonBodyAddForce(body, @F.X);
 end;
 
-function NewtonJointCallBack(const Universal: PNewtonJoint;
-  desc: PNewtonHingeSliderUpdateDesc): cardinal; cdecl;
+function NewtonJointCallBack(const Universal: PNewtonJoint; desc: PNewtonHingeSliderUpdateDesc)
+  : cardinal; cdecl;
 var
   angle: single;
 begin
@@ -120,97 +118,96 @@ constructor TNewtonRagdoll.Create;
 var
   i, j: integer;
   p1, p2: TVector4f;
-  d: single;
+  D: single;
   Collision: PNewtonCollision;
-  CollisionOffsetMatrix: TMatrix; // For cone capsule and cylinder
+  CollisionBox, CollisionCylinder, CollisionSphere: PNewtonCollision;
+  Matrix: TGLMatrix;
+  CollisionOffsetMatrix: TGLMatrix; // For cone capsule and cylinder
 begin
-  collisionOffsetMatrix := IdentityHmgMatrix;
-  d := 0;
+  CollisionOffsetMatrix := IdentityHmgMatrix;
+  D := 0;
   if full then
   begin
     inherited Create;
-    actor := model;
+    Actor := model;
     newtonworld := world;
   end;
   FEnabled := false;
-  bodies := TList.Create;
-  SetLength(envelopes, actor.Skeleton.BoneCount - 1);
-  SetLength(norm_matrices, actor.Skeleton.BoneCount - 1);
-  SetLength(joints, actor.Skeleton.BoneCount - 1);
-  for i := 0 to actor.Skeleton.BoneCount - 2 do
+  Bodies := TList.Create;
+  SetLength(Envelopes, Actor.Skeleton.BoneCount - 1);
+  SetLength(Norm_matrices, Actor.Skeleton.BoneCount - 1);
+  SetLength(Joints, Actor.Skeleton.BoneCount - 1);
+  for i := 0 to Actor.Skeleton.BoneCount - 2 do
   begin
-    p1 := actor.Skeleton.BoneByID(i).GlobalMatrix.w;
-    if actor.Skeleton.BoneByID(i).BoneCount > 1 then
-      p2 := actor.Skeleton.BoneByID(i).Items[0].GlobalMatrix.w
+    p1 := Actor.Skeleton.BoneByID(i).GlobalMatrix.W;
+    if Actor.Skeleton.BoneByID(i).BoneCount > 1 then
+      p2 := Actor.Skeleton.BoneByID(i).Items[0].GlobalMatrix.W
     else
       p2 := p1;
-    p1 := VectorTransform(p1, actor.AbsoluteMatrix);
-    p2 := VectorTransform(p2, actor.AbsoluteMatrix);
+    p1 := VectorTransform(p1, Actor.AbsoluteMatrix);
+    p2 := VectorTransform(p2, Actor.AbsoluteMatrix);
 
-    with envelopes[i] do
+    with Envelopes[i] do
     begin
       if full then
       begin
         kind := 1;
-        mass := 1;
-        d := 2 * min_env_size;
-        h := 2 * min_env_size;
-        w := 0.8 * VectorLength(VectorSubtract(p2, p1));
-        if w < 1 then
+        Mass := 1;
+        D := 2 * min_env_size;
+        H := 2 * min_env_size;
+        W := 0.8 * VectorLength(VectorSubtract(p2, p1));
+        if W < 1 then
         begin
-          w := min_env_size;
-          d := min_env_size;
-          h := min_env_size;
+          W := min_env_size;
+          D := min_env_size;
+          H := min_env_size;
         end;
-        pt := AffineVectorMake(w * 0.5 / 0.8, 0, 0);
+        Pt := AffineVectorMake(W * 0.5 / 0.8, 0, 0);
         // p2:=m[0];  m[0]:=m[1];  m[1]:=p2;
       end;
-      Mat := MatrixMultiply(Actor.Skeleton.BoneByID(i).GlobalMatrix,
-        Actor.AbsoluteMatrix);
-      Mat.w := TranslatePos(i, true);
+      Mat := MatrixMultiply(Actor.Skeleton.BoneByID(i).GlobalMatrix, Actor.AbsoluteMatrix);
+      Mat.W := TranslatePos(i, true);
       case kind of
         0, 1:
           begin
-            Collision := NewtonCreateBox(NewtonWorld, w, h, d, 0, @CollisionOffsetMatrix);
-            Bodies.Add(NewtonCreateBody(World, Collision, @CollisionOffsetMatrix));
-            NewtonBodySetMassMatrix(bodies[bodies.Count - 1], mass, w, h, d);
+            Collision := NewtonCreateBox(newtonworld, W, H, D, 0, @CollisionOffsetMatrix);
+            Bodies.add(NewtonCreateBody(world, Collision, @CollisionOffsetMatrix));
+            NewtonBodySetMassMatrix(Bodies[Bodies.Count - 1], Mass, W, H, D);
           end;
         2:
           begin
-            Bodies.Add(NewtonCreateBody(World, NewtonCreateCylinder(newtonworld,
-              w, h, 0, @CollisionOffsetMatrix), @CollisionOffsetMatrix));
-            NewtonBodySetMassMatrix(bodies[bodies.Count - 1], mass, 2, w, h);
+            Bodies.add(NewtonCreateBody(world, NewtonCreateCylinder(newtonworld, W, H, 0,
+              @CollisionOffsetMatrix), @CollisionOffsetMatrix));
+            NewtonBodySetMassMatrix(Bodies[Bodies.Count - 1], Mass, 2, W, H);
           end;
         3:
           begin
-            Bodies.Add(NewtonCreateBody(world, NewtonCreateSphere(newtonworld,
-              w, w, w, 0, @CollisionOffsetMatrix), @CollisionOffsetMatrix));
-            NewtonBodySetMassMatrix(bodies[bodies.Count - 1], mass, w, w, w);
+            Bodies.add(NewtonCreateBody(world, NewtonCreateSphere(newtonworld, W, W, W, 0,
+              @CollisionOffsetMatrix), @CollisionOffsetMatrix));
+            NewtonBodySetMassMatrix(Bodies[Bodies.Count - 1], Mass, W, W, W);
           end;
       end;
-      NewtonBodySetLinearDamping(bodies[i], 0);
-      NewtonBodySetAngularDamping(bodies[i], @d);
+      NewtonBodySetLinearDamping(Bodies[i], 0);
+      NewtonBodySetAngularDamping(Bodies[i], @D);
 
-      NewtonBodySetMatrix(bodies[i], @Mat);
-      NewtonBodySetForceAndTorqueCallBack(bodies[i],
-        NewtonApplyForceAndTorqueCallback);
+      NewtonBodySetMatrix(Bodies[i], @Mat);
+      NewtonBodySetForceAndTorqueCallBack(Bodies[i], NewtonApplyForceAndTorqueCallback);
     end;
   end;
 
   FERP := erp_;
   FSlideLimit := slide_limit;
   FAngleLimit := angle_limit;
-  for i := 0 to actor.Skeleton.BoneCount - 2 do
+  for i := 0 to Actor.Skeleton.BoneCount - 2 do
   begin
-    j := GetBoneParent(actor, i);
+    j := GetBoneParent(Actor, i);
     if i = j then
       Continue;
     p1 := TranslatePos(i, false);
-    with envelopes[i] do
-      joints[i] := NewtonConstraintCreateHinge(newtonworld, @p1, @Mat.Y,
-        bodies[i], bodies[j]);
-    NewtonJointSetCollisionState(joints[i], 1);
-    NewtonHingeSetUserCallback(joints[i], NewtonJointCallBack);
+    with Envelopes[i] do
+      Joints[i] := NewtonConstraintCreateHinge(newtonworld, @p1, @Mat.Y, Bodies[i], Bodies[j]);
+    NewtonJointSetCollisionState(Joints[i], 1);
+    NewtonHingeSetUserCallback(Joints[i], NewtonJointCallBack);
   end;
 end;
 
@@ -220,42 +217,42 @@ var
 begin
   if Enabled = false then
     Exit;
-  for i := 0 to Length(envelopes) - 1 do
-    with envelopes[i] do
+  for i := 0 to Length(Envelopes) - 1 do
+    with Envelopes[i] do
     begin
       NewtonBodyGetMatrix(Bodies[i], @Mat);
-      Mat.w := TranslatePos(i, false);
+      Mat.W := TranslatePos(i, false);
       Actor.Skeleton.BoneByID(i).SetGlobalMatrixForRagDoll(Mat);
     end;
-  actor.Skeleton.MorphMesh(true);
+  Actor.Skeleton.MorphMesh(true);
 end;
 
 procedure TNewtonRagdoll.Clean;
 var
   i: integer;
 begin
-  for i := 0 to Length(joints) - 1 do
-    if joints[i] <> nil then
-      NewtonDestroyJoint(newtonworld, joints[i]);
-  SetLength(joints, 0);
-  for i := 0 to bodies.Count - 1 do
-    NewtonDestroyBody(newtonworld, bodies[i]);
-  bodies.Clear;
-  FreeAndNil(bodies);
+  for i := 0 to Length(Joints) - 1 do
+    if Joints[i] <> nil then
+      NewtonDestroyJoint(newtonworld, Joints[i]);
+  SetLength(Joints, 0);
+  for i := 0 to Bodies.Count - 1 do
+    NewtonDestroyBody(newtonworld, Bodies[i]);
+  Bodies.Clear;
+  FreeAndNil(Bodies);
 end;
 
 destructor TNewtonRagdoll.Destroy;
 begin
   Clean;
-  SetLength(envelopes, 0);
-  SetLength(norm_matrices, 0);
+  SetLength(Envelopes, 0);
+  SetLength(Norm_matrices, 0);
   inherited Destroy;
 end;
 
 procedure TNewtonRagdoll.SetEnabled;
 var
   i: integer;
-  a: TMatrix;
+  a: TGLMatrix;
   v: TVector3f;
 begin
   if FEnabled = value then
@@ -263,28 +260,28 @@ begin
   FEnabled := value;
   if value = true then
   begin
-    actor.Skeleton.StartRagdoll;
-    for i := 0 to Length(envelopes) - 1 do
-      norm_matrices[i] := envelopes[i].Mat;
+    Actor.Skeleton.StartRagdoll;
+    for i := 0 to Length(Envelopes) - 1 do
+      Norm_matrices[i] := Envelopes[i].Mat;
     Exit;
   end;
 
-  actor.Skeleton.StopRagdoll;
-  for i := 0 to Length(envelopes) - 1 do
+  Actor.Skeleton.StopRagdoll;
+  for i := 0 to Length(Envelopes) - 1 do
   begin
     v := NullVector;
-    NewtonBodySetVelocity(bodies[i], @v);
-    NewtonBodySetOmega(bodies[i], @v);
-    NewtonBodySetForce(bodies[i], @v);
-    NewtonBodySetTorque(bodies[i], @v);
+    NewtonBodySetVelocity(Bodies[i], @v);
+    NewtonBodySetOmega(Bodies[i], @v);
+    NewtonBodySetForce(Bodies[i], @v);
+    NewtonBodySetTorque(Bodies[i], @v);
 
-    envelopes[i].Mat := norm_matrices[i];
-    a := envelopes[i].Mat;
-    NewtonBodySetMatrix(bodies[i], @a);
-    NewtonBodySetCollision(bodies[i], nil);
-    actor.Skeleton.BoneByID(i).SetGlobalMatrixForRagDoll(a);
+    Envelopes[i].Mat := Norm_matrices[i];
+    a := Envelopes[i].Mat;
+    NewtonBodySetMatrix(Bodies[i], @a);
+    NewtonBodySetCollision(Bodies[i], nil);
+    Actor.Skeleton.BoneByID(i).SetGlobalMatrixForRagDoll(a);
   end;
-  actor.Skeleton.MorphMesh(true);
+  Actor.Skeleton.MorphMesh(true);
 end;
 
 procedure TNewtonRagdoll.SetSlideLimit;
@@ -312,19 +309,19 @@ var
 begin
   F := TFileStream.Create(filename, fmOpenRead);
   F.Read(i, SizeOf(i));
-  SetLength(envelopes, i);
+  SetLength(Envelopes, i);
   F.Read(s, SizeOf(s));
   F.Read(e, SizeOf(e));
   F.Read(a, SizeOf(a));
   Clean;
-  for i := 0 to Length(envelopes) - 1 do
+  for i := 0 to Length(Envelopes) - 1 do
   begin
-    F.Read(envelopes[i].kind, SizeOf(envelopes[i].kind));
-    F.Read(envelopes[i].w, SizeOf(envelopes[i].w));
-    F.Read(envelopes[i].h, SizeOf(envelopes[i].h));
-    F.Read(envelopes[i].d, SizeOf(envelopes[i].d));
-    F.Read(envelopes[i].mass, SizeOf(envelopes[i].mass));
-    F.Read(envelopes[i].pt, SizeOf(envelopes[i].pt));
+    F.Read(Envelopes[i].kind, SizeOf(Envelopes[i].kind));
+    F.Read(Envelopes[i].W, SizeOf(Envelopes[i].W));
+    F.Read(Envelopes[i].H, SizeOf(Envelopes[i].H));
+    F.Read(Envelopes[i].D, SizeOf(Envelopes[i].D));
+    F.Read(Envelopes[i].Mass, SizeOf(Envelopes[i].Mass));
+    F.Read(Envelopes[i].Pt, SizeOf(Envelopes[i].Pt));
   end;
   /// Create(actor, newtonworld, 0.8, s, e, a, false);
   F.Free;
@@ -339,19 +336,19 @@ begin
     F := TFileStream.Create(filename, fmOpenWrite)
   else
     F := TFileStream.Create(filename, fmCreate);
-  i := Length(envelopes);
+  i := Length(Envelopes);
   F.Write(i, SizeOf(i));
   F.Write(FSlideLimit, SizeOf(FSlideLimit));
   F.Write(FERP, SizeOf(FERP));
   F.Write(FAngleLimit, SizeOf(FAngleLimit));
-  for i := 0 to Length(envelopes) - 1 do
+  for i := 0 to Length(Envelopes) - 1 do
   begin
-    F.Write(envelopes[i].kind, SizeOf(envelopes[i].kind));
-    F.Write(envelopes[i].w, SizeOf(envelopes[i].w));
-    F.Write(envelopes[i].h, SizeOf(envelopes[i].h));
-    F.Write(envelopes[i].d, SizeOf(envelopes[i].d));
-    F.Write(envelopes[i].mass, SizeOf(envelopes[i].mass));
-    F.Write(envelopes[i].pt, SizeOf(envelopes[i].pt));
+    F.Write(Envelopes[i].kind, SizeOf(Envelopes[i].kind));
+    F.Write(Envelopes[i].W, SizeOf(Envelopes[i].W));
+    F.Write(Envelopes[i].H, SizeOf(Envelopes[i].H));
+    F.Write(Envelopes[i].D, SizeOf(Envelopes[i].D));
+    F.Write(Envelopes[i].Mass, SizeOf(Envelopes[i].Mass));
+    F.Write(Envelopes[i].Pt, SizeOf(Envelopes[i].Pt));
   end;
   F.Free;
 end;

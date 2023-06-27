@@ -1,14 +1,13 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.LinePFX;
 
 (* A PFX whose particles are lines *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
@@ -34,8 +33,8 @@ type
     FLength: Single;
   protected
   public
-    procedure WriteToFiler(writer: TVirtualWriter); override;
-    procedure ReadFromFiler(reader: TVirtualReader); override;
+    procedure WriteToFiler(writer: TGLVirtualWriter); override;
+    procedure ReadFromFiler(reader: TGLVirtualReader); override;
     // Direction of the line.
     property Direction: TAffineVector read FDirection write FDirection;
     // Length of the line
@@ -113,7 +112,7 @@ end;
 procedure TGLLinePFXManager.InitializeRendering(var rci: TGLRenderContextInfo);
 var
   i: Integer;
-  matrix: TMatrix;
+  matrix: TGLMatrix;
 begin
   inherited;
   gl.GetFloatv(GL_MODELVIEW_MATRIX, @matrix);
@@ -135,7 +134,7 @@ procedure TGLLinePFXManager.RenderParticle(var rci: TGLRenderContextInfo;
   aParticle: TGLParticle);
 var
   lifeTime, sizeScale, fx, fy, f: Single;
-  inner, outer: TColorVector;
+  inner, outer: TGLColorVector;
   pos, dir, start, stop, dv: TAffineVector;
 begin
   lifeTime := CurrentTime - aParticle.CreationTime;
@@ -194,7 +193,7 @@ end;
 // ------------------ TGLLineParticle ------------------
 // ------------------
 
-procedure TGLLineParticle.WriteToFiler(writer: TVirtualWriter);
+procedure TGLLineParticle.WriteToFiler(writer: TGLVirtualWriter);
 begin
   inherited WriteToFiler(writer);
   with writer do
@@ -205,7 +204,7 @@ begin
   end;
 end;
 
-procedure TGLLineParticle.ReadFromFiler(reader: TVirtualReader);
+procedure TGLLineParticle.ReadFromFiler(reader: TGLVirtualReader);
 var
   archiveVersion: Integer;
 begin

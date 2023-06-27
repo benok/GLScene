@@ -1,14 +1,13 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.Blur;
 
 (* Applies a blur effect over the viewport *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
@@ -17,9 +16,11 @@ uses
   System.SysUtils,
   VCL.Graphics,
 
-  
   GLS.OpenGLTokens,
+  GLS.VectorTypes,
   GLS.VectorGeometry,
+  GLS.TextureFormat,
+
   GLS.BaseClasses,
   GLS.Scene,
   GLS.Objects,
@@ -32,7 +33,6 @@ uses
   GLS.Context,
   GLS.XOpenGL,
   GLS.State,
-  GLS.TextureFormat,
   GLS.RenderContextInfo;
 
 type
@@ -169,7 +169,6 @@ uses
   GLS.Coordinates,
   GLS.PersistentClasses,
   GLS.Strings,
-  GLS.VectorTypes,
   GLS.OpenGLAdapter;
 
 const
@@ -248,7 +247,7 @@ var
   refsiz: single;
   BMP: TGLImage;
   x, y: integer;
-  line: PPixel32Array;
+  line: PGLPixel32Array;
   by: Integer;
   bp: Integer;
   DoBlur: Boolean;
@@ -257,7 +256,7 @@ var
   var
     t: integer;
     x, y: integer;
-    lin, linu, lind, linuu, lindd: PPixel32Array;
+    lin, linu, lind, linuu, lindd: PGLPixel32Array;
     r, g, b: single;
 
     procedure ApplyBlurClampAndSetPixel;

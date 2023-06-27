@@ -1,14 +1,13 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.OpenGLAdapter;
 
 (* OpenGL adapter *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
@@ -23,8 +22,20 @@ uses
   GLS.VectorTypes;
 
 const
+  {$IFDEF CROSSVCL}
+    {$IF Defined(LINUX)}
+    opengl32 = 'libGL.so';
+    glu32 = 'libGLU.so.1';
+    {$ELSEIF Defined(MACOS)}
+    opengl32 = '/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib';
+    glu32 = '/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGLU.dylib';
+    {$ELSE}
+    Unsupported platform
+    {$ENDIF}
+  {$ELSE}
   opengl32 = 'OpenGL32.dll';
   glu32 = 'GLU32.dll';
+  {$ENDIF}
 
 type
   EOpenGLError = class(Exception);
@@ -1353,137 +1364,6 @@ type
 
 {$ENDIF SUPPORT_WGL}
 
-    // ------- GLX function/procedure definitions for ARB approved extensions'}
-
-{$IFDEF SUPPORT_GLX}
-    // ###########################################################
-    // function and procedure definitions for
-    // ARB approved GLX extensions
-    // ###########################################################
-
-    // GLX extension checks
-    X_VERSION_1_1, X_VERSION_1_2, X_VERSION_1_3, X_VERSION_1_4,
-      X_ARB_create_context, X_ARB_create_context_profile,
-      X_ARB_framebuffer_sRGB, X_ARB_multisample, X_EXT_framebuffer_sRGB,
-      X_EXT_fbconfig_packed_float, X_SGIS_multisample, X_EXT_visual_info,
-      X_SGI_swap_control, X_SGI_video_sync, X_SGI_make_current_read,
-      X_SGIX_video_source, X_EXT_visual_rating, X_EXT_import_context,
-      X_SGIX_fbconfig, X_SGIX_pbuffer, X_SGI_cushion, X_SGIX_video_resize,
-      X_SGIX_dmbuffer, X_SGIX_swap_group, X_SGIX_swap_barrier,
-      X_SGIS_blended_overlay, X_SGIS_shared_multisample,
-      X_SUN_get_transparent_index, X_3DFX_multisample, X_MESA_copy_sub_buffer,
-      X_MESA_pixmap_colormap, X_MESA_release_buffers, X_MESA_set_3dfx_mode,
-      X_SGIX_visual_select_group, X_SGIX_hyperpipe,
-      X_NV_multisample_coverage: boolean;
-
-    // GLX 1.3 and later
-    XChooseFBConfig: PFNGLXCHOOSEFBCONFIGPROC;
-    XGetFBConfigAttrib: PFNGLXGETFBCONFIGATTRIBPROC;
-    XGetFBConfigs: PFNGLXGETFBCONFIGSPROC;
-    XGetVisualFromFBConfig: PFNGLXGETVISUALFROMFBCONFIGPROC;
-    XCreateWindow: PFNGLXCREATEWINDOWPROC;
-    XDestroyWindow: PFNGLXDESTROYWINDOWPROC;
-    XCreatePixmap: PFNGLXCREATEPIXMAPPROC;
-    XDestroyPixmap: PFNGLXDESTROYPIXMAPPROC;
-    XCreatePbuffer: PFNGLXCREATEPBUFFERPROC;
-    XDestroyPbuffer: PFNGLXDESTROYPBUFFERPROC;
-    XQueryDrawable: PFNGLXQUERYDRAWABLEPROC;
-    XCreateNewContext: PFNGLXCREATENEWCONTEXTPROC;
-    XMakeContextCurrent: PFNGLXMAKECONTEXTCURRENTPROC;
-    XGetCurrentReadDrawable: PFNGLXGETCURRENTREADDRAWABLEPROC;
-    XQueryContext: PFNGLXQUERYCONTEXTPROC;
-    XSelectEvent: PFNGLXSELECTEVENTPROC;
-    XGetSelectedEvent: PFNGLXGETSELECTEDEVENTPROC;
-    XBindTexImageARB: PFNGLXBINDTEXIMAGEARBPROC;
-    XReleaseTexImageARB: PFNGLXRELEASETEXIMAGEARBPROC;
-    XDrawableAttribARB: PFNGLXDRAWABLEATTRIBARBPROC;
-
-    // GLX 1.4
-    // X_ARB_create_context (EXT #56)
-    XCreateContextAttribsARB: PFNGLXCREATECONTEXTATTRIBSARBPROC;
-
-    // ------------- GLX function/procedure definitions for Vendor/EXT extensions'}
-
-    // ###########################################################
-    // function and procedure definitions for
-    // Vendor/EXT GLX extensions
-    // ###########################################################
-
-    // X_SGI_swap_control (EXT #40)
-    XSwapIntervalSGI: PFNGLXSWAPINTERVALSGIPROC;
-    XGetVideoSyncSGI: PFNGLXGETVIDEOSYNCSGIPROC;
-    XWaitVideoSyncSGI: PFNGLXWAITVIDEOSYNCSGIPROC;
-    XFreeContextEXT: PFNGLXFREECONTEXTEXTPROC;
-    XGetContextIDEXT: PFNGLXGETCONTEXTIDEXTPROC;
-    XGetCurrentDisplayEXT: PFNGLXGETCURRENTDISPLAYEXTPROC;
-    XImportContextEXT: PFNGLXIMPORTCONTEXTEXTPROC;
-    XQueryContextInfoEXT: PFNGLXQUERYCONTEXTINFOEXTPROC;
-    XCopySubBufferMESA: PFNGLXCOPYSUBBUFFERMESAPROC;
-    XCreateGLXPixmapMESA: PFNGLXCREATEGLXPIXMAPMESAPROC;
-    XReleaseBuffersMESA: PFNGLXRELEASEBUFFERSMESAPROC;
-    XSet3DfxModeMESA: PFNGLXSET3DFXMODEMESAPROC;
-    XBindTexImageEXT: PFNGLXBINDTEXIMAGEEXTPROC;
-    XReleaseTexImageEXT: PFNGLXRELEASETEXIMAGEEXTPROC;
-
-    // GLX 1.4
-    XMakeCurrentReadSGI: PFNGLXMAKECURRENTREADSGIPROC;
-    XGetCurrentReadDrawableSGI: PFNGLXGETCURRENTREADDRAWABLESGIPROC;
-    XGetFBConfigAttribSGIX: PFNGLXGETFBCONFIGATTRIBSGIXPROC;
-    XChooseFBConfigSGIX: PFNGLXCHOOSEFBCONFIGSGIXPROC;
-    XCreateGLXPixmapWithConfigSGIX: PFNGLXCREATEGLXPIXMAPWITHCONFIGSGIXPROC;
-    XCreateContextWithConfigSGIX: PFNGLXCREATECONTEXTWITHCONFIGSGIXPROC;
-    XGetVisualFromFBConfigSGIX: PFNGLXGETVISUALFROMFBCONFIGSGIXPROC;
-    XGetFBConfigFromVisualSGIX: PFNGLXGETFBCONFIGFROMVISUALSGIXPROC;
-    XCreateGLXPbufferSGIX: PFNGLXCREATEGLXPBUFFERSGIXPROC;
-    XDestroyGLXPbufferSGIX: PFNGLXDESTROYGLXPBUFFERSGIXPROC;
-    XQueryGLXPbufferSGIX: PFNGLXQUERYGLXPBUFFERSGIXPROC;
-    XSelectEventSGIX: PFNGLXSELECTEVENTSGIXPROC;
-    XGetSelectedEventSGIX: PFNGLXGETSELECTEDEVENTSGIXPROC;
-    XCushionSGI: PFNGLXCUSHIONSGIPROC;
-    XBindChannelToWindowSGIX: PFNGLXBINDCHANNELTOWINDOWSGIXPROC;
-    XChannelRectSGIX: PFNGLXCHANNELRECTSGIXPROC;
-    XQueryChannelRectSGIX: PFNGLXQUERYCHANNELRECTSGIXPROC;
-    XQueryChannelDeltasSGIX: PFNGLXQUERYCHANNELDELTASSGIXPROC;
-    XChannelRectSyncSGIX: PFNGLXCHANNELRECTSYNCSGIXPROC;
-    XJoinSwapGroupSGIX: PFNGLXJOINSWAPGROUPSGIXPROC;
-    XBindSwapBarrierSGIX: PFNGLXBINDSWAPBARRIERSGIXPROC;
-    XQueryMaxSwapBarriersSGIX: PFNGLXQUERYMAXSWAPBARRIERSSGIXPROC;
-    XQueryHyperpipeNetworkSGIX: PFNGLXQUERYHYPERPIPENETWORKSGIXPROC;
-    XHyperpipeConfigSGIX: PFNGLXHYPERPIPECONFIGSGIXPROC;
-    XQueryHyperpipeConfigSGIX: PFNGLXQUERYHYPERPIPECONFIGSGIXPROC;
-    XDestroyHyperpipeConfigSGIX: PFNGLXDESTROYHYPERPIPECONFIGSGIXPROC;
-    XBindHyperpipeSGIX: PFNGLXBINDHYPERPIPESGIXPROC;
-    XQueryHyperpipeBestAttribSGIX: PFNGLXQUERYHYPERPIPEBESTATTRIBSGIXPROC;
-    XHyperpipeAttribSGIX: PFNGLXHYPERPIPEATTRIBSGIXPROC;
-    XQueryHyperpipeAttribSGIX: PFNGLXQUERYHYPERPIPEATTRIBSGIXPROC;
-    XGetAGPOffsetMESA: PFNGLXGETAGPOFFSETMESAPROC;
-    XEnumerateVideoDevicesNV: PFNGLXENUMERATEVIDEODEVICESNVPROC;
-    XBindVideoDeviceNV: PFNGLXBINDVIDEODEVICENVPROC;
-    XGetVideoDeviceNV: PFNGLXGETVIDEODEVICENVPROC;
-
-    XAllocateMemoryNV: PFNGLXALLOCATEMEMORYNVPROC;
-    XFreeMemoryNV: PFNGLXFREEMEMORYNVPROC;
-
-    XReleaseVideoDeviceNV: PFNGLXRELEASEVIDEODEVICENVPROC;
-    XBindVideoImageNV: PFNGLXBINDVIDEOIMAGENVPROC;
-    XReleaseVideoImageNV: PFNGLXRELEASEVIDEOIMAGENVPROC;
-    XSendPbufferToVideoNV: PFNGLXSENDPBUFFERTOVIDEONVPROC;
-    XGetVideoInfoNV: PFNGLXGETVIDEOINFONVPROC;
-    XJoinSwapGroupNV: PFNGLXJOINSWAPGROUPNVPROC;
-    XBindSwapBarrierNV: PFNGLXBINDSWAPBARRIERNVPROC;
-    XQuerySwapGroupNV: PFNGLXQUERYSWAPGROUPNVPROC;
-    XQueryMaxSwapGroupsNV: PFNGLXQUERYMAXSWAPGROUPSNVPROC;
-    XQueryFrameCountNV: PFNGLXQUERYFRAMECOUNTNVPROC;
-    XResetFrameCountNV: PFNGLXRESETFRAMECOUNTNVPROC;
-    XBindVideoCaptureDeviceNV: PFNGLXBINDVIDEOCAPTUREDEVICENVPROC;
-    XEnumerateVideoCaptureDevicesNV: PFNGLXENUMERATEVIDEOCAPTUREDEVICESNVPROC;
-    XLockVideoCaptureDeviceNV: PFNGLXLOCKVIDEOCAPTUREDEVICENVPROC;
-    XQueryVideoCaptureDeviceNV: PFNGLXQUERYVIDEOCAPTUREDEVICENVPROC;
-    XReleaseVideoCaptureDeviceNV: PFNGLXRELEASEVIDEOCAPTUREDEVICENVPROC;
-    XSwapIntervalEXT: PFNGLXSWAPINTERVALEXTPROC;
-    XCopyImageSubDataNV: PFNGLXCOPYIMAGESUBDATANVPROC;
-
-{$ENDIF SUPPORT_GLX}
 
     // ------------------------------ EGL function/procedure
 
@@ -1576,15 +1456,16 @@ function wglCopyContext(p1: HGLRC; p2: HGLRC; p3: cardinal): BOOL; stdcall; exte
 function wglCreateContext(DC: HDC): HGLRC; stdcall; external opengl32;
 function wglCreateLayerContext(p1: HDC; p2: integer): HGLRC; stdcall; external opengl32;
 function wglDeleteContext(p1: HGLRC): BOOL; stdcall; external opengl32;
-function wglDescribeLayerPlane(p1: HDC; p2, p3: integer; p4: cardinal; var p5: TLayerPlaneDescriptor): BOOL; stdcall; external opengl32;
+///function wglDescribeLayerPlane(p1: HDC; p2, p3: integer; p4: cardinal; var p5: TLayerPlaneDescriptor): BOOL; stdcall; external opengl32;
 function wglGetCurrentContext: HGLRC; stdcall; external opengl32;
 function wglGetCurrentDC: HDC; stdcall; external opengl32;
-function wglGetLayerPaletteEntries(p1: HDC; p2, p3, p4: integer; var pcr): integer; stdcall; external opengl32;
+///function wglGetLayerPaletteEntries(p1: HDC; p2, p3, p4: integer; var pcr): integer; stdcall; external opengl32;
 function wglMakeCurrent(DC: HDC; p2: HGLRC): BOOL; stdcall; external opengl32;
 function wglRealizeLayerPalette(p1: HDC; p2: integer; p3: BOOL): BOOL; stdcall; external opengl32;
-function wglSetLayerPaletteEntries(p1: HDC; p2, p3, p4: integer; var pcr): integer; stdcall; external opengl32;
+///function wglSetLayerPaletteEntries(p1: HDC; p2, p3, p4: integer; var pcr): integer; stdcall; external opengl32;
 function wglShareLists(p1, p2: HGLRC): BOOL; stdcall; external opengl32;
 function wglSwapLayerBuffers(p1: HDC; p2: cardinal): BOOL; stdcall; external opengl32;
+(*
 function wglSwapMultipleBuffers(p1: UINT; const p2: PWGLSwap): DWORD; stdcall; external opengl32;
 function wglUseFontBitmapsA(DC: HDC; p2, p3, p4: DWORD): BOOL; stdcall; external opengl32;
 function wglUseFontOutlinesA(p1: HDC; p2, p3, p4: DWORD; p5, p6: single;
@@ -1595,6 +1476,7 @@ function wglUseFontOutlinesW(p1: HDC; p2, p3, p4: DWORD; p5, p6: single;
 function wglUseFontBitmaps(DC: HDC; p2, p3, p4: DWORD): BOOL; stdcall; external opengl32 Name 'wglUseFontBitmapsA';
 function wglUseFontOutlines(p1: HDC; p2, p3, p4: DWORD; p5, p6: single;
   p7: integer; p8: PGlyphMetricsFloat): BOOL; stdcall; external opengl32 Name 'wglUseFontOutlinesA';
+*)
 {$ENDIF}
 
 
@@ -1766,8 +1648,17 @@ end;
 {$ENDIF} //MSWINDOWS
 
 function GetProcAddressGLLib(ProcName: PAnsiChar): Pointer;
+{$IFDEF CROSSVCL}
+var
+  UniProcName: string;
+{$ENDIF}
 begin
+  {$IFDEF CROSSVCL}
+  UniProcName := ProcName;
+  Result := getProcAddress(GLHandle, PChar(UniProcName));
+  {$ELSE}
   Result := getProcAddress(GLHandle, ProcName);
+  {$ENDIF}
 end;
 
 var
@@ -1952,10 +1843,6 @@ begin
 {$IFDEF SUPPORT_WGL}
   ReadWGLExtensions;
   ReadWGLImplementationProperties;
-{$ENDIF}
-{$IFDEF SUPPORT_GLX}
-  ReadGLXExtensions;
-  ReadGLXImplementationProperties;
 {$ENDIF}
 {$IFDEF EGL_SUPPORT}
   ReadEGLExtensions;
@@ -4909,7 +4796,9 @@ end;
 initialization
 //--------------------------------------
 
+{$IFNDEF CROSSVCL}
 Set8087CW($133F);
+{$ENDIF}
 
 finalization
 

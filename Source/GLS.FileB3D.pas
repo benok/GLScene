@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.FileB3D;
 
 (* B3D VectorFile class to load Blitz 3D model files *)
@@ -12,15 +11,17 @@ uses
   System.Classes, 
   System.SysUtils,
    
-  GLS.VectorFileObjects, 
-  GLS.ApplicationFileIO, 
-  GLS.Texture, 
+  GLS.VectorTypes,
+  GLS.VectorGeometry,
   GLS.TextureFormat,
-  GLS.Material, 
-  GLS.VectorTypes, 
-  GLS.VectorGeometry, 
+
+  GLS.VectorFileObjects,
+  GLS.ApplicationFileIO,
+  GLS.Texture,
+  GLS.Material,
   GLS.VectorLists,
-  FormatB3D;
+
+  Formats.B3D;
 
 type
   TGLB3DVectorFile = class(TGLVectorFile)
@@ -46,7 +47,7 @@ procedure TGLB3DVectorFile.LoadFromStream(AStream: TStream);
 var
   B3d: TFileB3D;
   S: string;
-  Mo: TMeshObject;
+  Mo: TGLMeshObject;
   I, J: Integer;
   FaceGroup: TFGVertexIndexList;
   // lightmapBmp : TBitmap;
@@ -57,11 +58,11 @@ var
   Vertex: PVertexData;
   Triangles: PTRISChunk;
   V, V1: TAffineVector;
-  Matrix: TMatrix;
+  Matrix: TGLMatrix;
   MatLib: TGLMaterialLibrary;
   LightLib: TGLMaterialLibrary;
   RotQuat: TQuaternion;
-  RotMat: TMatrix;
+  RotMat: TGLMatrix;
 
   function GetOrAllocateMaterial(MaterialNum: Integer; AMat: TB3DMaterial;
     ATex: TB3DTexture; ALightmap: TB3DTexture): string;
@@ -213,7 +214,7 @@ begin
     begin
       if Node^.Meshes <> nil then
       begin
-        Mo := TMeshObject.CreateOwned(Owner.MeshObjects);
+        Mo := TGLMeshObject.CreateOwned(Owner.MeshObjects);
 
         SetString(S, Node^.Name, Strlen(Node^.Name));
         // if Pos('16', s)>1 then

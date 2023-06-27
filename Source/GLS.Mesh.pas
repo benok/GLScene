@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.Mesh;
 
 (*
@@ -11,7 +10,7 @@ unit GLS.Mesh;
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
@@ -20,17 +19,16 @@ uses
   System.SysUtils,
 
   GLS.OpenGLTokens,
-  GLS.OpenGLAdapter,
   GLS.Strings,
+  GLS.VectorGeometry,
+  GLS.VectorTypes,
   GLS.XOpenGL,
   GLS.Context,
   GLS.Scene,
-  GLS.VectorGeometry,
   GLS.State,
   GLS.Color,
   GLS.BaseClasses,
-  GLS.RenderContextInfo,
-  GLS.VectorTypes;
+  GLS.RenderContextInfo;
 
 type
   TGLMeshMode = (mmTriangleStrip, mmTriangleFan, mmTriangles, mmQuadStrip,
@@ -49,7 +47,7 @@ type
 
   TGLVertexData = packed record
     textCoord: TTexPoint;
-    color: TVector;
+    color: TGLVector;
     normal: TAffineVector;
     coord: TVertex;
   end;
@@ -99,10 +97,10 @@ type
       Use the NullVector, NullHmgVector or NullTexPoint constants for
       params you don't want to set. *)
     procedure AddVertex(const aVertex: TVertex; const aNormal: TAffineVector;
-      const aColor: TColorVector; const aTexPoint: TTexPoint); overload;
+      const aColor: TGLColorVector; const aTexPoint: TTexPoint); overload;
     //  Adds a vertex to the list, no texturing version.  
     procedure AddVertex(const vertex: TVertex; const normal: TAffineVector;
-      const color: TColorVector); overload;
+      const color: TGLColorVector); overload;
     //  Adds a vertex to the list, no texturing, not color version.  
     procedure AddVertex(const vertex: TVertex; const normal: TAffineVector); overload;
     //  Duplicates the vertex of given index and adds it at the end of the list. 
@@ -158,7 +156,7 @@ type
     FVertices: TGLVertexList;
     FMode: TGLMeshMode;
     FVertexMode: TGLVertexMode;
-    FAxisAlignedDimensionsCache: TVector;
+    FAxisAlignedDimensionsCache: TGLVector;
   protected
     procedure SetMode(AValue: TGLMeshMode);
     procedure SetVertices(AValue: TGLVertexList);
@@ -171,7 +169,7 @@ type
     procedure BuildList(var rci: TGLRenderContextInfo); override;
     procedure CalcNormals(Frontface: TGLFaceWinding);
     property Vertices: TGLVertexList read FVertices write SetVertices;
-    function AxisAlignedDimensionsUnscaled: TVector; override;
+    function AxisAlignedDimensionsUnscaled: TGLVector; override;
     procedure StructureChanged; override;
     function Length: Single;
     function Area: Single;
@@ -416,7 +414,7 @@ begin
 end;
 
 procedure TGLVertexList.AddVertex(const aVertex: TVertex;
-  const aNormal: TAffineVector; const aColor: TColorVector;
+  const aNormal: TAffineVector; const aColor: TGLColorVector;
   const aTexPoint: TTexPoint);
 begin
   if FCount = FCapacity then
@@ -434,7 +432,7 @@ begin
 end;
 
 procedure TGLVertexList.AddVertex(const vertex: TVertex;
-  const normal: TAffineVector; const color: TColorVector);
+  const normal: TAffineVector; const color: TGLColorVector);
 begin
   AddVertex(vertex, normal, color, NullTexPoint);
 end;
@@ -742,7 +740,7 @@ begin
     inherited Assign(Source);
 end;
 
-function TGLMesh.AxisAlignedDimensionsUnscaled: TVector;
+function TGLMesh.AxisAlignedDimensionsUnscaled: TGLVector;
 var
   dMin, dMax: TAffineVector;
 begin
@@ -766,7 +764,6 @@ end;
 initialization
 // ------------------------------------------------------------------
 
-  // class registrations
   RegisterClasses([TGLMesh]);
 
 end.

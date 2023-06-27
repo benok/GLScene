@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.MultiSampleImage;
 
 (*
@@ -13,18 +12,19 @@ unit GLS.MultiSampleImage;
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
   Winapi.OpenGLext,
   System.Classes,
-  
+
   GLS.OpenGLTokens,
+  GLS.VectorTypes,
+  GLS.TextureFormat,
   GLS.Context,
   GLS.Texture,
-  GLS.Graphics,
-  GLS.TextureFormat;
+  GLS.Graphics;
 
 type
   TGLMultisampleImage = class(TGLTextureImage)
@@ -76,7 +76,6 @@ implementation
 // ------------------ TGLMultisampleImage ------------------
 // ------------------
 
- 
 constructor TGLMultisampleImage.Create(AOwner: TPersistent);
 begin
   inherited;

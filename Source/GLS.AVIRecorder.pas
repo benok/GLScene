@@ -1,14 +1,13 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.AVIRecorder;
 
 (* Component to make it easy to record GLScene frames into an AVI file *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.Windows,
@@ -21,7 +20,7 @@ uses
   VCL.Graphics, 
   VCL.Dialogs,
    
-  FormatVFW,
+  Formats.VFW,
 
   GLS.Graphics,
   GLS.Scene,

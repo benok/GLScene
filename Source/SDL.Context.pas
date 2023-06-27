@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit SDL.Context;
 
 (*
@@ -20,14 +19,13 @@ uses
   System.Classes,
   System.SysUtils,
 
-  GLS.OpenGLTokens,
   GLS.OpenGLAdapter,
   GLS.XOpenGL,
   GLS.Context,
   GLS.Scene,
 
-  SDL.Window,
-  Import.SDL2;
+  SDL.Import,
+  SDL.Window;
 
 type
   (* A viewer using SDL.

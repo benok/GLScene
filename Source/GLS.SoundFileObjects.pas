@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.SoundFileObjects;
 
 (*
@@ -11,7 +10,7 @@ unit GLS.SoundFileObjects;
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.MMSystem,
@@ -214,7 +213,7 @@ end;
 
 procedure TGLSoundFile.PlayOnWaveOut;
 begin
-  // GLSM.SoundFileObjects.PlayOnWaveOut(PCMData, LengthInSamples, Sampling);
+///  PlayOnWaveOut(PCMData, LengthInSamples, Sampling); ?
 end;
 
 function TGLSoundFile.LengthInSamples: Integer;

@@ -1,14 +1,13 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.FPSMovement;
 
 (* FPS-like movement behaviour and manager. *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
@@ -36,12 +35,12 @@ uses
 
 type
   TGLContactPoint = record
-    intPoint, intNormal: TVector;
+    intPoint, intNormal: TGLVector;
   end;
 
   TGLCollisionState = class
   public
-    Position: TVector;
+    Position: TGLVector;
     Contact: TGLContactPoint;
     Time: Int64;
   end;
@@ -92,7 +91,7 @@ type
     FScene: TGLScene;
     procedure SetNavigator(value: TGLNavigator);
     procedure setScene(value: TGLScene);
-    procedure DrawArrows(intPoint, intNormal, Ray: TVector;
+    procedure DrawArrows(intPoint, intNormal, Ray: TGLVector;
       Arrow1, Arrow2: TGLArrowLine);
   protected
     procedure Loaded; override;
@@ -109,10 +108,10 @@ type
       (e.g. floor + multiple walls + ceiling) limit iterations to 4 or 5 for now,
       may need to be higher for more complex maps or fast motion *)
     function SphereSweepAndSlide(freeform: TGLFreeForm;
-      behaviour: TGLBFPSMovement; SphereStart: TVector;
-      var Velocity, newPosition: TVector; sphereRadius: single): boolean; overload;
+      behaviour: TGLBFPSMovement; SphereStart: TGLVector;
+      var Velocity, newPosition: TGLVector; sphereRadius: single): boolean; overload;
     procedure SphereSweepAndSlide(behaviour: TGLBFPSMovement;
-      SphereStart: TVector; var Velocity, newPosition: TVector;
+      SphereStart: TGLVector; var Velocity, newPosition: TGLVector;
       sphereRadius: single); overload;
   published
     property Maps: TGLMapCollection read FMaps write FMaps;
@@ -131,7 +130,7 @@ type
       ArrowLine6: TGLArrowLine;
     dirGl: TGLDirectOpenGL;
     tickCount: Int64;
-    oldPosition: TVector;
+    oldPosition: TGLVector;
     FGravityEnabled: boolean;
     FSphereRadius: single;
     FShowArrows: boolean;
@@ -144,7 +143,7 @@ type
     procedure ReadFromFiler(reader: TReader); override;
     procedure Loaded; override;
   public
-    Velocity: TVector;
+    Velocity: TGLVector;
     constructor Create(aOwner: TXCollection); override;
     destructor Destroy; override;
     procedure DoProgress(const progressTime: TGLProgressTimes); override;
@@ -348,11 +347,11 @@ end;
 procedure TGLFPSMovementManager.DefineProperties(Filer: TFiler);
 begin
   inherited;
-  { FOriginalFiler := Filer; }
+  // FOriginalFiler := Filer;
 
   Filer.DefineBinaryProperty('MapsData', ReadMaps, WriteMaps,
     (assigned(FMaps) and (FMaps.count > 0)));
-  { FOriginalFiler:=nil; }
+  // FOriginalFiler:=nil;
 end;
 
 procedure TGLFPSMovementManager.WriteMaps(stream: TStream);
@@ -419,7 +418,7 @@ begin
   end;
 end;
 
-procedure TGLFPSMovementManager.DrawArrows(intPoint, intNormal, Ray: TVector;
+procedure TGLFPSMovementManager.DrawArrows(intPoint, intNormal, Ray: TGLVector;
   Arrow1, Arrow2: TGLArrowLine);
 begin
   Arrow1.Position.AsVector := intPoint;
@@ -434,7 +433,7 @@ begin
 end;
 
 procedure TGLFPSMovementManager.SphereSweepAndSlide(behaviour: TGLBFPSMovement;
-  SphereStart: TVector; var Velocity, newPosition: TVector;
+  SphereStart: TGLVector; var Velocity, newPosition: TGLVector;
   sphereRadius: single);
 var
   i: integer;
@@ -450,14 +449,14 @@ begin
 end;
 
 function TGLFPSMovementManager.SphereSweepAndSlide(freeform: TGLFreeForm;
-  behaviour: TGLBFPSMovement; SphereStart: TVector;
-  var Velocity, newPosition: TVector; sphereRadius: single): boolean;
+  behaviour: TGLBFPSMovement; SphereStart: TGLVector;
+  var Velocity, newPosition: TGLVector; sphereRadius: single): boolean;
 var
-  oldPosition, Ray: TVector;
+  oldPosition, Ray: TGLVector;
   vel, slidedistance: single;
-  intPoint, intNormal: TVector;
+  intPoint, intNormal: TGLVector;
   newDirection, newRay, collisionPosition, pointOnSphere,
-    point2OnSphere: TVector;
+    point2OnSphere: TGLVector;
   i: integer;
   CollisionState: TGLCollisionState;
   SphereRadiusRel: single; // mrqzzz
@@ -471,7 +470,7 @@ begin
 
   // Direction sphere is moving in
   Ray := VectorSubtract(newPosition, oldPosition);
-  // ray:=Velocity;
+  // ray := Velocity;
   // newPosition:=VectorAdd(newPosition,ray);
   // Speed of sphere
   vel := VectorLength(Ray);
@@ -796,7 +795,7 @@ end;
 
 procedure TGLBFPSMovement.DoProgress(const progressTime: TGLProgressTimes);
 var
-  newPosition: TVector;
+  newPosition: TGLVector;
   CollisionState: TGLCollisionState;
 begin
   inherited DoProgress(progressTime);

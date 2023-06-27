@@ -1,21 +1,20 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLSL.Shader;
 
 (* TGLSLShader is a wrapper for GLS shaders. *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
   Winapi.OpenGLext,
   System.Classes,
   System.SysUtils,
-  
+
   GLS.OpenGLTokens,
   GLS.VectorGeometry,
   GLS.VectorTypes,
@@ -106,7 +105,7 @@ type
     function GetAsVector1f: Single; override;
     function GetAsVector2f: TVector2f; override;
     function GetAsVector3f: TVector3f; override;
-    function GetAsVector4f: TVector; override;
+    function GetAsVector4f: TGLVector; override;
     function GetAsVector1i: Integer; override;
     function GetAsVector2i: TVector2i; override;
     function GetAsVector3i: TVector3i; override;
@@ -238,6 +237,8 @@ begin
 
           if (not FGLSLProg.LinkProgram) then
             raise EGLSLShaderException.Create(FGLSLProg.InfoLog);
+
+          FGLSLProg.DetachAllObject;  // Detach shaders after linking. 
         end;
         FGLSLProg.NotifyDataUpdated;
       end;
@@ -499,7 +500,7 @@ begin
   gl.GetUniformiv(FGLSLProg.Handle, FParameterID, @Result);
 end;
 
-function TGLSLShaderParameter.GetAsVector4f: TVector;
+function TGLSLShaderParameter.GetAsVector4f: TGLVector;
 begin
   gl.GetUniformfv(FGLSLProg.Handle, FParameterID, @Result);
 end;

@@ -1,14 +1,13 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.WindowsContext;
 
 (* Windows specific Context *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
@@ -19,6 +18,7 @@ uses
   System.Classes,
   Vcl.Forms,
 
+  GLS.VectorTypes,
   GLS.OpenGLTokens,
   GLS.OpenGLAdapter,
   GLS.PipelineTransformation,
@@ -35,7 +35,7 @@ type
     FDC: NativeUInt;
     FRC: NativeUInt;
     FShareContext: TGLWindowsContext;
-    FHPBUFFER: Integer;
+    FHPBUFFER: HPBUFFERARB;
     FiAttribs: packed array of Integer;
     FfAttribs: packed array of Single;
     FLegacyContextsOnly: Boolean;
@@ -911,13 +911,13 @@ var
   nbFormats: Integer;
   iFormats: array [0 .. 31] of Integer;
   iPBufferAttribs: array [0 .. 0] of Integer;
-  localHPBuffer: Integer;
+  localHPBuffer: HPBUFFERARB;
   localRC: HGLRC;
   localDC, tempDC: HDC;
   tempWnd: HWND;
   shareRC: TGLWindowsContext;
   pfDescriptor: TPixelFormatDescriptor;
-  bOES: Boolean;
+  bOES: Boolean;  // for logger
 begin
   localHPBuffer := 0;
   localDC := 0;

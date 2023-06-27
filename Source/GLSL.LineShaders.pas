@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLSL.LineShaders;
 
 (*
@@ -12,13 +11,14 @@ unit GLSL.LineShaders;
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
   System.Classes,
-   
+
   GLS.OpenGLTokens,
+  GLS.VectorTypes,
   GLS.Scene,
   GLS.Color,
   GLS.Material,

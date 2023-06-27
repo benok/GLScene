@@ -1,18 +1,17 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.Logger;
 
 (*
-  Activate USE_LOGGING in "GLScene.inc" to turn on inner GLScene logger.
+  Activate USE_LOGGING in "GLS.inc" to turn on inner Scene logger.
   You may have only one instance of TGLSLogger
   To obtain it, call UserLog() function from any unit.
 *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.Windows,
@@ -997,7 +996,7 @@ begin
 end;
 
 procedure TLogSession.DisplayLog;
-{$IFDEF LINUX}
+{$IF Defined(LINUX) and not Defined(CROSSVCL)}
 var
   lProcess: TProcess;
 {$ENDIF}
@@ -1006,7 +1005,7 @@ begin
   ShellExecute(0, 'open', 'C:\WINDOWS\notepad.exe',
     PChar(FCurrentLogFileName), nil, 1);
 {$ENDIF}
-{$IFDEF LINUX}
+{$IF Defined(LINUX) and not Defined(CROSSVCL)}
   lProcess := TProcess.Create(nil);
   lProcess.CommandLine := 'gedit ' + FCurrentLogFileName;
   lProcess.Execute;

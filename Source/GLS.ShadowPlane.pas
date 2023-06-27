@@ -1,19 +1,18 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.ShadowPlane;
 
 (*
    Implements a basic shadow plane.
 
-   It is strongly recommended to read and understand the explanations in the
-   materials/mirror demo before using this component.
+   It is strongly recommended to read and understand the explanations
+   in the materials/mirror demo before using this component.
 *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
@@ -36,9 +35,7 @@ uses
   GLS.Texture,
   GLS.Utils;
 
-
 type
-
   TShadowPlaneOption = (spoUseStencil, spoScissor, spoTransparent, spoIgnoreZ);
   TShadowPlaneOptions = set of TShadowPlaneOption;
 
@@ -115,7 +112,7 @@ implementation
 
 constructor TGLShadowPlane.Create(AOwner: Tcomponent);
 const
-  cDefaultShadowColor: TColorVector = (X:0; Y:0; Z:0; W:0.5);
+  cDefaultShadowColor: TGLColorVector = (X:0; Y:0; Z:0; W:0.5);
 begin
   inherited Create(AOwner);
   FShadowOptions := cDefaultShadowPlaneOptions;
@@ -133,10 +130,10 @@ procedure TGLShadowPlane.DoRender(var ARci: TGLRenderContextInfo;
   ARenderSelf, ARenderChildren: Boolean);
 var
   oldProxySubObject, oldIgnoreMaterials: Boolean;
-  shadowMat: TMatrix;
+  shadowMat: TGLMatrix;
   sr, ds: TRect;
   CurrentBuffer: TGLSceneBuffer;
-  ModelMat: TMatrix;
+  ModelMat: TGLMatrix;
 begin
   if FRendering then
     Exit;
@@ -174,10 +171,10 @@ begin
         // "Render"  plane and stencil mask
         if (spoTransparent in ShadowOptions) then
         begin
-          SetGLColorWriting(False);
+          SetColorWriting(False);
           DepthWriteMask := False;
           BuildList(ARci);
-          SetGLColorWriting(True);
+          SetColorWriting(True);
         end
         else
         begin
@@ -278,7 +275,6 @@ begin
   end;
 end;
 
-
 procedure TGLShadowPlane.Notification(AComponent: TComponent; Operation: TOperation);
 begin
   if Operation = opRemove then
@@ -290,7 +286,6 @@ begin
   end;
   inherited;
 end;
-
 
 procedure TGLShadowPlane.SetShadowingObject(const val: TGLBaseSceneObject);
 begin
@@ -304,7 +299,6 @@ begin
     NotifyChange(Self);
   end;
 end;
-
 
 procedure TGLShadowPlane.SetShadowedLight(const val: TGLLightSource);
 begin

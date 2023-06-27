@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.DCE;
 
 (*
@@ -26,16 +25,18 @@ unit GLS.DCE;
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   System.Classes,
   System.SysUtils,
   System.Types,
 
+  GLS.VectorTypes,
+  GLS.VectorGeometry,
+
   GLS.Scene,
   GLS.XCollection,
-  GLS.VectorGeometry,
   GLS.VectorLists,
   GLS.VectorFileObjects,
   GLS.EllipseCollision,
@@ -45,7 +46,6 @@ uses
   GLS.ProxyObjects,
   GLS.MultiProxy,
   GLS.Manager,
-  GLS.VectorTypes,
   GLS.Strings;
 
 type
@@ -318,7 +318,7 @@ procedure ECAddFreeForm(var MovePack: TECMovePack; FreeForm: TGLBaseSceneObject;
   Solid: Boolean; ObjectID: Integer);
 var
   i, count: Integer;
-  Pos: TVector;
+  Pos: TGLVector;
   Master: TGLBaseSceneObject;
   d1, d2: single;
 begin
@@ -502,7 +502,7 @@ end;
 function RotateVectorByObject(obj: TGLBaseSceneObject; const v: TAffineVector)
   : TAffineVector;
 var
-  v2: TVector;
+  v2: TGLVector;
 begin
   SetVector(v2, v);
   SetVector(result, VectorTransform(v2, obj.Matrix^));
@@ -549,7 +549,7 @@ function TGLDCEManager.MoveByDistance(var Body: TGLDCEDynamic;
 var
   // Friction and bounce
   TotalFriction, Bounce, f, m, restitution: single;
-  ContactList: TIntegerList;
+  ContactList: TGLIntegerList;
   // Temporary properties (Static or Dynamic)
   tFriction, tBounceFactor: single;
   TObject: TGLBaseSceneObject;
@@ -669,7 +669,7 @@ begin
   // Generate events and calculate average friction
   lastobj := -1;
   TotalFriction := Body.Friction;
-  ContactList := TIntegerList.Create;
+  ContactList := TGLIntegerList.Create;
   try
     for i := 0 to High(MP.Contacts) do
       with MP do

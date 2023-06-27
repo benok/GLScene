@@ -1,14 +1,13 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.ThorFX;
 
 (* ThorFX  for GLScene *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
@@ -38,7 +37,7 @@ type
   PThorpoint = ^TThorpoint;
 
   TThorpoint = record
-    Position: TVector; // Position
+    Position: TGLVector; // Position
     Size: single; // particle size
   end;
 
@@ -293,7 +292,7 @@ end;
 procedure TGLThorFXManager.CalcThor;
 var
   N: integer;
-  vec, axs, nvec: TVector;
+  vec, axs, nvec: TGLVector;
   dist: single;
   a, b: single;
   len: single;
@@ -463,16 +462,16 @@ procedure TGLBThorFX.Render(var rci: TGLRenderContextInfo);
 var
   N: integer;
   i: integer;
-  // absPos :TVector;
-  InnerColor: TVector;
-  distList: TSingleList;
+  // absPos :TGLVector;
+  InnerColor: TGLVector;
+  distList: TGLSingleList;
   objList: TList;
   fp: PThorpoint;
-  mat: TMatrix;
+  mat: TGLMatrix;
 
-  vx, vy: TVector;
+  vx, vy: TGLVector;
   m: integer;
-  Icol, Ocol, Ccol: TColorVector;
+  Icol, Ocol, Ccol: TGLColorVector;
   Ppos, Ppos2: TAffineVector;
 begin
   if Manager = nil then
@@ -494,7 +493,7 @@ begin
 
   if N > 1 then
   begin
-    distList := TSingleList.Create;
+    distList := TGLSingleList.Create;
     objList := TList.Create;
     for i := 0 to N - 1 do
     begin

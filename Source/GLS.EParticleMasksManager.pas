@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.EParticleMasksManager;
 
 (*
@@ -25,7 +24,7 @@ unit GLS.EParticleMasksManager;
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   System.Types,
@@ -33,12 +32,13 @@ uses
   System.Classes,
   System.Math,
   VCL.Graphics,
-  
+
+  GLS.VectorGeometry,
+  GLS.VectorTypes,
+
   GLS.Texture,
   GLS.Material,
   GLS.Scene,
-  GLS.VectorGeometry,
-  GLS.VectorTypes,
   GLS.ParticleFX,
   GLS.Coordinates;
 

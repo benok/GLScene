@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics rendering engine GLScene http://glscene.org
 //
-
 unit Physics.SPIJoints;
 
 (*
@@ -12,6 +11,7 @@ unit Physics.SPIJoints;
 interface
 
 uses
+  GLS.VectorTypes,
   GLS.Scene,
   GLS.VectorGeometry;
 
@@ -71,7 +71,7 @@ type
     // [    0               0                            0                 1         ]
     //
 *)
-    A: TMatrix;
+    A: TGLMatrix;
     constructor Create(LinkLength, TwistAngle, LinkAngle, LinkDistance: Real);
     // constructor Create();virtual;
   end;

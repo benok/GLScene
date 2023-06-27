@@ -1,14 +1,13 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.AnimationUtils;
 
-(* Main purpose is to give an easy way to create an interpolation. *)
+(* Main purpose is to give an easy way to create a linear interpolation *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   System.SysUtils, 
@@ -62,7 +61,7 @@ type
 
 
   function Tweener(Current, Target: TAffineVector; Time, Duration: Single; EaseType: TEaseType): TAffineVector; overload;
-  function Tweener(Current, Target: TVector; Time, Duration: Single; EaseType: TEaseType): TVector; overload;
+  function Tweener(Current, Target: TGLVector; Time, Duration: Single; EaseType: TEaseType): TGLVector; overload;
   function Tweener(Current, Target: TVector2f; Time, Duration: Single; EaseType: TEaseType): TVector2f; overload;
   function Tweener(Current, Target: Single; Time, Duration: Single; EaseType: TEaseType): Single; overload;
 
@@ -600,8 +599,6 @@ begin
   end;
 end;
 
-
-
 (*
    Easing equation function for an elastic (exponentially decaying sine wave) easing out: decelerating from zero velocity.
  
@@ -670,8 +667,6 @@ begin
     end;
   end;
 end;
-
-
 
 (*
    Easing equation function for an elastic (exponentially decaying sine wave) easing out/in: deceleration until halfway, then acceleration.
@@ -773,8 +768,6 @@ begin
   else
     Result := easeInBack((t*2)-d, b+c/2, c/2, d);
 end;
-
-
 
 (*
    Easing equation function for a bounce (exponentially decaying parabolic bounce) easing out: decelerating from zero velocity.
@@ -918,7 +911,7 @@ begin
   end;
 end;
 
-function Tweener(Current, Target: TVector; Time, Duration: Single; EaseType: TEaseType): TVector;
+function Tweener(Current, Target: TGLVector; Time, Duration: Single; EaseType: TEaseType): TGLVector;
 var
   i: integer;
   EaseFunction : TEaseFunction;

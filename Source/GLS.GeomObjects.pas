@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.GeomObjects;
 
 (*
@@ -14,7 +13,7 @@ unit GLS.GeomObjects;
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
@@ -23,17 +22,20 @@ uses
 
   GLS.OpenGLTokens,
   GLS.OpenGLAdapter,
+  GLS.VectorTypes,
+  GLS.VectorGeometry,
+  GLS.PipelineTransformation,
+  GLS.Polynomials,
+
   GLS.Scene,
   GLS.State,
   GLS.PersistentClasses,
-  GLS.VectorGeometry,
   GLS.VectorLists,
-  GLS.Polynomials,
   GLS.Silhouette,
-  GLS.VectorTypes,
   GLS.GeometryBB,
   GLS.VectorFileObjects,
-  GLS.PipelineTransformation,
+  GLS.Material,
+  GLS.Texture,
 
   GLS.Context,
   GLS.Objects,
@@ -46,32 +48,24 @@ type
 
 //-------------------- TGLBaseMesh Objects -----------------------
 
-  (* The tetrahedron has no texture coordinates defined, ie. without using
+  (* This objects has no texture coordinates defined, ie. without using
     a texture generation mode, no texture will be mapped. *)
   TGLTetrahedron = class(TGLBaseMesh)
   public
     procedure BuildList(var rci: TGLRenderContextInfo); override;
   end;
-  (* The octahedron has no texture coordinates defined, ie. without using
-    a texture generation mode, no texture will be mapped. *)
   TGLOctahedron = class(TGLBaseMesh)
   public
     procedure BuildList(var rci: TGLRenderContextInfo); override;
   end;
-  (* The hexahedron has no texture coordinates defined, ie. without using
-    a texture generation mode, no texture will be mapped. *)
   TGLHexahedron = class(TGLBaseMesh)
   public
     procedure BuildList(var rci: TGLRenderContextInfo); override;
   end;
-  (* The dodecahedron has no texture coordinates defined, ie. without using
-   a texture generation mode, no texture will be mapped. *)
   TGLDodecahedron = class(TGLBaseMesh)
   public
     procedure BuildList(var rci: TGLRenderContextInfo); override;
   end;
-  (* The icosahedron has no texture coordinates defined, ie. without using
-     a texture generation mode, no texture will be mapped. *)
   TGLIcosahedron = class(TGLBaseMesh)
   public
     procedure BuildList(var rci: TGLRenderContextInfo); override;
@@ -96,9 +90,9 @@ type
     constructor Create(AOwner: TComponent); override;
     procedure BuildList(var rci: TGLRenderContextInfo); override;
     procedure Assign(Source: TPersistent); override;
-    function AxisAlignedDimensionsUnscaled: TVector; override;
-    function RayCastIntersect(const rayStart, rayVector: TVector;
-      intersectPoint: PVector = nil; intersectNormal: PVector = nil) : Boolean; override;
+    function AxisAlignedDimensionsUnscaled: TGLVector; override;
+    function RayCastIntersect(const rayStart, rayVector: TGLVector;
+      intersectPoint: PGLVector = nil; intersectNormal: PGLVector = nil) : Boolean; override;
   published
     //  Allows defining a "hole" in the disk 
     property InnerRadius: Single read FInnerRadius write SetInnerRadius;
@@ -112,7 +106,7 @@ type
     property SweepAngle: Single read FSweepAngle write SetSweepAngle;
   end;
 
-  (*  Base class to cylinder-like objects that introduces the basic cylinder description properties.
+  (* Base class to cylinder-like objects that introduces the basic cylinder description properties.
     Be aware teh default slices and stacks make up for a high-poly cylinder,
     unless you're after high-quality lighting it is recommended to reduce the
     Stacks property to 1. *)
@@ -156,9 +150,9 @@ type
     constructor Create(AOwner: TComponent); override;
     procedure Assign(Source: TPersistent); override;
     procedure BuildList(var rci: TGLRenderContextInfo); override;
-    function AxisAlignedDimensionsUnscaled: TVector; override;
-    function RayCastIntersect(const rayStart, rayVector: TVector;
-      intersectPoint: PVector = nil; intersectNormal: PVector = nil)
+    function AxisAlignedDimensionsUnscaled: TGLVector; override;
+    function RayCastIntersect(const rayStart, rayVector: TGLVector;
+      intersectPoint: PGLVector = nil; intersectNormal: PGLVector = nil)
       : Boolean; override;
   published
     property Parts: TGLConeParts read FParts write SetParts
@@ -184,11 +178,11 @@ type
     constructor Create(AOwner: TComponent); override;
     procedure Assign(Source: TPersistent); override;
     procedure BuildList(var rci: TGLRenderContextInfo); override;
-    function AxisAlignedDimensionsUnscaled: TVector; override;
-    function RayCastIntersect(const rayStart, rayVector: TVector;
-      intersectPoint: PVector = nil; intersectNormal: PVector = nil)
+    function AxisAlignedDimensionsUnscaled: TGLVector; override;
+    function RayCastIntersect(const rayStart, rayVector: TGLVector;
+      intersectPoint: PGLVector = nil; intersectNormal: PGLVector = nil)
       : Boolean; override;
-    procedure Align(const startPoint, endPoint: TVector); overload;
+    procedure Align(const startPoint, endPoint: TGLVector); overload;
     procedure Align(const startObj, endObj: TGLBaseSceneObject); overload;
     procedure Align(const startPoint, endPoint: TAffineVector); overload;
   published
@@ -219,11 +213,11 @@ type
     constructor Create(AOwner: TComponent); override;
     procedure Assign(Source: TPersistent); override;
     procedure BuildList(var rci: TGLRenderContextInfo); override;
-    function AxisAlignedDimensionsUnscaled: TVector; override;
-    function RayCastIntersect(const rayStart, rayVector: TVector;
-      intersectPoint: PVector = nil; intersectNormal: PVector = nil)
+    function AxisAlignedDimensionsUnscaled: TGLVector; override;
+    function RayCastIntersect(const rayStart, rayVector: TGLVector;
+      intersectPoint: PGLVector = nil; intersectNormal: PGLVector = nil)
       : Boolean; override;
-    procedure Align(const startPoint, endPoint: TVector); overload;
+    procedure Align(const startPoint, endPoint: TGLVector); overload;
     procedure Align(const startObj, endObj: TGLBaseSceneObject); overload;
     procedure Align(const startPoint, endPoint: TAffineVector); overload;
   published
@@ -256,9 +250,9 @@ type
     constructor Create(AOwner: TComponent); override;
     procedure Assign(Source: TPersistent); override;
     procedure BuildList(var rci: TGLRenderContextInfo); override;
-    function AxisAlignedDimensionsUnscaled: TVector; override;
-    function RayCastIntersect(const rayStart, rayVector: TVector;
-      intersectPoint: PVector = nil; intersectNormal: PVector = nil)
+    function AxisAlignedDimensionsUnscaled: TGLVector; override;
+    function RayCastIntersect(const rayStart, rayVector: TGLVector;
+      intersectPoint: PGLVector = nil; intersectNormal: PGLVector = nil)
       : Boolean; override;
   published
     property BottomInnerRadius: Single read FBottomInnerRadius
@@ -292,9 +286,9 @@ type
   public
     constructor Create(AOwner: TComponent); override;
     procedure BuildList(var rci: TGLRenderContextInfo); override;
-    function AxisAlignedDimensionsUnscaled: TVector; override;
-    function RayCastIntersect(const rayStart, rayVector: TVector;
-      intersectPoint: PVector = nil; intersectNormal: PVector = nil): Boolean; override;
+    function AxisAlignedDimensionsUnscaled: TGLVector; override;
+    function RayCastIntersect(const rayStart, rayVector: TGLVector;
+      intersectPoint: PGLVector = nil; intersectNormal: PGLVector = nil): Boolean; override;
   published
     property MajorRadius: Single read FMajorRadius write SetMajorRadius;
     property MinorRadius: Single read FMinorRadius write SetMinorRadius;
@@ -353,8 +347,8 @@ type
       write SetBottomArrowHeadRadius;
   end;
 
-  TArrowArcPart = (aaArc, aaTopArrow, aaBottomArrow);
-  TGLArrowArcPart = set of TArrowArcPart;
+  TGLArrowArcPart = (aaArc, aaTopArrow, aaBottomArrow);
+  TGLArrowArcParts = set of TGLArrowArcPart;
 
   (* Draws an arrowhead (Sliced Torus + cone).
     The arrow head is a cone that shares the attributes of the Torus
@@ -367,7 +361,7 @@ type
     fArcRadius: Single;
     FStartAngle: Single;
     FStopAngle: Single;
-    FParts: TGLArrowArcPart;
+    FParts: TGLArrowArcParts;
     FTopRadius: Single;
     fTopArrowHeadHeight: Single;
     fTopArrowHeadRadius: Single;
@@ -384,7 +378,7 @@ type
     procedure SetTopArrowHeadRadius(const aValue: Single);
     procedure SetBottomArrowHeadHeight(const aValue: Single);
     procedure SetBottomArrowHeadRadius(const aValue: Single);
-    procedure SetParts(aValue: TGLArrowArcPart);
+    procedure SetParts(aValue: TGLArrowArcParts);
     procedure SetHeadStackingStyle(const val: TGLArrowHeadStyle);
   public
     constructor Create(AOwner: TComponent); override;
@@ -397,7 +391,7 @@ type
     property TopRadius: Single read FTopRadius write SetTopRadius;
     property HeadStackingStyle: TGLArrowHeadStyle read FHeadStackingStyle
       write SetHeadStackingStyle default ahssStacked;
-    property Parts: TGLArrowArcPart read FParts write SetParts
+    property Parts: TGLArrowArcParts read FParts write SetParts
       default [aaArc, aaTopArrow];
     property TopArrowHeadHeight: Single read fTopArrowHeadHeight
       write SetTopArrowHeadHeight;
@@ -469,7 +463,7 @@ type
     function TopDepth: Single;
     function TopWidth: Single;
     function AxisAlignedBoundingBoxUnscaled: TAABB;
-    function AxisAlignedDimensionsUnscaled: TVector; override;
+    function AxisAlignedDimensionsUnscaled: TGLVector; override;
   published
     property ApexHeight: Single read FApexHeight write SetApexHeight stored False;
     property BaseDepth: Single read FBaseDepth write SetBaseDepth stored False;
@@ -479,7 +473,6 @@ type
       write SetNormalDirection default ndOutside;
     property Parts: TGLFrustrumParts read FParts write SetParts default cAllFrustrumParts;
   end;
-
 //--------------------- TGLTeapot -------------------------
   (* The classic teapot.
      The only use of this object is as placeholder for testing... *)
@@ -488,7 +481,7 @@ type
     FGrid: Cardinal;
   public
     constructor Create(AOwner: TComponent); override;
-    function AxisAlignedDimensionsUnscaled: TVector; override;
+    function AxisAlignedDimensionsUnscaled: TGLVector; override;
     procedure BuildList(var rci: TGLRenderContextInfo); override;
     procedure DoRender(var ARci: TGLRenderContextInfo;
       ARenderSelf, ARenderChildren: Boolean); override;
@@ -795,7 +788,7 @@ begin
   inherited Assign(Source);
 end;
 
-function TGLDisk.AxisAlignedDimensionsUnscaled: TVector;
+function TGLDisk.AxisAlignedDimensionsUnscaled: TGLVector;
 var
   r: Single;
 begin
@@ -803,13 +796,13 @@ begin
   Result := VectorMake(r, r, 0);
 end;
 
-function TGLDisk.RayCastIntersect(const rayStart, rayVector: TVector;
-  intersectPoint: PVector = nil; intersectNormal: PVector = nil): Boolean;
+function TGLDisk.RayCastIntersect(const rayStart, rayVector: TGLVector;
+  intersectPoint: PGLVector = nil; intersectNormal: PGLVector = nil): Boolean;
 var
-  ip: TVector;
+  ip: TGLVector;
   d: Single;
   angle, beginAngle, endAngle: Single;
-  localIntPoint: TVector;
+  localIntPoint: TGLVector;
 begin
   Result := False;
   if SweepAngle > 0 then
@@ -833,7 +826,7 @@ begin
           // we also want StartAngle and StartAngle+SweepAngle to be in this range
           beginAngle := Trunc(StartAngle) mod 360;
           endAngle := Trunc(StartAngle + SweepAngle) mod 360;
-          // If beginAngle>endAngle then area crosses the boundary from 360=>0 degrees
+          // If beginAngle > endAngle then area crosses the boundary from 360=>0 degrees
           // therefore have 2 valid regions  (beginAngle to 360) & (0 to endAngle)
           // otherwise just 1 valid region (beginAngle to endAngle)
           if beginAngle > endAngle then
@@ -967,10 +960,8 @@ begin
     MakeVector(p[0], FBottomRadius * sina2, -HalfHeight, FBottomRadius * cosa2);
     MakeVector(p[1], FBottomRadius * sina1, -HalfHeight, FBottomRadius * cosa1);
     // Top corners
-    MakeVector(p[2], ShadowTopRadius * sina1, HalfHeight,
-      ShadowTopRadius * cosa1);
-    MakeVector(p[3], ShadowTopRadius * sina2, HalfHeight,
-      ShadowTopRadius * cosa2); // }
+    MakeVector(p[2], ShadowTopRadius * sina1, HalfHeight, ShadowTopRadius * cosa1);
+    MakeVector(p[3], ShadowTopRadius * sina2, HalfHeight, ShadowTopRadius * cosa2);
     // This should be optimized to use AddIndexedFace, because this method
     // searches for each of the vertices and adds them or re-uses them.
     // Skin
@@ -1036,7 +1027,7 @@ begin
   inherited Assign(Source);
 end;
 
-function TGLCone.AxisAlignedDimensionsUnscaled: TVector;
+function TGLCone.AxisAlignedDimensionsUnscaled: TGLVector;
 var
   r: Single;
 begin
@@ -1050,10 +1041,10 @@ begin
   Result := 0;
 end;
 
-function TGLCone.RayCastIntersect(const rayStart, rayVector: TVector;
-  intersectPoint: PVector = nil; intersectNormal: PVector = nil): Boolean;
+function TGLCone.RayCastIntersect(const rayStart, rayVector: TGLVector;
+  intersectPoint: PGLVector = nil; intersectNormal: PGLVector = nil): Boolean;
 var
-  ip, localRayStart, localRayVector: TVector;
+  ip, localRayStart, localRayVector: TGLVector;
   poly: array [0 .. 2] of Double;
   roots: TDoubleArray;
   minRoot: Double;
@@ -1208,7 +1199,7 @@ begin
   inherited Assign(Source);
 end;
 
-function TGLCylinder.AxisAlignedDimensionsUnscaled: TVector;
+function TGLCylinder.AxisAlignedDimensionsUnscaled: TGLVector;
 var
   r, r1: Single;
 begin
@@ -1220,12 +1211,12 @@ begin
   // ScaleVector(Result, Scale.AsVector);
 end;
 
-function TGLCylinder.RayCastIntersect(const rayStart, rayVector: TVector;
-  intersectPoint: PVector = nil; intersectNormal: PVector = nil): Boolean;
+function TGLCylinder.RayCastIntersect(const rayStart, rayVector: TGLVector;
+  intersectPoint: PGLVector = nil; intersectNormal: PGLVector = nil): Boolean;
 const
   cOne: Single = 1;
 var
-  locRayStart, locRayVector, ip: TVector;
+  locRayStart, locRayVector, ip: TGLVector;
   poly: array [0 .. 2] of Double;
   roots: TDoubleArray;
   minRoot: Double;
@@ -1340,7 +1331,7 @@ begin
     SetLength(roots, 0);
 end;
 
-procedure TGLCylinder.Align(const startPoint, endPoint: TVector);
+procedure TGLCylinder.Align(const startPoint, endPoint: TGLVector);
 var
   dir: TAffineVector;
 begin
@@ -1565,7 +1556,7 @@ begin
   inherited Assign(Source);
 end;
 
-function TGLCapsule.AxisAlignedDimensionsUnscaled: TVector;
+function TGLCapsule.AxisAlignedDimensionsUnscaled: TGLVector;
 var
   r, r1: Single;
 begin
@@ -1577,12 +1568,12 @@ begin
   // ScaleVector(Result, Scale.AsVector);
 end;
 
-function TGLCapsule.RayCastIntersect(const rayStart, rayVector: TVector;
-  intersectPoint: PVector = nil; intersectNormal: PVector = nil): Boolean;
+function TGLCapsule.RayCastIntersect(const rayStart, rayVector: TGLVector;
+  intersectPoint: PGLVector = nil; intersectNormal: PGLVector = nil): Boolean;
 const
   cOne: Single = 1;
 var
-  locRayStart, locRayVector, ip: TVector;
+  locRayStart, locRayVector, ip: TGLVector;
   poly: array [0 .. 2] of Double;
   roots: TDoubleArray;
   minRoot: Double;
@@ -1696,7 +1687,7 @@ begin
     SetLength(roots, 0);
 end;
 
-procedure TGLCapsule.Align(const startPoint, endPoint: TVector);
+procedure TGLCapsule.Align(const startPoint, endPoint: TGLVector);
 var
   dir: TAffineVector;
 begin
@@ -1814,7 +1805,7 @@ begin
   inherited Assign(Source);
 end;
 
-function TGLAnnulus.AxisAlignedDimensionsUnscaled: TVector;
+function TGLAnnulus.AxisAlignedDimensionsUnscaled: TGLVector;
 var
   r, r1: Single;
 begin
@@ -1825,12 +1816,12 @@ begin
   Result := VectorMake(r, 0.5 * FHeight, r);
 end;
 
-function TGLAnnulus.RayCastIntersect(const rayStart, rayVector: TVector;
-  intersectPoint, intersectNormal: PVector): Boolean;
+function TGLAnnulus.RayCastIntersect(const rayStart, rayVector: TGLVector;
+  intersectPoint, intersectNormal: PGLVector): Boolean;
 const
   cOne: Single = 1;
 var
-  locRayStart, locRayVector, ip: TVector;
+  locRayStart, locRayVector, ip: TGLVector;
   poly: array [0 .. 2] of Double;
   t, tr2, invRayVector1: Single;
   tPlaneMin, tPlaneMax: Single;
@@ -2316,7 +2307,7 @@ begin
   end;
 end;
 
-function TGLTorus.AxisAlignedDimensionsUnscaled: TVector;
+function TGLTorus.AxisAlignedDimensionsUnscaled: TGLVector;
 var
   r, r1: Single;
 begin
@@ -2325,15 +2316,15 @@ begin
   Result := VectorMake(r + r1, r + r1, r1); // Danb
 end;
 
-function TGLTorus.RayCastIntersect(const rayStart, rayVector: TVector;
-  intersectPoint: PVector = nil; intersectNormal: PVector = nil): Boolean;
+function TGLTorus.RayCastIntersect(const rayStart, rayVector: TGLVector;
+  intersectPoint: PGLVector = nil; intersectNormal: PGLVector = nil): Boolean;
 var
   i: integer;
   fRo2, fRi2, fDE, fVal, r, nearest: Double;
   polynom: array [0 .. 4] of Double;
   polyRoots: TDoubleArray;
-  localStart, localVector: TVector;
-  vi, vc: TVector;
+  localStart, localVector: TGLVector;
+  vi, vc: TGLVector;
 begin
   // compute coefficients of quartic polynomial
   fRo2 := Sqr(MajorRadius);
@@ -2663,7 +2654,7 @@ begin
   end;
 end;
 
-procedure TGLArrowArc.SetParts(aValue: TGLArrowArcPart);
+procedure TGLArrowArc.SetParts(aValue: TGLArrowArcParts);
 begin
   if aValue <> FParts then
   begin
@@ -3386,7 +3377,7 @@ begin
   end;
 end;
 
-function TGLFrustrum.AxisAlignedDimensionsUnscaled: TVector;
+function TGLFrustrum.AxisAlignedDimensionsUnscaled: TGLVector;
 begin
   Result.X := FBaseWidth * 0.5;
   Result.Y := FHeight * 0.5;
@@ -3473,7 +3464,7 @@ begin
   FGrid := 5;
 end;
 
-function TGLTeapot.AxisAlignedDimensionsUnscaled: TVector;
+function TGLTeapot.AxisAlignedDimensionsUnscaled: TGLVector;
 begin
   SetVector(Result, 0.55, 0.25, 0.35);
 end;
@@ -3532,7 +3523,7 @@ begin
     FGrid := 2;
   GRD := FGrid;
 
-  rci.GLStates.InvertGLFrontFace;
+  rci.GLStates.InvertFrontFace;
   gl.Enable(GL_AUTO_NORMAL);
   gl.Enable(GL_MAP2_VERTEX_3);
   gl.Enable(GL_MAP2_TEXTURE_COORD_2);
@@ -3577,13 +3568,13 @@ begin
   gl.Disable(GL_AUTO_NORMAL);
   gl.Disable(GL_MAP2_VERTEX_3);
   gl.Disable(GL_MAP2_TEXTURE_COORD_2);
-  rci.GLStates.InvertGLFrontFace;
+  rci.GLStates.InvertFrontFace;
 end;
 
 procedure TGLTeapot.DoRender(var ARci: TGLRenderContextInfo;
   ARenderSelf, ARenderChildren: Boolean);
 const
-  M: TMatrix = (
+  M: TGLMatrix = (
   X:(X:0.150000005960464; Y:0; Z:0; W:0);
   Y:(X:0; Y:-6.55670850946422e-09; Z:-0.150000005960464; W:0);
   Z:(X:0; Y:0.150000005960464; Z:-6.55670850946422e-09; W:0);
@@ -3623,9 +3614,6 @@ RegisterClasses([TGLDodecahedron, TGLIcosahedron, TGLHexahedron,
     TGLOctahedron, TGLTetrahedron]);
 
 RegisterClasses([TGLCylinder, TGLCone, TGLTorus, TGLDisk, TGLArrowLine,
-  TGLAnnulus, TGLFrustrum, TGLPolygon, TGLCapsule, TGLArrowArc]);
-
-RegisterClasses([TGLTeapot]);
+  TGLAnnulus, TGLFrustrum, TGLPolygon, TGLCapsule, TGLArrowArc, TGLTeapot]);
 
 end.
-

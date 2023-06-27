@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.HeightData;
 
 (*
@@ -20,7 +19,7 @@ unit GLS.HeightData;
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.Windows, // to CreateMonochromeBitmap
@@ -29,9 +28,9 @@ uses
   System.Types,
   Vcl.Graphics,
 
+  GLS.VectorGeometry,
   GLS.ApplicationFileIO,
   GLS.Utils,
-  GLS.VectorGeometry,
   GLS.Material,
   GLS.BaseClasses;
 
@@ -41,8 +40,7 @@ type
   PByteRaster = ^TByteRaster;
   TSmallintArray = array [0 .. MaxInt div (2 * SizeOf(SmallInt))] of SmallInt;
   PSmallIntArray = ^TSmallintArray;
-  TSmallIntRaster = array [0 .. MaxInt div (2 * SizeOf(Pointer))
-    ] of PSmallIntArray;
+  TSmallIntRaster = array [0 .. MaxInt div (2 * SizeOf(Pointer))] of PSmallIntArray;
   PSmallIntRaster = ^TSmallIntRaster;
   TSingleRaster = array [0 .. MaxInt div (2 * SizeOf(Pointer))] of PSingleArray;
   PSingleRaster = ^TSingleRaster;
@@ -915,7 +913,6 @@ procedure TGLHeightDataSource.BeforePreparingData(HeightData: TGLHeightData);
 begin
   //
 end;
-
 
 // When Threads are used, this runs from the sub-thread, so this MUST be thread-safe.
 // Any Non-thread-safe code should be placed in "BeforePreparingData"

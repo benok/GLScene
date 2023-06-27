@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.FileOCT;
 
 (*
@@ -11,7 +10,7 @@ unit GLS.FileOCT;
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   System.Classes,
@@ -26,7 +25,7 @@ uses
   GLS.VectorFileObjects,
   GLS.VectorGeometry,
   GLS.ApplicationFileIO,
-  FormatOCT;
+  Formats.OCT;
 
 type
 
@@ -61,7 +60,7 @@ var
   oct: TOCTFile;
   octFace: POCTFace;
   octLightmap: POCTLightmap;
-  mo: TMeshObject;
+  mo: TGLMeshObject;
   fg: TFGVertexIndexList;
   lightmapLib: TGLMaterialLibrary;
   lightmapBmp: TBitmap;
@@ -69,7 +68,7 @@ var
 begin
   oct := TOCTFile.Create(aStream);
   try
-    mo := TMeshObject.CreateOwned(Owner.MeshObjects);
+    mo := TGLMeshObject.CreateOwned(Owner.MeshObjects);
     mo.Mode := momFaceGroups;
 
     lightmapLib := Owner.LightmapLibrary;

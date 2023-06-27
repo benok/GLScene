@@ -1,14 +1,13 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.GameMenu;
 
 (* Manages a basic game menu UI *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
@@ -165,7 +164,7 @@ var
   canvas: TGLCanvas;
   buffer: TGLSceneBuffer;
   i, w, h, tw, Y: Integer;
-  color: TColorVector;
+  color: TGLColorVector;
   libMat: TGLLibMaterial;
 begin
   if Font = nil then

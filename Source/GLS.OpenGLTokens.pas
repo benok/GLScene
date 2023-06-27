@@ -1,26 +1,30 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.OpenGLTokens;
 
 (* OpenGL tokens *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGLext,
   Winapi.Windows,
   System.SysUtils,
+
   GLS.VectorTypes;
 
+
+// ===========  OpenGL types  ============
+
 type
-  TGLboolean = BYTEBOOL; 
+
+  TGLboolean = BYTEBOOL;
   PGLboolean = ^TGLboolean;
 
-  TGLbitfield = UINT;
+  TGLbitfield = LongWord;  // UINT
   PGLbitfield = ^TGLbitfield;
 
   TGLbyte = ShortInt;
@@ -61,29 +65,22 @@ type
 
   TGLfloat = Single;
   PGLfloat = System.PSingle;
-  PGLclampf = System.PSingle;
 
   TGLdouble = Double;
   PGLdouble = System.PDouble;
 
+  PGLclampf = System.PSingle;
+
   TGLclampd = Double;
   PGLclampd = System.PDouble;
-
-  TGLhandleARB = Cardinal;
-  PGLhandleARB = ^TGLhandleARB;
 
   PGLPCharArray = ^PAnsiChar;
 
   PGLvoid = Pointer;
   PGLPointer = ^PGLvoid;
 
-  // GL_ARB_cl_event
-  (* These incomplete types are declare types compatible with OpenCL's
-    cl_context and cl_event *)
-  T_cl_context = record end;
-  P_cl_context = ^T_cl_context;
-  T_cl_event = record end;
-  P_cl_event = ^T_cl_event;
+  TGLhandleARB = Cardinal;
+  PGLhandleARB = ^TGLhandleARB;
 
   // the size of these depend on platform (32bit or 64bit)
   TGLintptr = NativeInt;
@@ -101,7 +98,8 @@ type
   TGLhalf = WORD;
   PGLhalf = ^TGLhalf;
 
-  // Windows types
+// ========= Windows types ==============
+
   PWGLswap = ^TWGLswap;
   _WGLSWAP = packed record
     hdc: HDC;
@@ -110,7 +108,8 @@ type
 
   TWGLswap = _WGLSWAP;
   WGLSWAP = _WGLSWAP;
-  HPBUFFERARB = Integer;
+  HPBUFFERARB = type UINT_PTR;
+
 
 type
   PHGPUNV = ^HGPUNV;
@@ -135,7 +134,7 @@ type
     severity: Cardinal;
     length: TGLsizei;
     const message: PAnsiChar;
-    userParam: Pointer); {$IFDEF MSWINDOWS}stdcall; {$ENDIF}{$IFDEF UNIX}cdecl; {$ENDIF}
+    userParam: Pointer); {$IFDEF MSWINDOWS}stdcall;{$ELSE}cdecl; {$ENDIF}
    TGLDEBUGPROCARB = TDebugProc;
 
   TDebugProcAMD = procedure(
@@ -144,7 +143,7 @@ type
     severity: Cardinal;
     length: TGLsizei;
     message: PAnsiChar;
-    userParam: Pointer); {$IFDEF MSWINDOWS}stdcall;{$ENDIF}{$IFDEF UNIX}cdecl;{$ENDIF}
+    userParam: Pointer); {$IFDEF MSWINDOWS}stdcall;{$ELSE}cdecl;{$ENDIF}
 
   TGLvdpauSurfaceNV = TGLintptr;
   PGLvdpauSurfaceNV = ^TGLvdpauSurfaceNV;
@@ -2374,4 +2373,4 @@ type
 implementation
 //-----------------------------------------
 
-end.
+end.

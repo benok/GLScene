@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics rendering engine GLScene http://glscene.org
 //
-
 unit Physics.SPIInertias;
 
 interface
@@ -11,6 +10,7 @@ uses
   System.Classes,
   Vcl.Dialogs,
 
+  GLS.PersistentClasses,
   GLS.XCollection,
   GLS.Scene,
   GLS.BaseClasses,
@@ -18,13 +18,12 @@ uses
   GLS.VectorTypes,
   Physics.SPIManager,
   GLS.Coordinates,
+  GLS.Strings,
   GLS.Behaviours;
 
 type
-  // TGLRigidBody=class;
-
   TGLParticleInertia = class(TGLBaseInertia)
-  // modified from TGLBInertia by Dan Bartlett
+  // modified from TGLBInertia
   private
     FMass: Single;
     FTranslationSpeed: TGLCoordinates;
@@ -69,7 +68,7 @@ type
     (* Bounce speed as if hitting a surface.
       restitution is the coefficient of restituted energy (1=no energy loss,
       0=no bounce). The normal is NOT assumed to be normalized. *)
-    procedure SurfaceBounce(const surfaceNormal: TVector; restitution: Single);
+    procedure SurfaceBounce(const surfaceNormal: TGLVector; restitution: Single);
   published
     property Mass: Single read FMass write FMass;
     property TranslationSpeed: TGLCoordinates read FTranslationSpeed
@@ -158,7 +157,7 @@ type
     class function FriendlyName: String; override;
     class function FriendlyDescription: String; override;
     class function UniqueItem: Boolean; override;
-    // function Star(Vector:TAffineVector):TMatrix;
+    // function Star(Vector:TAffineVector):TGLMatrix;
     function QuaternionToString(Quat: TQuaternion): String;
     procedure RemoveForces(); override;
     procedure SetTorque(x, y, z: Real);
@@ -465,7 +464,7 @@ begin
   FTranslationSpeed.Invert;
 end;
 
-procedure TGLParticleInertia.SurfaceBounce(const surfaceNormal: TVector;
+procedure TGLParticleInertia.SurfaceBounce(const surfaceNormal: TGLVector;
   restitution: Single);
 var
   f: Single;
@@ -700,7 +699,7 @@ begin
 end;
 
 (*
- function TGLRigidBodyInertia.Star(Vector:TAffineVector):TMatrix;
+ function TGLRigidBodyInertia.Star(Vector:TAffineVector):TGLMatrix;
   begin
   Result.X.X:=0;             Result[0][1]:=-Vector[2];  Result[0][2]:=Vector[1];  Result[0][3]:=0;
   Result[1][0]:=Vector[2];   Result[1][1]:=0;           Result[1][2]:=-Vector[0]; Result[1][3]:=0;
@@ -792,7 +791,7 @@ var
   IRt: TAffineMAtrix;
   Rt: TAffineMAtrix;
   Scale: TAffineVector;
-  RMatrix: TMatrix;
+  RMatrix: TGLMatrix;
 begin
   // TODO: sort this out
   fBodyInverseInertiaTensor := IdentityMatrix;

@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.GizmoEx;
 
 (*
@@ -12,7 +11,7 @@ unit GLS.GizmoEx;
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
@@ -48,16 +47,16 @@ type
 
   TGLGizmoExObjectItem = class(TCollectionItem)
   private
-    FOldAutoScaling: TVector;
+    FOldAutoScaling: TGLVector;
     FEffectedObject: TGLBaseSceneObject;
     FParentOldObject: TGLBaseSceneObject;
     FIndexOldObject: Integer;
     FNameOldObject: string;
     FReturnObject: Boolean;
-    FOldMatrix: TMatrix;
+    FOldMatrix: TGLMatrix;
     FGizmoTmpRoot: TGLBaseSceneObject;
     procedure SetEffectedObject(const Value: TGLBaseSceneObject);
-    procedure SetOldMatrix(const Value: TMatrix);
+    procedure SetOldMatrix(const Value: TGLMatrix);
   protected
     procedure DoUndo;
     function GetParent: TGLGizmoExObjectCollection;
@@ -69,7 +68,7 @@ type
     procedure Notification(AComponent: TComponent; Operation: TOperation); virtual;
     procedure AssignFromObject(const AObject: TGLBaseSceneObject; AssignAndRemoveObj: Boolean = False);
     // TODO: create a special type for Matrix.
-    property OldMatrix: TMatrix read FOldMatrix write SetOldMatrix;
+    property OldMatrix: TGLMatrix read FOldMatrix write SetOldMatrix;
   published
     property EffectedObject: TGLBaseSceneobject read FEffectedObject write SetEffectedObject;
   end;
@@ -129,12 +128,9 @@ type
   TInfoLabelCoordType = (ilcChanging, ilcChangeRate);
 
   TGLGizmoExAxis = (gaNone, gaX, gaY, gaZ, gaXY, gaXZ, gaYZ, gaXYZ);
-
-  TGLGizmoExSelectionRegion = (gsrRectangular, gsrCircular, gsrFence,
-    gsrLasso);
+  TGLGizmoExSelectionRegion = (gsrRectangular, gsrCircular, gsrFence, gsrLasso);
 
   TGLGizmoExReferenceCoordinateSystem = (rcsView, rcsLocal);
-
   TGLGizmoExSelRec = array of TPoint;
 
   TGLGizmoExOperation = (gopMove, gopRotate, gopScale, gopNone);
@@ -221,9 +217,7 @@ type
   TGLGizmoEx = class(TComponent)
   private
     FUIBaseGizmo: TGLBaseSceneObject;
-
     FUIRootHelpers: TGLBaseSceneObject;
-
     FUIRootSelect: TGLBaseSceneObject; // for None
     FUIRootMovement: TGLBaseSceneObject; // for Move
     FUIRootRotate: TGLBaseSceneObject; //for Rotate
@@ -233,7 +227,6 @@ type
     FUIRootVisibleInfoLabels: TGLBaseSceneObject;
     FInterfaceRender: TGLDirectOpenGL;
     FInternalRender: TGLDirectOpenGL;
-
     FUISelectLineX, FUISelectLineY, FUISelectLineZ: TGLGizmoExUILines;  //  For None (Select)
 
     //IC- Invisible Control
@@ -253,15 +246,12 @@ type
 
     //ForScale
     FUIScaleArrowX, FUIScaleArrowY, FUIScaleArrowZ: TGLGizmoExUISphere; // For Scale
-
     FUIScaleLineX, FUIScaleLineY, FUIScaleLineZ, FUIScaleLineXY, FUIScaleLineYZ, FUIScaleLineXZ: TGLGizmoExUILines;
-
     FUIICScaleLineX, FUIICScaleLineY, FUIICScaleLineZ, FUIICScaleLineXY, FUIICScaleLineXZ, FUIICScaleLineYZ, FUIICScaleLineXYZ: TGLGizmoExUIFrustrum;
     FUIScalePlaneXY, FUIScalePlaneXZ, FUIScalePlaneYZ, FUIScalePlaneXYZ: TGLGizmoExUIPolyGon; // For Move
 
     FUIAxisLabelX, FUIAxisLabelY, FUIAxisLabelZ: TGLGizmoExUIFlatText;
     FUIVisibleInfoLabels: TGLGizmoExUIFlatText;
-
     FRootGizmo: TGLBaseSceneObject;
     FRootObjects: TGLBaseSceneObject;
     FGizmoTmpRoot: TGLBaseSceneObject;
@@ -318,7 +308,7 @@ type
     fLastCursorPos: TPoint;
     fChangeRate: TAffineVector;   //total rotate angle
     FEnableLoopCursorMoving: Boolean;
-    lastMousePos: TVector;
+    lastMousePos: TGLVector;
     FOnUpdate: TNotifyEvent;
     FOnSelect: TGLGizmoExAcceptEvent;
     FOnOperationChange: TNotifyEvent;
@@ -347,7 +337,7 @@ type
     procedure SetHistoryStepsCount(aValue: Integer);
     procedure SetExcludeObjectsList(const AValue: TStrings);
     procedure SetExcludeClassNameList(const AValue: TStrings);
-    function MouseWorldPos(const X, Y: Integer): TVector;
+    function MouseWorldPos(const X, Y: Integer): TGLVector;
     function CheckObjectInExcludeList(const Obj: TGLBaseSceneObject): Boolean;
     function CheckClassNameInExcludeList(const Obj: TGLBaseSceneObject): Boolean;
     procedure UpdateVisibleInfoLabels;
@@ -480,7 +470,7 @@ uses
 
 procedure RotateAroundArbitraryAxis(const anObject: TGLBaseSceneObject; const Axis, Origin: TAffineVector; const angle: Single);
 var
-  M, M1, M2, M3: TMatrix;
+  M, M1, M2, M3: TGLMatrix;
 begin
   M1 := CreateTranslationMatrix(VectorNegate(Origin));
   M2 := CreateRotationMatrix(Axis, Angle * PI / 180);
@@ -1131,7 +1121,7 @@ begin
   with FUIRotateLineX do
   begin
     Options := [loUseNodeColorForLines];
-    //Для исправления проблем с прозрачностью
+    // To fix transparency issues
     lineColor.Alpha := 0.1;
     Nodecolor.Color := clrred;
     Nodecolor.Alpha := 0.1;
@@ -1214,7 +1204,7 @@ begin
   with FUIRotateLineY do
   begin
     Options := [loUseNodeColorForLines];
-    //Для исправления проблем с прозрачностью
+    // To fix transparency issues
     lineColor.Alpha := 0.1;
     Nodecolor.Color := clrLime;
     Nodecolor.Alpha := 0.1;
@@ -1298,7 +1288,7 @@ begin
   with FUIRotateLineZ do
   begin
     Options := [loUseNodeColorForLines];
-    //to correct transparency problem
+    // to correct transparency problem
     lineColor.Alpha := 0.1;
     Nodecolor.Color := clrBlue;
     Nodecolor.Alpha := 0.1;
@@ -2110,7 +2100,7 @@ procedure TGLGizmoEx.InternalRender(Sender: TObject; var rci: TGLRenderContextIn
   var
     I, J:    Byte;
     BB:      THmgBoundingBox;
-    AVector: TVector;
+    AVector: TGLVector;
   begin
     if aObject = nil then
       Exit;
@@ -2134,11 +2124,11 @@ procedure TGLGizmoEx.InternalRender(Sender: TObject; var rci: TGLRenderContextIn
 
   //test#12 result is positive, but only for 2d
   //
-  procedure ShowText(const Text: UnicodeString; Position: Tvector; Scale: TVector; Color: Tvector);
+  procedure ShowText(const Text: UnicodeString; Position: TGLVector; Scale: TGLVector; Color: TGLVector);
   var
     FLayout: TTextLayout;
     FAlignment: TAlignment;
-    wm:   TMatrix;
+    wm:   TGLMatrix;
     I, J: Integer;
   begin
     if not Assigned(FLabelFont) and (Text = '') then
@@ -2897,7 +2887,7 @@ function TGLGizmoEx.InternalGetPickedObjects(const x1, y1, x2, y2: Integer; cons
   var
     t:    Integer;
     dist: Single;
-    rayStart, rayVector, iPoint, iNormal: TVector;
+    rayStart, rayVector, iPoint, iNormal: TGLVector;
   begin
     SetVector(rayStart, Viewer.Camera.AbsolutePosition);
     SetVector(rayVector, Viewer.Buffer.ScreenToVector(AffineVectorMake(X, Viewer.Height - Y, 0)));
@@ -2948,7 +2938,6 @@ begin
     end;
   end;
 end;
-
 
 procedure TGLGizmoEx.Loaded;
 begin
@@ -3073,9 +3062,9 @@ begin
 
 end;
 
-function TGLGizmoEx.MouseWorldPos(const X, Y: Integer): TVector;
+function TGLGizmoEx.MouseWorldPos(const X, Y: Integer): TGLVector;
 var
-  v: TVector;
+  v: TGLVector;
   InvertedY: Integer;
 begin
 
@@ -3100,7 +3089,7 @@ end;
 
 procedure TGLGizmoEx.ActivatingElements(PickList: TGLPickList);
 
-  procedure ActlightRotateLine(const line: TGLLines; const dark: TVector);
+  procedure ActlightRotateLine(const line: TGLLines; const dark: TGLVector);
   var
     v: TVector4f;
     I: Integer;
@@ -3122,7 +3111,7 @@ procedure TGLGizmoEx.ActivatingElements(PickList: TGLPickList);
     end;
   end;
 
-  procedure DeActlightRotateLine(const line: TGLLines; const dark: TVector);
+  procedure DeActlightRotateLine(const line: TGLLines; const dark: TGLVector);
   var
     v: TVector4f;
     I: Integer;
@@ -3151,7 +3140,7 @@ procedure TGLGizmoEx.ActivatingElements(PickList: TGLPickList);
     line.Options := [];
   end;
 
-  procedure DeActlightLine(const line: TGLLines; const dark: TVector; alterStyle: Boolean = False);
+  procedure DeActlightLine(const line: TGLLines; const dark: TGLVector; alterStyle: Boolean = False);
   begin
     with  line.LineColor do
       if (AsWinColor = FSelectedColor.AsWinColor) then
@@ -3163,13 +3152,13 @@ procedure TGLGizmoEx.ActivatingElements(PickList: TGLPickList);
       end;
   end;
 
-  procedure ActlightRotateArrowLine(const line: TGLLines; Color: TVector);
+  procedure ActlightRotateArrowLine(const line: TGLLines; Color: TGLVector);
   begin
     line.LineColor.color := Color;
     line.Options := [];
   end;
 
-  procedure DeActlightRotateArrowLine(const line: TGLLines; const dark: TVector);
+  procedure DeActlightRotateArrowLine(const line: TGLLines; const dark: TGLVector);
   begin
     if not VectorEquals(line.LineColor.Color, dark) then
     begin
@@ -3194,19 +3183,19 @@ procedure TGLGizmoEx.ActivatingElements(PickList: TGLPickList);
     FlatText.ModulateColor.Color := FSelectedColor.Color;
   end;
 
-  procedure DeActlightText(const FlatText: TGLFlatText; const dark: TVector);
+  procedure DeActlightText(const FlatText: TGLFlatText; const dark: TGLVector);
   begin
     with FlatText.ModulateColor do
       if AsWinColor = FSelectedColor.AsWinColor then
         Color := dark;
   end;
 
-  procedure ActlightTextRotate(const FlatText: TGLFlatText; Color: TVector);
+  procedure ActlightTextRotate(const FlatText: TGLFlatText; Color: TGLVector);
   begin
     FlatText.ModulateColor.Color := Color;
   end;
 
-  procedure DeActlightTextRotate(const FlatText: TGLFlatText; const dark: TVector);
+  procedure DeActlightTextRotate(const FlatText: TGLFlatText; const dark: TGLVector);
   begin
     with FlatText.ModulateColor do
       if not VectorEquals(Color, dark) then
@@ -3458,7 +3447,7 @@ end;
 procedure TGLGizmoEx.ViewerMouseMove(const X, Y: Integer);
 var
   pickList:  TGLPickList;
-  mousePos:  TVector;
+  mousePos:  TGLVector;
   includeCh: Boolean;
 
   function FindParent(parent: TGLBaseSceneObject): Boolean;
@@ -3472,10 +3461,10 @@ var
     end;
   end;
 
-  procedure OpeMove(mousePos: TVector);
+  procedure OpeMove(mousePos: TGLVector);
   var
-    vec1, vec2: TVector;
-    quantizedMousePos, quantizedMousePos2: TVector;
+    vec1, vec2: TGLVector;
+    quantizedMousePos, quantizedMousePos2: TGLVector;
     I: Integer;
   begin
     if VectorNorm(lastMousePos) = 0 then
@@ -3558,12 +3547,12 @@ var
 
   procedure OpeRotate(const X, Y: Integer);
   var
-    vec1: TVector;
+    vec1: TGLVector;
     rotV: TAffineVector;
-    pmat: TMatrix;
+    pmat: TGLMatrix;
     I:    Integer;
     IncludeCh: Boolean;
-    v:    TVector;
+    v:    TGLVector;
   begin
 
     vec1.X := 0;
@@ -3598,7 +3587,6 @@ var
     for I := 0 to FSelectedObjects.Count - 1 do
       with FSelectedObjects do
       begin
-
         case Ord(FReferenceCoordSystem) of
           0: v := FUIRootHelpers.AbsolutePosition;
           1: v := TGLBaseSceneObject(Hit[I]).AbsolutePosition;
@@ -3657,10 +3645,10 @@ var
       end;
   end;
 
-  procedure OpeScale(const mousePos: TVector);
+  procedure OpeScale(const mousePos: TGLVector);
   var
-    vec1, vec2: TVector;
-    quantizedMousePos, quantizedMousePos2: TVector;
+    vec1, vec2: TGLVector;
+    quantizedMousePos, quantizedMousePos2: TGLVector;
     t: Integer;
   begin
     if VectorNorm(lastMousePos) = 0 then
@@ -3826,10 +3814,8 @@ var
   end;
 
 begin
-
   if (not Enabled) or (RootGizmo = nil) or (RootObjects = nil) then
     Exit;
-
   if not FShowMultiSelecting then
   begin
 
@@ -3881,9 +3867,9 @@ end;
 
 procedure TGLGizmoEx.ViewerMouseDown(const X, Y: Integer);
 
-  function SetInitialDiskPostition(aObject, aObject2: TGLCustomSceneObject): TVector;
+  function SetInitialDiskPostition(aObject, aObject2: TGLCustomSceneObject): TGLVector;
   var
-    rayStart, rayVector, iPoint, iNormal: TVector;
+    rayStart, rayVector, iPoint, iNormal: TGLVector;
   begin
     if (Viewer = nil) then
       Exit;
@@ -3911,13 +3897,10 @@ begin
      not Assigned(RootObjects) or
      not Assigned(Viewer)      then
     Exit;
-
   mx := X;
   my := Y;
-
   pick := InternalGetPickedObjects(X - 1, Y - 1, X + 1, Y + 1);
   gotPick := False;
-
   for I := 0 to pick.Count - 1 do
     if (pick.Hit[I] is TGLGizmoExUIDisk) or
       (pick.Hit[I] is TGLGizmoExUISphere) or
@@ -4021,7 +4004,7 @@ begin
   if operation = gopNone then
   begin
     pick := InternalGetPickedObjects(X - 1, Y - 1, X + 1, Y + 1, 8);
-    //очистка списка если кликнули в пустоту
+    // clearing the list if clicked into the void
     if not FCanAddObjToSelectionList and not FCanRemoveObjFromSelectionList and (pick.Count = 0) then
       ClearSelection;
 
@@ -4042,7 +4025,7 @@ end;
 procedure TGLGizmoEx.UpdateGizmo;
 var
   d: Single;
-  v: TVector;
+  v: TGLVector;
   I: Integer;
 begin
   if not Assigned(RootGizmo)   or
@@ -4063,7 +4046,7 @@ begin
       OnUpdate(self);
 
     v := VectorMake(0, 0, 0);
-    //устанавливаем гизмо в нужную позицию!
+    // set the gizmo to the right position!
     for  I := 0 to FSelectedObjects.Count - 1 do
       VectorAdd(v, TGLBaseSceneObject(FSelectedObjects.Hit[I]).AbsolutePosition, v);
 
@@ -4233,7 +4216,7 @@ begin
   UpdateGizmo;
 end;
 
-////////////////////////////////////////////////////////////
+//===========================================================================================
 
 procedure TGLGizmoExObjectItem.AssignFromObject(const AObject: TGLBaseSceneObject; AssignAndRemoveObj: Boolean = False);
 begin
@@ -4324,12 +4307,14 @@ begin
   FEffectedObject := Value;
 end;
 
-procedure TGLGizmoExObjectItem.SetOldMatrix(const Value: TMatrix);
+procedure TGLGizmoExObjectItem.SetOldMatrix(const Value: TGLMatrix);
 begin
   FOldMatrix := Value;
 end;
 
-{ TGLGizmoExUndoCollection }
+//==================================
+//     TGLGizmoExUndoCollection
+//=================================
 
 function TGLGizmoExObjectCollection.Add: TGLGizmoExObjectItem;
 begin
@@ -4377,7 +4362,7 @@ begin
     GetItems(I).DoUndo;
 end;
 
-/////////////////////////////////////////////////////////////
+//==================================================================
 
 constructor TGLGizmoExActionHistoryItem.Create(AOwner: TCollection);
 begin
@@ -4403,7 +4388,9 @@ begin
     FGizmoObjectCollection := aValue;
 end;
 
-{ TGLGizmoExUndoCollection }
+//=======================================
+//      TGLGizmoExUndoCollection
+//=======================================
 
 constructor TGLGizmoExActionHistoryCollection.Create(AOwner: TPersistent; ItemClass: TCollectionItemClass);
 begin

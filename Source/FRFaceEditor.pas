@@ -1,18 +1,18 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit FRFaceEditor;
 
 (* Editor frame for a TGLFaceProperties. *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   WinApi.Windows,
   System.Classes,
+  System.SysUtils,
   System.ImageList,
   VCL.Forms,
   VCL.ComCtrls,
@@ -56,9 +56,9 @@ type
       write SetGLFaceProperties;
   end;
 
-//------------------------------------------------------
+// ------------------------------------------------------
 implementation
-//------------------------------------------------------
+// ------------------------------------------------------
 
 {$R *.dfm}
 
@@ -95,7 +95,7 @@ var
   end;
 
 begin
-  if not updating then
+  if not Updating then
   begin
     // Update imageList
     bmp := TBitmap.Create;
@@ -142,7 +142,7 @@ begin
     CESpecular.Color := val.Specular.Color;
     TBEShininess.Value := val.Shininess;
   finally
-    updating := False;
+    Updating := False;
   end;
   OnColorChange(Self);
   TBEShininessTrackBarChange(Self);

@@ -1,5 +1,5 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
 
 unit GLSL.ShapeShaders;
@@ -11,7 +11,7 @@ unit GLSL.ShapeShaders;
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
@@ -800,7 +800,7 @@ end;
 
 procedure TGLCelShader.DoApply(var rci: TGLRenderContextInfo; Sender: TObject);
 var
-  light: TVector;
+  light: TGLVector;
 begin
   if (csDesigning in ComponentState) then
     exit;

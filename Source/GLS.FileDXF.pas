@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.FileDXF;
 
 (*
@@ -26,7 +25,8 @@ uses
   GLS.Scene,
   GLS.Texture,
   GLS.VectorFileObjects,
-  GLS.Material;
+  GLS.Material,
+  GLS.Utils;
 
 type
   TGLDXFVectorFile = class(TGLVectorFile)
@@ -47,11 +47,11 @@ type
     procedure SkipTable;
     procedure SkipSection;
     // procedure DoProgress (Stage: TGLProgressStage; PercentDone: single; RedrawNow: Boolean; const Msg: string);
-    function NeedMesh(basemesh: TGLBaseMesh; layer: STRING): TMeshObject;
-    function NeedFaceGroup(m: TMeshObject; fgmode: TGLFaceGroupMeshMode;
-      fgmat: STRING): TFGVertexIndexList;
+    function NeedMesh(basemesh: TGLBaseMesh; layer: STRING): TGLMeshObject;
+    function NeedFaceGroup(m: TGLMeshObject; fgmode: TGLFaceGroupMeshMode;
+      fgmat: String): TFGVertexIndexList;
     procedure NeedMeshAndFaceGroup(basemesh: TGLBaseMesh; layer: STRING;
-      fgmode: TGLFaceGroupMeshMode; fgmat: STRING; var m: TMeshObject;
+      fgmode: TGLFaceGroupMeshMode; fgmat: STRING; var m: TGLMeshObject;
       var fg: TFGVertexIndexList);
 
     function ReadLine: STRING;
@@ -74,7 +74,7 @@ type
 
 implementation
 
-procedure BuildNormals(m: TMeshObject); FORWARD;
+procedure BuildNormals(m: TGLMeshObject); FORWARD;
 
 const
   DXFcolorsRGB: ARRAY [1 .. 255] OF LONGINT = ($FF0000, $FFFF00, $00FF00,
@@ -245,7 +245,7 @@ const
     c := FormatSettings.DecimalSeparator;
     FormatSettings.DecimalSeparator := '.';
     S := Trim(ReadLine);
-    result := StrToFloat(S);
+    result := GLStrToFloatDef(S);
     FormatSettings.DecimalSeparator := c;
   end;
 
@@ -389,8 +389,8 @@ const
       pt, insertpoint, scale: TAffineVector;
       blockmesh: TGLBaseMesh;
       // blockproxy  :TGLProxyObject;
-      mo_block: TMeshObject;
-      mo_base: TMeshObject;
+      mo_block: TGLMeshObject;
+      mo_base: TGLMeshObject;
       fg_block, fg_base: TFGVertexIndexList;
     begin
       blockname := '';
@@ -478,7 +478,7 @@ const
     end;
 
     function TGLDXFVectorFile.NeedMesh(basemesh: TGLBaseMesh; layer: STRING)
-      : TMeshObject;
+      : TGLMeshObject;
     var
       i: Integer;
     begin
@@ -490,13 +490,13 @@ const
         result := basemesh.MeshObjects[i]
       else
       begin
-        result := TMeshObject.CreateOwned(basemesh.MeshObjects);
+        result := TGLMeshObject.CreateOwned(basemesh.MeshObjects);
         result.mode := momFaceGroups;
         result.name := layer;
       end;
     end;
 
-    function TGLDXFVectorFile.NeedFaceGroup(m: TMeshObject;
+    function TGLDXFVectorFile.NeedFaceGroup(m: TGLMeshObject;
       fgmode: TGLFaceGroupMeshMode; fgmat: STRING): TFGVertexIndexList;
     var
       i: Integer;
@@ -541,7 +541,7 @@ const
 
     procedure TGLDXFVectorFile.NeedMeshAndFaceGroup(basemesh: TGLBaseMesh;
       layer: STRING; fgmode: TGLFaceGroupMeshMode; fgmat: STRING;
-      var m: TMeshObject; var fg: TFGVertexIndexList);
+      var m: TGLMeshObject; var fg: TFGVertexIndexList);
     begin
       m := NeedMesh(basemesh, layer);
       fg := NeedFaceGroup(m, fgmode, fgmat);
@@ -554,7 +554,7 @@ const
       isquad: Boolean;
       fg: TFGVertexIndexList;
       color, layer: STRING;
-      m: TMeshObject;
+      m: TGLMeshObject;
     begin
       color := '';
       layer := '';
@@ -623,7 +623,7 @@ const
 
     procedure TGLDXFVectorFile.ReadEntityPolyLine(basemesh: TGLBaseMesh);
 
-      procedure ReadPolylineVertex(m: TMeshObject; vertexindexbase: Integer);
+      procedure ReadPolylineVertex(m: TGLMeshObject; vertexindexbase: Integer);
       var
         color: STRING;
         pt: TAffineVector;
@@ -711,7 +711,7 @@ const
       end;
 
     var
-      m: TMeshObject;
+      m: TGLMeshObject;
       code, vertexindexbase: Integer;
       S, layer: STRING;
     begin
@@ -775,7 +775,7 @@ const
     end;
 
     // build normals
-    procedure BuildNormals(m: TMeshObject);
+    procedure BuildNormals(m: TGLMeshObject);
     var
       i, j: Integer;
       v1, v2, v3, v4, n: TAffineVector;

@@ -1,18 +1,15 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.Mirror;
-
 (*
-   Implements a basic, stencil-based mirror (as in Mark Kilgard's demo). 
+   Implements a basic, stencil-based mirror (as in Mark Kilgard's demo).
    It is strongly recommended to read and understand the explanations in the
-   materials/mirror demo before using this component. 
+   materials/mirror demo before using this component.
 *)
-
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
@@ -82,7 +79,7 @@ type
       ARenderSelf, ARenderChildren: Boolean); override;
     procedure BuildList(var ARci: TGLRenderContextInfo); override;
     procedure Assign(Source: TPersistent); override;
-    function AxisAlignedDimensionsUnscaled: TVector; override;
+    function AxisAlignedDimensionsUnscaled: TGLVector; override;
   published
     // Selects the object to mirror. If nil, the whole scene is mirrored 
     property MirrorObject: TGLBaseSceneObject read FMirrorObject write
@@ -122,7 +119,6 @@ implementation
 // ------------------ TGLMirror ------------------
 // ------------------
 
- 
 constructor TGLMirror.Create(AOwner: Tcomponent);
 begin
   inherited Create(AOwner);
@@ -143,10 +139,10 @@ procedure TGLMirror.DoRender(var ARci: TGLRenderContextInfo;
   ARenderSelf, ARenderChildren: Boolean);
 var
   oldProxySubObject: Boolean;
-  refMat, curMat, ModelMat: TMatrix;
+  refMat, curMat, ModelMat: TGLMatrix;
   clipPlane: TDoubleHmgPlane;
-  bgColor: TColorVector;
-  cameraPosBackup, cameraDirectionBackup: TVector;
+  bgColor: TGLColorVector;
+  cameraPosBackup, cameraDirectionBackup: TGLVector;
   CurrentBuffer: TGLSceneBuffer;
 begin
   if FRendering then
@@ -180,7 +176,7 @@ begin
               clrBlack, clrBlack, 0);
           end
           else
-            SetGLColorWriting(False);
+            SetColorWriting(False);
 
           Enable(stDepthTest);
           DepthWriteMask := False;
@@ -198,7 +194,7 @@ begin
             ClearZBufferArea(CurrentBuffer);
 
           if not (moOpaque in MirrorOptions) then
-            SetGLColorWriting(True);
+            SetColorWriting(True);
         end;
 
         ARci.PipelineTransformation.Push;
@@ -311,7 +307,7 @@ end;
 
 procedure TGLMirror.ClearZBufferArea(aBuffer: TGLSceneBuffer);
 var
-  worldMat: TMatrix;
+  worldMat: TGLMatrix;
   p: TAffineVector;
 begin
   with aBuffer do
@@ -328,7 +324,7 @@ begin
     with aBuffer.RenderingContext.GLStates do
     begin
       DepthFunc := cfAlways;
-      SetGLColorWriting(False);
+      SetColorWriting(False);
     end;
 
     gl.Begin_(GL_QUADS);
@@ -349,7 +345,7 @@ begin
     with aBuffer.RenderingContext.GLStates do
     begin
       DepthFunc := cfLess;
-      SetGLColorWriting(True);
+      SetColorWriting(True);
     end;
 
     gl.MatrixMode(GL_PROJECTION);
@@ -415,7 +411,7 @@ begin
 end;
 
 
-function TGLMirror.AxisAlignedDimensionsUnscaled: TVector;
+function TGLMirror.AxisAlignedDimensionsUnscaled: TGLVector;
 begin
   Result := VectorMake(0.5 * Abs(FWidth),
     0.5 * Abs(FHeight), 0);

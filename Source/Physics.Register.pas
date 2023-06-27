@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit Physics.Register;
 
 (* DesignTime registration code for the Physics Managers *)
@@ -22,11 +21,10 @@ implementation
 
 procedure Register;
 begin
-  RegisterClasses([TGLODEManager, TGLODEJointList,  TGLODEJoints, TGLODEElements,
-                   TGLNGDManager, TGLNGDDynamic, TGLNGDStatic,
-                   TGLSPIManager]);
-  RegisterComponents('GLScene Physics Managers',[TGLODEManager,TGLODEJointList,
-                                TGLNGDManager, TGLSPIManager]);
+  RegisterClasses([TGLODEManager, TGLODEJointList, TGLODEJoints, TGLODEElements,
+    TGLNGDManager, TGLNGDDynamic, TGLNGDStatic, TGLSPIManager]);
+  RegisterComponents('GLScene Physics Managers', [TGLODEManager, TGLODEJointList, 
+                    TGLNGDManager, TGLSPIManager]);
 end;
 
 end.

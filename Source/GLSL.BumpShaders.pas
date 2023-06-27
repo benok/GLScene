@@ -1,5 +1,5 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
 
 unit GLSL.BumpShaders;
@@ -28,7 +28,7 @@ unit GLSL.BumpShaders;
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
@@ -319,7 +319,7 @@ type
   private
     FVertexProgramHandle: TGLARBVertexProgramHandle;
     FFragmentProgramHandle: TGLARBFragmentProgramHandle;
-    FLightIDs: TIntegerList;
+    FLightIDs: TGLIntegerList;
     FLightsEnabled: Integer;
     FBumpMethod: TBumpMethod;
     FBumpSpace: TBumpSpace;
@@ -1192,7 +1192,7 @@ end;
 constructor TGLBumpShader.Create(AOwner: TComponent);
 begin
   inherited;
-  FLightIDs := TIntegerList.Create;
+  FLightIDs := TGLIntegerList.Create;
   FBumpMethod := bmDot3TexCombiner;
   FBumpSpace := bsObject;
   FBumpOptions := [];
@@ -1593,7 +1593,7 @@ procedure TGLBumpShader.DoLightPass(var rci: TGLRenderContextInfo;
 var
   dummyHandle, tempHandle: Integer;
   lightPos, lightAtten,
-    materialDiffuse, lightDiffuse, lightSpecular: TVector;
+    materialDiffuse, lightDiffuse, lightSpecular: TGLVector;
 begin
   FVertexProgramHandle.Enable;
   FVertexProgramHandle.Bind;
@@ -1667,7 +1667,7 @@ end;
 procedure TGLBumpShader.DoApply(var rci: TGLRenderContextInfo; Sender: TObject);
 var
   maxTextures, i: Integer;
-  ambient, LMaterialAmbient: TColorVector;
+  ambient, LMaterialAmbient: TGLColorVector;
   success: Boolean;
 begin
   if (csDesigning in ComponentState) and not DesignTimeEnabled then
@@ -1763,7 +1763,7 @@ end;
 
 function TGLBumpShader.DoUnApply(var rci: TGLRenderContextInfo): Boolean;
 var
-  ambient, LMaterialAmbient: TVector;
+  ambient, LMaterialAmbient: TGLVector;
 begin
   Result := False;
   if (csDesigning in ComponentState) and not DesignTimeEnabled then

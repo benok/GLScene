@@ -1,14 +1,13 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.FileMS3D;
 
 (* Support for MS3D file format. *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   System.Math,
@@ -123,10 +122,10 @@ type
   // *) ms3d_material_t;
   TMS3DMaterial = record
     Name: array[0..31] of AnsiChar;
-    Ambient: TColorVector;
-    Diffuse: TColorVector;
-    Specular: TColorVector;
-    Emissive: TColorVector;
+    Ambient: TGLColorVector;
+    Diffuse: TGLColorVector;
+    Specular: TGLColorVector;
+    Emissive: TGLColorVector;
     Shininess: single;
     Transparency: single;
     Mode: AnsiChar;
@@ -340,7 +339,7 @@ var
   itemp: Cardinal;
   wtemp: word;
   TexCoordID: integer;
-  MO: TMeshObject;
+  MO: TGLMeshObject;
   FaceGroup: TFGVertexNormalTexIndexList;
   Sk_MO: TGLSkeletonMeshObject;
 
@@ -411,7 +410,7 @@ var
 
   function AddRotations(rot, baserot: TAffineVector): TAffineVector;
   var
-    mat1, mat2, rmat: TMatrix;
+    mat1, mat2, rmat: TGLMatrix;
     s, c: Single;
     Trans: TTransformations;
   begin
@@ -477,7 +476,7 @@ begin
       TGLSkeletonMeshObject(MO).BonesPerVertex := 4;
     end
     else
-      MO := TMeshObject.CreateOwned(Owner.MeshObjects);
+      MO := TGLMeshObject.CreateOwned(Owner.MeshObjects);
     MO.Mode := momFaceGroups;
 
     // Then comes nNumVertices * sizeof (ms3d_vertex_t)

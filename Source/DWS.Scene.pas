@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics rendering engine GLScene http://glscene.org
 //
-
 unit DWS.Scene;
 
 (*
@@ -325,13 +324,13 @@ type
   // ---------- Vector/Matrix to/from IInfo helper functions ----------
   // ----------
 
-function GetVectorFromInfo(Info: IInfo): TVector;
+function GetVectorFromInfo(Info: IInfo): TGLVector;
 begin
   Result := VectorMake(Info.Element([0]).Value, Info.Element([1]).Value,
     Info.Element([2]).Value, Info.Element([3]).Value);
 end;
 
-procedure SetInfoFromVector(Info: IInfo; vec: TVector);
+procedure SetInfoFromVector(Info: IInfo; vec: TGLVector);
 var
   i: Integer;
 begin
@@ -339,7 +338,7 @@ begin
     Info.Element([i]).Value := vec[i];
 end;
 
-function GetMatrixFromInfo(Info: IInfo): TMatrix;
+function GetMatrixFromInfo(Info: IInfo): TGLMatrix;
 var
   i: Integer;
 begin
@@ -349,7 +348,7 @@ begin
       .Value, Info.Element([i]).Element([3]).Value);
 end;
 
-procedure SetInfoFromMatrix(Info: IInfo; mat: TMatrix);
+procedure SetInfoFromMatrix(Info: IInfo; mat: TGLMatrix);
 var
   i, j: Integer;
 begin
@@ -439,7 +438,7 @@ end;
 // TGLCoordinates.AsVector write access
 procedure TGLCoordinatesSetAsVectorMethod.Execute(var ExternalObject: TObject);
 var
-  v: TVector;
+  v: TGLVector;
 begin
   ValidateExternalObject(ExternalObject, TGLCoordinates);
   v := GetVectorFromInfo(Info.Vars['Value']);
@@ -449,7 +448,7 @@ end;
 // TGLCoordinates.AsVector read access
 procedure TGLCoordinatesGetAsVectorMethod.Execute(var ExternalObject: TObject);
 var
-  v: TVector;
+  v: TGLVector;
 begin
   ValidateExternalObject(ExternalObject, TGLCoordinates);
   v := TGLCoordinates(ExternalObject).AsVector;
@@ -466,7 +465,7 @@ end;
 // TGLCoordinates.Translate
 procedure TGLCoordinatesTranslateMethod.Execute(var ExternalObject: TObject);
 var
-  v: TVector;
+  v: TGLVector;
 begin
   ValidateExternalObject(ExternalObject, TGLCoordinates);
   v := GetVectorFromInfo(Info.Vars['translationVector']);
@@ -477,7 +476,7 @@ end;
 procedure TGLCoordinatesAddScaledVectorMethod.Execute(var ExternalObject
   : TObject);
 var
-  v: TVector;
+  v: TGLVector;
 begin
   ValidateExternalObject(ExternalObject, TGLCoordinates);
   v := GetVectorFromInfo(Info.Vars['translationVector']);
@@ -487,7 +486,7 @@ end;
 // TGLCoordinates.Rotate
 procedure TGLCoordinatesRotateMethod.Execute(var ExternalObject: TObject);
 var
-  v: TVector;
+  v: TGLVector;
 begin
   ValidateExternalObject(ExternalObject, TGLCoordinates);
   v := GetVectorFromInfo(Info.Vars['anAxis']);
@@ -518,7 +517,7 @@ end;
 // TGLCoordinates.Equals
 procedure TGLCoordinatesEqualsMethod.Execute(var ExternalObject: TObject);
 var
-  v: TVector;
+  v: TGLVector;
 begin
   ValidateExternalObject(ExternalObject, TGLCoordinates);
   v := GetVectorFromInfo(Info.Vars['aVector']);
@@ -874,23 +873,23 @@ begin
       '', ClassSym, SymbolTable);
   if not Assigned(ClassSym.Members.FindLocal('SetAsVector')) then
     TGLCoordinatesSetAsVectorMethod.Create(mkProcedure, [], 0, 'SetAsVector',
-      ['Value', 'TVector'], '', ClassSym, SymbolTable);
+      ['Value', 'TGLVector'], '', ClassSym, SymbolTable);
   if not Assigned(ClassSym.Members.FindLocal('GetAsVector')) then
     TGLCoordinatesGetAsVectorMethod.Create(mkFunction, [], 0, 'GetAsVector', [],
-      'TVector', ClassSym, SymbolTable);
+      'TGLVector', ClassSym, SymbolTable);
   if not Assigned(ClassSym.Members.FindLocal('GetAsString')) then
     TGLCoordinatesGetAsStringMethod.Create(mkFunction, [], 0, 'GetAsString', [],
       'String', ClassSym, SymbolTable);
   if not Assigned(ClassSym.Members.FindLocal('Translate')) then
     TGLCoordinatesTranslateMethod.Create(mkProcedure, [], 0, 'Translate',
-      ['translationVector', 'TVector'], '', ClassSym, SymbolTable);
+      ['translationVector', 'TGLVector'], '', ClassSym, SymbolTable);
   if not Assigned(ClassSym.Members.FindLocal('AddScaledVector')) then
     TGLCoordinatesAddScaledVectorMethod.Create(mkProcedure, [], 0,
-      'AddScaledVector', ['factor', 'Float', 'translationVector', 'TVector'],
+      'AddScaledVector', ['factor', 'Float', 'translationVector', 'TGLVector'],
       '', ClassSym, SymbolTable);
   if not Assigned(ClassSym.Members.FindLocal('Rotate')) then
     TGLCoordinatesRotateMethod.Create(mkProcedure, [], 0, 'Rotate',
-      ['anAxis', 'TVector', 'anAngle', 'Float'], '', ClassSym, SymbolTable);
+      ['anAxis', 'TGLVector', 'anAngle', 'Float'], '', ClassSym, SymbolTable);
   if not Assigned(ClassSym.Members.FindLocal('Normalize')) then
     TGLCoordinatesNormalizeMethod.Create(mkProcedure, [], 0, 'Normalize', [],
       '', ClassSym, SymbolTable);
@@ -902,7 +901,7 @@ begin
       ['factor', 'Float'], '', ClassSym, SymbolTable);
   if not Assigned(ClassSym.Members.FindLocal('Equals')) then
     TGLCoordinatesEqualsMethod.Create(mkFunction, [], 0, 'Equals',
-      ['aVector', 'TVector'], 'Boolean', ClassSym, SymbolTable);
+      ['aVector', 'TGLVector'], 'Boolean', ClassSym, SymbolTable);
 
   // Properties
   AddPropertyToClass('X', 'Float', 'GetX', 'SetX', '', False, ClassSym,
@@ -911,7 +910,7 @@ begin
     SymbolTable);
   AddPropertyToClass('Z', 'Float', 'GetZ', 'SetZ', '', False, ClassSym,
     SymbolTable);
-  AddPropertyToClass('AsVector', 'TVector', 'GetAsVector', 'SetAsVector', '',
+  AddPropertyToClass('AsVector', 'TGLVector', 'GetAsVector', 'SetAsVector', '',
     False, ClassSym, SymbolTable);
   AddPropertyToClass('AsString', 'String', 'GetAsString', '', '', False,
     ClassSym, SymbolTable);
@@ -933,34 +932,34 @@ begin
       [], 'Boolean', ClassSym, SymbolTable);
   if not Assigned(ClassSym.Members.FindLocal('SetMatrix')) then
     TGLBaseSceneObjectSetMatrixMethod.Create(mkProcedure, [], 0, 'SetMatrix',
-      ['Value', 'TMatrix'], '', ClassSym, SymbolTable);
+      ['Value', 'TGLMatrix'], '', ClassSym, SymbolTable);
   if not Assigned(ClassSym.Members.FindLocal('GetMatrix')) then
     TGLBaseSceneObjectGetMatrixMethod.Create(mkFunction, [], 0, 'GetMatrix', [],
-      'TMatrix', ClassSym, SymbolTable);
+      'TGLMatrix', ClassSym, SymbolTable);
   if not Assigned(ClassSym.Members.FindLocal('AbsoluteMatrix')) then
     TGLBaseSceneObjectAbsoluteMatrixMethod.Create(mkFunction, [], 0,
-      'AbsoluteMatrix', [], 'TMatrix', ClassSym, SymbolTable);
+      'AbsoluteMatrix', [], 'TGLMatrix', ClassSym, SymbolTable);
   if not Assigned(ClassSym.Members.FindLocal('InvAbsoluteMatrix')) then
     TGLBaseSceneObjectInvAbsoluteMatrixMethod.Create(mkFunction, [], 0,
-      'InvAbsoluteMatrix', [], 'TMatrix', ClassSym, SymbolTable);
+      'InvAbsoluteMatrix', [], 'TGLMatrix', ClassSym, SymbolTable);
   if not Assigned(ClassSym.Members.FindLocal('SetAbsolutePosition')) then
     TGLBaseSceneObjectSetAbsolutePositionMethod.Create(mkProcedure, [], 0,
-      'SetAbsolutePosition', ['Value', 'TVector'], '', ClassSym, SymbolTable);
+      'SetAbsolutePosition', ['Value', 'TGLVector'], '', ClassSym, SymbolTable);
   if not Assigned(ClassSym.Members.FindLocal('GetAbsolutePosition')) then
     TGLBaseSceneObjectGetAbsolutePositionMethod.Create(mkFunction, [], 0,
-      'GetAbsolutePosition', [], 'TVector', ClassSym, SymbolTable);
+      'GetAbsolutePosition', [], 'TGLVector', ClassSym, SymbolTable);
   if not Assigned(ClassSym.Members.FindLocal('SetAbsoluteUp')) then
     TGLBaseSceneObjectSetAbsoluteUpMethod.Create(mkProcedure, [], 0,
-      'SetAbsoluteUp', ['Value', 'TVector'], '', ClassSym, SymbolTable);
+      'SetAbsoluteUp', ['Value', 'TGLVector'], '', ClassSym, SymbolTable);
   if not Assigned(ClassSym.Members.FindLocal('GetAbsoluteUp')) then
     TGLBaseSceneObjectGetAbsoluteUpMethod.Create(mkFunction, [], 0,
-      'GetAbsoluteUp', [], 'TVector', ClassSym, SymbolTable);
+      'GetAbsoluteUp', [], 'TGLVector', ClassSym, SymbolTable);
   if not Assigned(ClassSym.Members.FindLocal('SetAbsoluteDirection')) then
     TGLBaseSceneObjectSetAbsoluteDirectionMethod.Create(mkProcedure, [], 0,
-      'SetAbsoluteDirection', ['Value', 'TVector'], '', ClassSym, SymbolTable);
+      'SetAbsoluteDirection', ['Value', 'TGLVector'], '', ClassSym, SymbolTable);
   if not Assigned(ClassSym.Members.FindLocal('GetAbsoluteDirection')) then
     TGLBaseSceneObjectGetAbsoluteDirectionMethod.Create(mkFunction, [], 0,
-      'GetAbsoluteDirection', [], 'TVector', ClassSym, SymbolTable);
+      'GetAbsoluteDirection', [], 'TGLVector', ClassSym, SymbolTable);
 
   if not Assigned(ClassSym.Members.FindLocal('SetPosition')) then
     TGLBaseSceneObjectSetPositionMethod.Create(mkProcedure, [], 0,
@@ -1024,13 +1023,13 @@ begin
   // Properties
   AddPropertyToClass('Visible', 'Boolean', 'GetVisible', 'SetVisible', '',
     False, ClassSym, SymbolTable);
-  AddPropertyToClass('Matrix', 'TMatrix', 'GetMatrix', 'SetMatrix', '', False,
+  AddPropertyToClass('Matrix', 'TGLMatrix', 'GetMatrix', 'SetMatrix', '', False,
     ClassSym, SymbolTable);
-  AddPropertyToClass('AbsolutePosition', 'TVector', 'GetAbsolutePosition',
+  AddPropertyToClass('AbsolutePosition', 'TGLVector', 'GetAbsolutePosition',
     'SetAbsolutePosition', '', False, ClassSym, SymbolTable);
-  AddPropertyToClass('AbsoluteUp', 'TVector', 'GetAbsoluteUp', 'SetAbsoluteUp',
+  AddPropertyToClass('AbsoluteUp', 'TGLVector', 'GetAbsoluteUp', 'SetAbsoluteUp',
     '', False, ClassSym, SymbolTable);
-  AddPropertyToClass('AbsoluteDirection', 'TVector', 'GetAbsoluteDirection',
+  AddPropertyToClass('AbsoluteDirection', 'TGLVector', 'GetAbsoluteDirection',
     'SetAbsoluteDirection', '', False, ClassSym, SymbolTable);
   AddPropertyToClass('Position', 'TGLBaseSceneObject', 'GetPosition',
     'SetPosition', '', False, ClassSym, SymbolTable);

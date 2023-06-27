@@ -1,14 +1,13 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.Isolines;
 
 (* Class and routines to output isolines *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   System.SysUtils, 
@@ -17,15 +16,16 @@ uses
   System.Generics.Collections,
 
   GLS.VectorGeometry, 
-  GLS.VectorLists, 
-  GLS.Objects, 
-  GLS.MultiPolygon,  
-  GLS.Coordinates,
-  GLS.VectorRecTypes,
-  GLS.Color, 
-  GLS.Spline, 
-  GLS.SpaceText, 
   GLS.VectorTypes,
+  GLS.VectorTypesExt,
+  GLS.Spline,
+
+  GLS.VectorLists,
+  GLS.Objects,
+  GLS.MultiPolygon,
+  GLS.Coordinates,
+  GLS.Color,
+  GLS.SpaceText,
   GLS.VectorFileObjects;
 
 type
@@ -39,7 +39,7 @@ type
   TVectorL4I = array [0 .. 4] of Integer;
   TCastArray = array [0 .. 2, 0 .. 2, 0 .. 2] of Integer;
 
-  TVertex2DArr = array [0 .. 32767] of TxPoint2D;
+  TVertex2DArr = array [0 .. 32767] of TPoint2DRec;
   PVertex2DArr = ^TVertex2DArr;
 
   PGLIsoline = ^TGLIsoline;
@@ -62,7 +62,8 @@ type
     constructor Create(AOwner: TComponent); virtual;
     destructor Destroy; override;
 
-  (* CONREC is a contouring routine for rectangular spaced data or regular 2D grids
+  (*
+    CONREC is a contouring routine for rectangular spaced data or regular 2D grids
     It takes each rectangle of adjacent data points and splits it
     into 4 triangles after choosing the height at the centre of the rectangle.
     For each of the triangles the line segment resulting from the intersection
@@ -101,7 +102,7 @@ function GetNextIsoline(var Isoline: TGLIsoline): Boolean;
 
 // Defines contouring segments inside a triangle using elevations
 procedure TriangleElevationSegments(const p1, p2, p3: TAffineVector;
-  ElevationDelta: Single; Segments: TAffineVectorList);
+  ElevationDelta: Single; Segments: TGLAffineVectorList);
 
 //----------------------------------------------------------------------
 implementation
@@ -389,7 +390,7 @@ begin
 end;
 
 procedure TriangleElevationSegments(const p1, p2, p3: TAffineVector;
-  ElevationDelta: Single; Segments: TAffineVectorList);
+  ElevationDelta: Single; Segments: TGLAffineVectorList);
 
   function SegmentIntersect(const a, b: TAffineVector; e: Single): Integer;
   var

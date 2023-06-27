@@ -1,17 +1,13 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.SceneRegister;
-
 (*
-  Registration unit for library components, property editors and
-  IDE experts.
+  Registration unit for library components, property editors and IDE experts.
 *)
-
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   WinApi.Windows,
@@ -33,7 +29,6 @@ uses
   GLS.Scene,
   GLS.Color,
   GLS.ObjectManager,
-  GLS.PluginManager,
   GLS.Strings;
 
 type
@@ -88,7 +83,7 @@ type
   TGLColorProperty = class(TClassProperty, ICustomPropertyDrawing,
     ICustomPropertyListDrawing)
   protected
-    function ColorToBorderColor(aColor: TColorVector; selected: Boolean): TColor;
+    function ColorToBorderColor(aColor: TGLColorVector; selected: Boolean): TColor;
   public
     function GetAttributes: TPropertyAttributes; override;
     procedure GetValues(Proc: TGetStrProc); override;
@@ -139,11 +134,10 @@ type
 
   (* Editor copied from DsgnIntf.
     Could have been avoided, if only that guy at Borland didn't chose to
-    publish only half of the stuff (and that's not the only class with
-    that problem, most of the subitems handling code in TGLSceneBaseObject is
-    here for the same reason...), the "protected" wasn't meant just to lure
-    programmers into code they can't reuse... Arrr! and he did that again
-    in D6! Grrr... *)
+    publish only half of the stuff (and that's not the only class with that problem,
+    most of the subitems handling code in TGLSceneBaseObject is here for the same reason...),
+    the "protected" wasn't meant just to lure programmers into code they can't reuse...
+    Arrr! and he did that again in D7! Grrr... *)
   TGLReuseableDefaultEditor = class(TComponentEditor, IDefaultEditor)
   protected
     FFirst: IProperty;
@@ -171,23 +165,23 @@ type
     procedure GetValues(Proc: TGetStrProc); override;
   end;
 
-  (*  Selection editor for TGLSoundLibrary 
-    Allows units to be added to the uses clause automatically when
-    sound files are loaded into a TGLSoundLibrary at design-time. *)
+  (* Selection editor for TGLSoundLibrary
+     Allows units to be added to the uses clause automatically when
+     sound files are loaded into a TGLSoundLibrary at design-time. *)
   TGLSoundLibrarySelectionEditor = class(TSelectionEditor)
   public
     procedure RequiresUnits(Proc: TGetStrProc); override;
   end;
 
-  (*  Selection editor for TGLBaseSceneObject.
-    Allows units to be added to the uses clause automatically when
-    behaviours/effects are added to a TGLBaseSceneObject at design-time. *)
+  (* Selection editor for TGLBaseSceneObject.
+     Allows units to be added to the uses clause automatically when
+     behaviours/effects are added to a TGLBaseSceneObject at design-time. *)
   TGLBaseSceneObjectSelectionEditor = class(TSelectionEditor)
   public
     procedure RequiresUnits(Proc: TGetStrProc); override;
   end;
 
-  // Editor for GLScene Archive Manager.  
+  // Editor for Archive Manager
   TGLSArchiveManagerEditor = class(TGLReuseableDefaultEditor, IDefaultEditor)
   protected
     procedure EditProperty(const Prop: IProperty; var Continue: Boolean); override;
@@ -280,13 +274,13 @@ implementation
 // ------------------------------------------------------------------
 
 uses
-  FLibMaterialPicker,
-  FGUILayoutEditor,
-  FMaterialEditor,
-  FShaderMemo,
-  FShaderUniformEditor,
-  FVectorEditor,
-  FSceneEditor,
+  FmLibMaterialPicker,
+  FmGUILayoutEditor,
+  FmMaterialEditor,
+  FmShaderMemo,
+  FmShaderUniformEditor,
+  FmVectorEditor,
+  FmSceneEditor,
 
   GLS.ApplicationFileIO,
   GLS.VectorGeometry,
@@ -398,6 +392,7 @@ uses
   GLS.FileASE,
   GLS.FileB3D,
   GLS.FileGL2,
+  GLS.FileGLTF,
   GLS.FileGTS,
   GLS.FileLMTS,
   GLS.FileLWO,
@@ -422,14 +417,13 @@ uses
 
 //----------------- Raster file format
   GLS.FileDDS,
-  GLS.FileO3TC,
   GLS.FileHDR,
   GLS.FileJPEG,
   GLS.FilePNG,
   GLS.FileBMP,
   GLS.FileTGA,
 
-  GLS.Sound,
+  GLS.SoundManager,
   GLS.SoundFileObjects,
   GLS.SpaceText,
   GLS.Joystick,
@@ -648,7 +642,7 @@ begin
   Modified;
 end;
 
-//----------------- TGLColorproperty -----------------------------------------------------------------------------------
+//----------------- TGLColorproperty --------------------------------------------------------------
 
 procedure TGLColorProperty.Edit;
 var
@@ -691,7 +685,7 @@ begin
   Modified;
 end;
 
-function TGLColorProperty.ColorToBorderColor(aColor: TColorVector; selected: Boolean): TColor;
+function TGLColorProperty.ColorToBorderColor(aColor: TGLColorVector; selected: Boolean): TColor;
 begin
   if (aColor.X > 0.75) or (aColor.Y > 0.75) or (aColor.Z > 0.75) then
     Result := clBlack
@@ -715,7 +709,7 @@ procedure TGLColorProperty.ListDrawValue(const Value: string; ACanvas: TCanvas;
 var
   vRight: Integer;
   vOldPenColor, vOldBrushColor: TColor;
-  Color: TColorVector;
+  Color: TGLColorVector;
 begin
   vRight := (ARect.Bottom - ARect.Top) + ARect.Left;
   with ACanvas do
@@ -759,6 +753,7 @@ begin
 end;
 
 //----------------- TGLSoundFileProperty -----------------------------------------
+
 function TGLSoundFileProperty.GetAttributes: TPropertyAttributes;
 begin
   Result := [paDialog];
@@ -838,19 +833,7 @@ begin
   end;
 end;
 
-//----------------- TGLMaterialProperty --------------------------------------------------------------------------------
-
-function TGLMaterialProperty.GetAttributes: TPropertyAttributes;
-begin
-  Result := [paDialog, paSubProperties];
-end;
-
-procedure TGLMaterialProperty.Edit;
-begin
-  if FMaterialEditor.GLMaterialEditorForm.Execute(TGLMaterial(GetOrdValue))
-  then
-    Modified;
-end;
+//----------------- TGLGUILayoutEditor -------------------------------
 
 procedure TGLGUILayoutEditor.Edit;
 begin
@@ -876,6 +859,8 @@ function TGLGUILayoutEditor.GetVerbCount: Integer;
 begin
   Result := 1;
 end;
+
+//----------------- TGLReuseableDefaultEditor --------------------------
 
 procedure TGLReuseableDefaultEditor.CheckEdit(const Prop: IProperty);
 begin
@@ -966,6 +951,26 @@ begin
   Result := 1
 end;
 
+//----------------- TGLMaterialProperty -------------------------------
+
+function TGLMaterialProperty.GetAttributes: TPropertyAttributes;
+begin
+  Result := [paDialog, paSubProperties];
+end;
+
+procedure TGLMaterialProperty.Edit;
+var
+  buf: string;
+  ml: TGLAbstractMaterialLibrary;
+  obj: TPersistent;
+  Int: IGLMaterialLibrarySupported;
+begin
+
+  if FmMaterialEditor.GLMaterialEditorForm.Execute(TGLMaterial(GetOrdValue)) then
+    Modified;
+end;
+
+
 //----------------- TGLLibMaterialNameProperty ---------------------------------
 
 function TGLLibMaterialNameProperty.GetAttributes: TPropertyAttributes;
@@ -991,7 +996,8 @@ begin
   end;
   if not Assigned(ml) then
     ShowMessage('Select the material library first.')
-  else if GLLibMaterialPickerForm.Execute(buf, ml) then
+  else
+  if GLLibMaterialPickerForm.Execute(buf, ml) then
     SetStrValue(buf);
 end;
 
@@ -1096,6 +1102,8 @@ begin
   Result := 1
 end;
 
+//--------------------- TGLMaterialComponentNameProperty ------------------
+
 procedure TGLMaterialComponentNameProperty.Edit;
 var
   LOwner: IGLMaterialLibrarySupported;
@@ -1116,6 +1124,8 @@ begin
   Result := [paValueList];
 end;
 
+//------------------------ TGLLibTextureNameProperty --------------------------
+
 procedure TGLLibTextureNameProperty.GetValues(Proc: TGetStrProc);
 var
   LOwner: IGLMaterialLibrarySupported;
@@ -1129,6 +1139,8 @@ begin
   end;
 end;
 
+//------------------- TGLLibSamplerNameProperty -------------------------
+
 procedure TGLLibSamplerNameProperty.GetValues(Proc: TGetStrProc);
 var
   LOwner: IGLMaterialLibrarySupported;
@@ -1137,6 +1149,8 @@ begin
     TGLMaterialLibraryEx(LOwner.GetMaterialLibrary)
       .GetNames(Proc, TGLTextureSampler);
 end;
+
+//------------------- TGLLibCombinerNameProperty -------------------------
 
 procedure TGLLibCombinerNameProperty.GetValues(Proc: TGetStrProc);
 var
@@ -1164,6 +1178,8 @@ begin
       .GetNames(Proc, TGLFrameBufferAttachment);
 end;
 
+//------------------------- TGLLibAsmProgNameProperty ---------------------------
+
 procedure TGLLibAsmProgNameProperty.GetValues(Proc: TGetStrProc);
 var
   LOwner: IGLMaterialLibrarySupported;
@@ -1172,6 +1188,8 @@ begin
     TGLMaterialLibraryEx(LOwner.GetMaterialLibrary)
       .GetNames(Proc, TGLASMVertexProgram);
 end;
+
+//------------------------- TPictureFileProperty --------------------------------
 
 function TPictureFileProperty.GetAttributes: TPropertyAttributes;
 begin
@@ -1188,6 +1206,8 @@ begin
   end;
   Modified;
 end;
+
+// -------------------- TShaderFileProperty ------------------------------
 
 procedure TShaderFileProperty.Edit;
 var
@@ -1211,6 +1231,8 @@ begin
   Result := [paDialog];
 end;
 
+//----------------------- TAsmProgFileProperty ----------------------------------
+
 procedure TAsmProgFileProperty.Edit;
 var
   ODialog: TOpenDialog;
@@ -1232,6 +1254,8 @@ function TAsmProgFileProperty.GetAttributes: TPropertyAttributes;
 begin
   Result := [paDialog];
 end;
+
+//------------------------ TUniformAutoSetProperty ----------------------------
 
 function TUniformAutoSetProperty.GetAttributes: TPropertyAttributes;
 begin
@@ -1262,6 +1286,8 @@ begin
     end;
   end;
 end;
+
+//----------------------- TGLShaderEditorProperty -----------------------------
 
 function TGLShaderEditorProperty.GetAttributes: TPropertyAttributes;
 begin
@@ -1418,10 +1444,10 @@ begin
     ['*Frame*', 'Interval', 'OverlaySkeleton', 'UseMeshmaterials']);
   RegisterPropertiesInCategory(strVisualCategoryName, TGLActor,  ['OverlaySkeleton']);
 
-  // GLMesh 
+  // GLMesh
   RegisterPropertiesInCategory(strOpenGLCategoryName, [TypeInfo(TGLMeshMode), TypeInfo(TGLVertexMode)]);
 
-  // GLGraph 
+  // GLGraph
   RegisterPropertiesInCategory(strOpenGLCategoryName, [TypeInfo(TGLHeightFieldOptions)]);
   RegisterPropertiesInCategory(strVisualCategoryName, [TypeInfo(TGLHeightFieldColorMode), TypeInfo(TGLSamplingScale),
     TypeInfo(TGLXYZGridLinesStyle), TypeInfo(TGLXYZGridParts)]);
@@ -1444,7 +1470,7 @@ begin
   RegisterPropertiesInCategory(strOpenGLCategoryName,
     [TypeInfo(TGLMirrorOptions), TypeInfo(TGLBaseSceneObject)]);
 
-  // GLParticleFX 
+  // GLParticleFX
   RegisterPropertiesInCategory(strOpenGLCategoryName, [TypeInfo(TGLBlendingMode)]);
   RegisterPropertiesInCategory(strVisualCategoryName,
     [TypeInfo(TGLBlendingMode), TypeInfo(TPFXLifeColors), TypeInfo(TSpriteColorMode)]);
@@ -1456,11 +1482,11 @@ begin
   RegisterPropertiesInCategory(strVisualCategoryName, TGLPolygonPFXManager, ['NbSides']);
   RegisterPropertiesInCategory(strVisualCategoryName, TGLPointLightPFXManager, ['TexMapSize']);
 
-  // GLTerrainRenderer 
+  // GLTerrainRenderer
   RegisterPropertiesInCategory(strOpenGLCategoryName, [TypeInfo(TGLHeightDataSource)]);
   RegisterPropertiesInCategory(strVisualCategoryName, TGLTerrainRenderer, ['*CLOD*', 'QualityDistance', 'Tile*']);
 
-  // GLzBuffer 
+  // GLzBuffer
   RegisterPropertiesInCategory(strOpenGLCategoryName, [TypeInfo(TGLMemoryViewer),
     TypeInfo(TGLSceneViewer), TypeInfo(TOptimise)]);
   RegisterPropertiesInCategory(strVisualCategoryName, [TypeInfo(TOptimise)]);
@@ -1497,7 +1523,7 @@ begin
   RegisterPropertiesInCategory(strVisualCategoryName, TGLThorFXManager,
     ['Core', 'Glow*', 'Paused', 'Target', 'Vibrate', 'Wildness']);
 
-  // GLBitmapFont 
+  // GLBitmapFont
   RegisterPropertiesInCategory(strOpenGLCategoryName, [TypeInfo(TGLMagFilter), TypeInfo(TGLMinFilter)]);
   RegisterPropertiesInCategory(strLocalizableCategoryName, [TypeInfo(TGLBitmapFontRanges)]);
   RegisterPropertiesInCategory(strLocalizableCategoryName, TGLBitmapFontRange, ['*ASCII']);

@@ -1,5 +1,5 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
 
 unit GLS.Silhouette;
@@ -13,7 +13,7 @@ unit GLS.Silhouette;
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   System.Classes,
@@ -42,21 +42,21 @@ type
     need some helper methods for generating the indexed sets. *)
   TGLSilhouette = class
   private
-    FVertices: TVectorList;
-    FIndices: TIntegerList;
-    FCapIndices: TIntegerList;
+    FVertices: TGLVectorList;
+    FIndices: TGLIntegerList;
+    FCapIndices: TGLIntegerList;
     FParameters: TGLSilhouetteParameters;
   protected
-    procedure SetIndices(const value: TIntegerList);
-    procedure SetCapIndices(const value: TIntegerList);
-    procedure SetVertices(const value: TVectorList);
+    procedure SetIndices(const value: TGLIntegerList);
+    procedure SetCapIndices(const value: TGLIntegerList);
+    procedure SetVertices(const value: TGLVectorList);
   public
     constructor Create; virtual;
     destructor Destroy; override;
     property Parameters: TGLSilhouetteParameters read FParameters write FParameters;
-    property Vertices: TVectorList read FVertices write SetVertices;
-    property Indices: TIntegerList read FIndices write SetIndices;
-    property CapIndices: TIntegerList read FCapIndices write SetCapIndices;
+    property Vertices: TGLVectorList read FVertices write SetVertices;
+    property Indices: TGLIntegerList read FIndices write SetIndices;
+    property CapIndices: TGLIntegerList read FCapIndices write SetCapIndices;
     procedure Flush; virtual;
     procedure Clear; inline;
     procedure ExtrudeVerticesToInfinity(const origin: TAffineVector);
@@ -95,18 +95,18 @@ type
       it'd be nicer with Structs or classes, but it's actually faster this way.
       The reason it's faster is because of less cache overwrites when we only
       access a tiny bit of a triangle (for instance), not all data. *)
-    FEdgeVertices: TIntegerList;
-    FEdgeFaces: TIntegerList;
-    FFaceVisible: TByteList;
-    FFaceVertexIndex: TIntegerList;
-    FFaceNormal: TAffineVectorList;
-    FVertexMemory: TIntegerList;
-    FVertices: TAffineVectorList;
+    FEdgeVertices: TGLIntegerList;
+    FEdgeFaces: TGLIntegerList;
+    FFaceVisible: TGLByteList;
+    FFaceVertexIndex: TGLIntegerList;
+    FFaceNormal: TGLAffineVectorList;
+    FVertexMemory: TGLIntegerList;
+    FVertices: TGLAffineVectorList;
     function GetEdgeCount: integer;
     function GetFaceCount: integer;
     function ReuseOrFindVertexID(const SeenFrom: TAffineVector; ASilhouette: TGLSilhouette; index: integer): integer;
   public
-    // Clears out all connectivity information. 
+    // Clears out all connectivity information.
     procedure Clear; virtual;
     procedure CreateSilhouette(const silhouetteParameters: TGLSilhouetteParameters; var ASilhouette: TGLSilhouette;
       AddToSilhouette: Boolean);
@@ -131,9 +131,9 @@ implementation
 constructor TGLSilhouette.Create;
 begin
   inherited;
-  FVertices := TVectorList.Create;
-  FIndices := TIntegerList.Create;
-  FCapIndices := TIntegerList.Create;
+  FVertices := TGLVectorList.Create;
+  FIndices := TGLIntegerList.Create;
+  FCapIndices := TGLIntegerList.Create;
 end;
 
 destructor TGLSilhouette.Destroy;
@@ -144,17 +144,17 @@ begin
   inherited;
 end;
 
-procedure TGLSilhouette.SetIndices(const value: TIntegerList);
+procedure TGLSilhouette.SetIndices(const value: TGLIntegerList);
 begin
   FIndices.Assign(value);
 end;
 
-procedure TGLSilhouette.SetCapIndices(const value: TIntegerList);
+procedure TGLSilhouette.SetCapIndices(const value: TGLIntegerList);
 begin
   FCapIndices.Assign(value);
 end;
 
-procedure TGLSilhouette.SetVertices(const value: TVectorList);
+procedure TGLSilhouette.SetVertices(const value: TGLVectorList);
 begin
   FVertices.Assign(value);
 end;
@@ -277,35 +277,27 @@ end;
 
 constructor TGLConnectivity.Create(APrecomputeFaceNormal: Boolean);
 begin
-  FFaceVisible := TByteList.Create;
-
-  FFaceVertexIndex := TIntegerList.Create;
-  FFaceNormal := TAffineVectorList.Create;
-
-  FEdgeVertices := TIntegerList.Create;
-  FEdgeFaces := TIntegerList.Create;
-
+  FFaceVisible := TGLByteList.Create;
+  FFaceVertexIndex := TGLIntegerList.Create;
+  FFaceNormal := TGLAffineVectorList.Create;
+  FEdgeVertices := TGLIntegerList.Create;
+  FEdgeFaces := TGLIntegerList.Create;
   FPrecomputeFaceNormal := APrecomputeFaceNormal;
-  FVertexMemory := TIntegerList.Create;
-  FVertices := TAffineVectorList.Create;
+  FVertexMemory := TGLIntegerList.Create;
+  FVertices := TGLAffineVectorList.Create;
 end;
 
 destructor TGLConnectivity.Destroy;
 begin
   Clear;
-
   FFaceVisible.Free;
   FFaceVertexIndex.Free;
   FFaceNormal.Free;
-
   FEdgeVertices.Free;
   FEdgeFaces.Free;
-
   FVertexMemory.Free;
-
   if Assigned(FVertices) then
     FVertices.Free;
-
   inherited;
 end;
 
@@ -317,7 +309,6 @@ begin
   FFaceVertexIndex.Clear;
   FFaceNormal.Clear;
   FVertexMemory.Clear;
-
   if FVertices <> nil then
     FVertices.Clear;
 end;
@@ -337,10 +328,8 @@ begin
     ASilhouette := TGLSilhouette.Create
   else if not AddToSilhouette then
     ASilhouette.Flush;
-
   // Clear the vertex memory
   FVertexMemory.Flush;
-
   // Update visibility information for all Faces
   vis := FFaceVertexIndex.List;
   for i := 0 to FaceCount - 1 do
@@ -353,16 +342,13 @@ begin
       faceNormal := CalcPlaneNormal(verticesList^[vis^[0]], verticesList^[vis^[1]], verticesList^[vis^[2]]);
       faceIsVisible := (PointProject(silhouetteParameters.SeenFrom, FVertices.List^[vis^[0]], faceNormal) >= 0);
     end;
-
     FFaceVisible[i] := Byte(faceIsVisible);
-
     if (not faceIsVisible) and silhouetteParameters.CappingRequired then
       ASilhouette.CapIndices.Add(ReuseOrFindVertexID(silhouetteParameters.SeenFrom, ASilhouette, vis^[0]),
         ReuseOrFindVertexID(silhouetteParameters.SeenFrom, ASilhouette, vis^[1]),
         ReuseOrFindVertexID(silhouetteParameters.SeenFrom, ASilhouette, vis^[2]));
     vis := @vis[3];
   end;
-
   for i := 0 to EdgeCount - 1 do
   begin
     face0ID := FEdgeFaces[i * 2 + 0];
@@ -412,7 +398,6 @@ begin
   begin
     oldCount := FVertexMemory.Count;
     FVertexMemory.Count := index + 1;
-
     List := FVertexMemory.List;
     for i := oldCount to FVertexMemory.Count - 1 do
       List^[i] := -1;
@@ -452,7 +437,6 @@ begin
     end;
     edgesVertices := @edgesVertices[2];
   end;
-
   // No edge was found, create a new one
   FEdgeVertices.Add(vertexIndex0, vertexIndex1);
   FEdgeFaces.Add(FaceID, -1);
@@ -468,7 +452,6 @@ begin
 
   if FPrecomputeFaceNormal then
     FFaceNormal.Add(CalcPlaneNormal(FVertices.List^[Vi0], FVertices.List^[Vi1], FVertices.List^[vi2]));
-
   FaceID := FFaceVisible.Add(0);
   AddIndexedEdge(Vi0, Vi1, FaceID);
   AddIndexedEdge(Vi1, vi2, FaceID);
@@ -483,7 +466,6 @@ begin
   Vi0 := FVertices.FindOrAdd(vertex0);
   Vi1 := FVertices.FindOrAdd(vertex1);
   vi2 := FVertices.FindOrAdd(vertex2);
-
   result := AddIndexedFace(Vi0, Vi1, vi2);
 end;
 
@@ -495,10 +477,8 @@ begin
   Vi1 := FVertices.FindOrAdd(vertex1);
   vi2 := FVertices.FindOrAdd(vertex2);
   Vi3 := FVertices.FindOrAdd(vertex3);
-
   // First face
   result := AddIndexedFace(Vi0, Vi1, vi2);
-
   // Second face
   AddIndexedFace(vi2, Vi3, Vi0);
 end;

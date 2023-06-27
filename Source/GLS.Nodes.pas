@@ -1,14 +1,13 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.Nodes;
 
 (* Nodes are used to describe lines, polygons + more. *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
@@ -26,9 +25,9 @@ uses
 type
   TGLNode = class(TCollectionItem)
   private
-    FCoords: TVector;
+    FCoords: TGLVector;
     FTagObject: TObject;
-    procedure SetAsVector(const Value: TVector);
+    procedure SetAsVector(const Value: TGLVector);
     procedure SetAsAffineVector(const Value: TAffineVector);
     function GetAsAffineVector: TAffineVector;
     procedure SetCoordinate(AIndex: Integer; AValue: TGLFloat);
@@ -44,7 +43,7 @@ type
     (* The coordinates viewed as a vector.
       Assigning a value to this property will trigger notification events,
       if you don't want so, use DirectVector instead. *)
-    property AsVector: TVector read FCoords write SetAsVector;
+    property AsVector: TGLVector read FCoords write SetAsVector;
     (* The coordinates viewed as an affine vector.
       Assigning a value to this property will trigger notification events,
       if you don't want so, use DirectVector instead.
@@ -76,7 +75,7 @@ type
     // AddNode (TGLCustomCoordinates)
     procedure AddNode(const Coords: TGLCustomCoordinates); overload;
     procedure AddNode(const X, Y, Z: TGLfloat); overload;
-    procedure AddNode(const Value: TVector); overload;
+    procedure AddNode(const Value: TGLVector); overload;
     procedure AddNode(const Value: TAffineVector); overload;
     procedure AddXYArc(XRadius, YRadius: Single; StartAngle, StopAngle: Single; NbSegments: Integer;
       const Center: TAffineVector);
@@ -153,7 +152,7 @@ begin
   Result := @FCoords;
 end;
 
-procedure TGLNode.SetAsVector(const Value: TVector);
+procedure TGLNode.SetAsVector(const Value: TGLVector);
 begin
   FCoords := Value;
   (Collection as TGLNodes).NotifyChange;
@@ -278,7 +277,7 @@ begin
   Add.AsVector := PointMake(X, Y, Z);
 end;
 
-procedure TGLNodes.AddNode(const Value: TVector);
+procedure TGLNodes.AddNode(const Value: TGLVector);
 begin
   Add.AsVector := Value;
 end;

@@ -1,15 +1,14 @@
 object RFaceEditor: TRFaceEditor
   Left = 0
   Top = 0
-  Width = 305
-  Height = 186
-  AutoSize = True
+  Width = 355
+  Height = 247
   TabOrder = 0
   object Label1: TLabel
-    Left = 0
-    Top = 6
-    Width = 44
-    Height = 13
+    Left = 3
+    Top = 214
+    Width = 60
+    Height = 20
     Caption = 'Shininess'
   end
   object PageControl: TPageControl
@@ -55,11 +54,19 @@ object RFaceEditor: TRFaceEditor
       inline CEEmission: TRColorEditor
         Left = 0
         Top = 0
-        Width = 289
-        Height = 95
+        Width = 341
+        Height = 98
         AutoSize = True
         TabOrder = 0
         TabStop = True
+        ExplicitWidth = 341
+        ExplicitHeight = 98
+        inherited ColorEditorPaintBox: TPaintBox
+          Width = 341
+          Height = 98
+          ExplicitWidth = 341
+          ExplicitHeight = 98
+        end
       end
     end
     object TSSpecular: TTabSheet

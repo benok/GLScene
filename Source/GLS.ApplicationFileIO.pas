@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.ApplicationFileIO;
 
 (*
@@ -11,7 +10,7 @@ unit GLS.ApplicationFileIO;
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.Windows,
@@ -33,11 +32,11 @@ type
   TGLApplicationResource = (aresNone, aresSplash, aresTexture, aresMaterial,
     aresSampler, aresFont, aresMesh);
 
-  TAFIOCreateFileStream = function(const fileName: string; mode: Word): TStream;
-  TAFIOFileStreamExists = function(const fileName: string): Boolean;
-  TAFIOFileStreamEvent = procedure(const fileName: String; mode: Word;
+  TGLAFIOCreateFileStream = function(const fileName: string; mode: Word): TStream;
+  TGLAFIOFileStreamExists = function(const fileName: string): Boolean;
+  TGLAFIOFileStreamEvent = procedure(const fileName: String; mode: Word;
     var Stream: TStream) of object;
-  TAFIOFileStreamExistsEvent = function(const fileName: string)
+  TGLAFIOFileStreamExistsEvent = function(const fileName: string)
     : Boolean of object;
 
   (* Allows specifying a custom behaviour for CreateFileStream.
@@ -47,8 +46,8 @@ type
     the last one created will be the active one. *)
   TGLApplicationFileIO = class(TComponent)
   private
-    FOnFileStream: TAFIOFileStreamEvent;
-    FOnFileStreamExists: TAFIOFileStreamExistsEvent;
+    FOnFileStream: TGLAFIOFileStreamEvent;
+    FOnFileStreamExists: TGLAFIOFileStreamExistsEvent;
   public
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
@@ -57,10 +56,10 @@ type
       Destruction of the stream is at the discretion of the code that
       invoked CreateFileStream. Return nil to let the default mechanism
       take place (ie. attempt a regular file system access). *)
-    property OnFileStream: TAFIOFileStreamEvent read FOnFileStream
+    property OnFileStream: TGLAFIOFileStreamEvent read FOnFileStream
       write FOnFileStream;
     // Event that allows you to specify if a stream for the file exists.
-    property OnFileStreamExists: TAFIOFileStreamExistsEvent
+    property OnFileStreamExists: TGLAFIOFileStreamExistsEvent
       read FOnFileStreamExists write FOnFileStreamExists;
   end;
 
@@ -107,8 +106,8 @@ function CreateResourceStream(const ResName: string; ResType: PChar)
 function StrToGLSResType(const AStrRes: string): TGLApplicationResource;
 
 var
-  vAFIOCreateFileStream: TAFIOCreateFileStream = nil;
-  vAFIOFileStreamExists: TAFIOFileStreamExists = nil;
+  vAFIOCreateFileStream: TGLAFIOCreateFileStream = nil;
+  vAFIOFileStreamExists: TGLAFIOFileStreamExists = nil;
 
 // ---------------------------------------------------------------------
 implementation

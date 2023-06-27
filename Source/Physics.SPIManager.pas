@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics rendering engine GLScene http://glscene.org
 //
-
 unit Physics.SPIManager;
 
 (* The Manager for Scene Physics Interactions (SPI) *)

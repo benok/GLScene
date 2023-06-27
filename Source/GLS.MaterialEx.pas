@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.MaterialEx;
 
 (*
@@ -19,7 +18,7 @@ unit GLS.MaterialEx;
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
@@ -74,16 +73,16 @@ type
       IGLMaterialLibrarySupported)
   private
     FNameHashKey: Integer;
-    FUserList: TPersistentObjectList;
+    FUserList: TGLPersistentObjectList;
     FDefferedInit: Boolean;
     FNotifying: Boolean;
     FIsValid: Boolean;
-    function GetUserList: TPersistentObjectList;
+    function GetUserList: TGLPersistentObjectList;
     function GetMaterialLibraryEx: TGLMaterialLibraryEx;
   protected
     procedure SetName(const AValue: TGLMaterialComponentName); override;
     procedure NotifyChange(Sender: TObject); virtual;
-    property UserList: TPersistentObjectList read GetUserList;
+    property UserList: TGLPersistentObjectList read GetUserList;
     procedure DoOnPrepare(Sender: TGLContext); virtual; abstract;
   public
     destructor Destroy; override;
@@ -196,7 +195,7 @@ type
     FWidth: Integer;
     FHeight: Integer;
     FDepth: Integer;
-    FSwizzles: TSwizzleVector;
+    FSwizzles: TglSwizzleVector;
     FApplicableSampler: TGLTextureSampler;
     FLastSampler: TGLTextureSampler;
     function GetTextureTarget: TGLTextureTarget;
@@ -378,7 +377,7 @@ type
         shader or fixed-function pipeline. *)
   TGLTextureSwizzling = class(TGLUpdateAbleObject)
   private
-    FSwizzles: TSwizzleVector;
+    FSwizzles: TglSwizzleVector;
     function GetSwizzle(AIndex: Integer): TGLTextureSwizzle;
     procedure SetSwizzle(AIndex: Integer; AValue: TGLTextureSwizzle);
     function StoreSwizzle(AIndex: Integer): Boolean;
@@ -408,7 +407,7 @@ type
     FTextureRotate: Single;
     FTextureMatrixIsIdentity: Boolean;
     FTextureOverride: Boolean;
-    FTextureMatrix: TMatrix;
+    FTextureMatrix: TGLMatrix;
     FMappingMode: TGLTextureMappingMode;
     FEnvColor: TGLColor;
     FMapSCoordinates: TGLCoordinates4;
@@ -426,7 +425,7 @@ type
     function GetTextureScale: TGLCoordinates;
     procedure SetTextureScale(const AValue: TGLCoordinates);
     function StoreTextureScale: Boolean;
-    procedure SetTextureMatrix(const AValue: TMatrix);
+    procedure SetTextureMatrix(const AValue: TGLMatrix);
     procedure SetTextureRotate(AValue: Single);
     function StoreTextureRotate: Boolean;
     procedure SetMappingMode(const AValue: TGLTextureMappingMode);
@@ -459,7 +458,7 @@ type
     function IsValid: Boolean;
     procedure Apply(var ARci: TGLRenderContextInfo);
     procedure UnApply(var ARci: TGLRenderContextInfo);
-    property TextureMatrix: TMatrix read FTextureMatrix write SetTextureMatrix;
+    property TextureMatrix: TGLMatrix read FTextureMatrix write SetTextureMatrix;
   published
     property LibTextureName: TGLMaterialComponentName read GetLibTextureName
       write SetLibTextureName;
@@ -730,15 +729,15 @@ type
     function GetAutoSetMethod: string; virtual;
     function GetTextureName: string; virtual;
     function GetSamplerName: string; virtual;
-    function GetTextureSwizzle: TSwizzleVector; virtual;
+    function GetTextureSwizzle: TglSwizzleVector; virtual;
     procedure SetTextureName(const AValue: string); virtual;
     procedure SetSamplerName(const AValue: string); virtual;
     procedure SetAutoSetMethod(const AValue: string); virtual;
-    procedure SetTextureSwizzle(const AValue: TSwizzleVector); virtual;
+    procedure SetTextureSwizzle(const AValue: TglSwizzleVector); virtual;
     function GetFloat: Single; virtual;
     function GetVec2: TVector2f; virtual;
     function GetVec3: TVector3f; virtual;
-    function GetVec4: TVector; virtual;
+    function GetVec4: TGLVector; virtual;
     function GetInt: TGLint; virtual;
     function GetIVec2: TVector2i; virtual;
     function GetIVec3: TVector3i; virtual;
@@ -787,8 +786,8 @@ type
     function GetFloat: Single; override;
     function GetVec2: TVector2f; override;
     function GetVec3: TVector3f; override;
-    function GetVec4: TVector; override;
-    function GetInt: Integer; override;
+    function GetVec4: TGLVector; override;
+    function GetInt: TGLInt; override;
     function GetIVec2: TVector2i; override;
     function GetIVec3: TVector3i; override;
     function GetIVec4: TVector4i; override;
@@ -857,16 +856,16 @@ type
     FLibTexture: TGLAbstractTexture;
     FLibSampler: TGLTextureSampler;
     FTarget: TGLTextureTarget;
-    FSwizzling: TSwizzleVector;
+    FSwizzling: TglSwizzleVector;
   protected
     FLibTexureName: TGLMaterialComponentName;
     FLibSamplerName: TGLMaterialComponentName;
     function GetTextureName: string; override;
     function GetSamplerName: string; override;
-    function GetTextureSwizzle: TSwizzleVector; override;
+    function GetTextureSwizzle: TglSwizzleVector; override;
     procedure SetTextureName(const AValue: string); override;
     procedure SetSamplerName(const AValue: string); override;
-    procedure SetTextureSwizzle(const AValue: TSwizzleVector); override;
+    procedure SetTextureSwizzle(const AValue: TglSwizzleVector); override;
     procedure WriteToFiler(AWriter: TWriter); override;
     procedure ReadFromFiler(AReader: TReader); override;
     procedure Loaded;
@@ -881,7 +880,7 @@ type
     property LibSamplerName: TGLMaterialComponentName read GetSamplerName
       write SetSamplerName;
     property GLSLSampler: TGLSLSamplerType read GetGLSLSamplerType;
-    property Swizzling: TSwizzleVector read GetTextureSwizzle write
+    property Swizzling: TglSwizzleVector read GetTextureSwizzle write
       SetTextureSwizzle;
   end;
 
@@ -893,12 +892,12 @@ type
     FShaders: array[TGLShaderType] of TGLShaderEx;
     FIsValid: Boolean;
     FInfoLog: string;
-    FUniforms: TPersistentObjectList;
+    FUniforms: TGLPersistentObjectList;
     FAutoFill: Boolean;
     function GetLibShaderName(AType: TGLShaderType): string;
     procedure SetLibShaderName(AType: TGLShaderType; const AValue: string);
     function GetUniform(const AName: string): IShaderParameter;
-    class procedure ReleaseUniforms(AList: TPersistentObjectList);
+    class procedure ReleaseUniforms(AList: TGLPersistentObjectList);
     property LibVertexShaderName: TGLMaterialComponentName index shtVertex
       read GetLibShaderName write SetLibShaderName;
     property LibFragmentShaderName: TGLMaterialComponentName index shtFragment
@@ -1325,11 +1324,11 @@ begin
     Result := 0;
 end;
 
-function TGLBaseMaterialCollectionItem.GetUserList: TPersistentObjectList;
+function TGLBaseMaterialCollectionItem.GetUserList: TGLPersistentObjectList;
 begin
   if FUserList = nil then
   begin
-    FUserList := TPersistentObjectList.Create;
+    FUserList := TGLPersistentObjectList.Create;
     FNotifying := False;
   end;
   Result := FUserList;
@@ -2590,7 +2589,7 @@ begin
       FWrap[0] := TGLSeparateTextureWrap(ReadInteger);
       FWrap[1] := TGLSeparateTextureWrap(ReadInteger);
       FWrap[2] := TGLSeparateTextureWrap(ReadInteger);
-      Read(FBorderColor.AsAddress^, SizeOf(TColorVector));
+      Read(FBorderColor.AsAddress^, SizeOf(TGLColorVector));
       FCompareMode := TGLTextureCompareMode(ReadInteger);
       FCompareFunc := TGLDepthFunction(ReadInteger);
       FDecodeSRGB := ReadBoolean;
@@ -2701,7 +2700,7 @@ begin
     WriteInteger(Integer(FWrap[0]));
     WriteInteger(Integer(FWrap[1]));
     WriteInteger(Integer(FWrap[2]));
-    Write(FBorderColor.AsAddress^, SizeOf(TColorVector));
+    Write(FBorderColor.AsAddress^, SizeOf(TGLColorVector));
     WriteInteger(Integer(FCompareMode));
     WriteInteger(Integer(FCompareFunc));
     WriteBoolean(FDecodeSRGB);
@@ -3180,7 +3179,7 @@ end;
 procedure TGLMultitexturingProperties.Apply(var ARci: TGLRenderContextInfo);
 var
   N, U: Integer;
-  LDir: TVector;
+  LDir: TGLVector;
 begin
   if FEnabled then
   begin
@@ -3520,7 +3519,7 @@ begin
       end;
 
       if not FTextureMatrixIsIdentity and (MappingMode = tmmUser) then
-        ARci.GLStates.SetGLTextureMatrix(FTextureMatrix);
+        ARci.GLStates.SetTextureMatrix(FTextureMatrix);
 
       if ARci.currentMaterialLevel < mlSM3 then
       begin
@@ -3903,10 +3902,10 @@ begin
   FSwizzling.Assign(AValue);
 end;
 
-procedure TGLTextureProperties.SetTextureMatrix(const AValue: TMatrix);
+procedure TGLTextureProperties.SetTextureMatrix(const AValue: TGLMatrix);
 begin
   FTextureMatrixIsIdentity := CompareMem(@AValue.V[0], @IdentityHmgMatrix.V[0],
-    SizeOf(TMatrix));
+    SizeOf(TGLMatrix));
   FTextureMatrix := AValue;
   FTextureOverride := True;
   NotifyChange(Self);
@@ -4004,7 +4003,7 @@ begin
     if ARci.currentMaterialLevel < mlSM3 then
     begin
       if not FTextureMatrixIsIdentity and (MappingMode = tmmUser) then
-        ARci.GLStates.SetGLTextureMatrix(IdentityHmgMatrix);
+        ARci.GLStates.SetTextureMatrix(IdentityHmgMatrix);
       UnApplyMappingMode;
     end;
   end;
@@ -4419,7 +4418,7 @@ begin
   FHandle := TGLProgramHandle.Create;
   FHandle.OnPrapare := DoOnPrepare;
   FEnabled := False;
-  FUniforms := TPersistentObjectList.Create;
+  FUniforms := TGLPersistentObjectList.Create;
   FAutoFill := True;
 end;
 
@@ -4448,7 +4447,7 @@ end;
 procedure TGLBaseShaderModel.DoOnPrepare(Sender: TGLContext);
 var
   T: TGLShaderType;
-  LUniforms: TPersistentObjectList;
+  LUniforms: TGLPersistentObjectList;
   LUniform, LUniform2: TGLShaderUniform;
   ID: Cardinal;
   I, J, C: Integer;
@@ -4538,7 +4537,7 @@ begin
               end;
 
               // Get uniforms
-              LUniforms := TPersistentObjectList.Create;
+              LUniforms := TGLPersistentObjectList.Create;
 
               gl.GetProgramiv(ID, GL_ACTIVE_UNIFORMS, @C);
               for I := 0 to C - 1 do
@@ -4827,7 +4826,7 @@ begin
 end;
 
 class procedure TGLBaseShaderModel.ReleaseUniforms(
-  AList: TPersistentObjectList);
+  AList: TGLPersistentObjectList);
 var
   I: Integer;
 begin
@@ -5533,7 +5532,7 @@ begin
     Result := strNothing;
 end;
 
-function TGLShaderUniformTexture.GetTextureSwizzle: TSwizzleVector;
+function TGLShaderUniformTexture.GetTextureSwizzle: TglSwizzleVector;
 begin
   Result := FSwizzling;
 end;
@@ -5645,8 +5644,7 @@ begin
   NotifyChange(Self);
 end;
 
-procedure TGLShaderUniformTexture.SetTextureSwizzle(const AValue:
-  TSwizzleVector);
+procedure TGLShaderUniformTexture.SetTextureSwizzle(const AValue: TglSwizzleVector);
 begin
   FSwizzling := AValue;
 end;
@@ -5740,7 +5738,7 @@ begin
   Result := strNothing;
 end;
 
-function TGLAbstractShaderUniform.GetTextureSwizzle: TSwizzleVector;
+function TGLAbstractShaderUniform.GetTextureSwizzle: TglSwizzleVector;
 begin
   Result := cDefaultSwizzleVector;
 end;
@@ -5775,7 +5773,7 @@ begin
   FillChar(Result, SizeOf(Result), $00);
 end;
 
-function TGLAbstractShaderUniform.GetVec4: TVector;
+function TGLAbstractShaderUniform.GetVec4: TGLVector;
 begin
   FillChar(Result, SizeOf(Result), $00);
 end;
@@ -5838,8 +5836,7 @@ procedure TGLAbstractShaderUniform.SetTextureName(const AValue: string);
 begin
 end;
 
-procedure TGLAbstractShaderUniform.SetTextureSwizzle(const AValue:
-  TSwizzleVector);
+procedure TGLAbstractShaderUniform.SetTextureSwizzle(const AValue: TglSwizzleVector);
 begin
 end;
 
@@ -5985,7 +5982,7 @@ begin
   gl.GetUniformfv(GetProgram, FLocation, @Result);
 end;
 
-function TGLShaderUniform.GetVec4: TVector;
+function TGLShaderUniform.GetVec4: TGLVector;
 begin
   gl.GetUniformfv(GetProgram, FLocation, @Result);
 end;

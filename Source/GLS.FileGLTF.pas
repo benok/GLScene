@@ -1,10 +1,9 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.FileGLTF;
 
-(* GLB binary file for glTF format implementation. *)
+(* glTF/glb formats implementation. *)
 
 interface
 
@@ -19,17 +18,27 @@ uses
   GLS.VectorTypes,
   GLS.VectorLists,
   GLS.VectorGeometry,
-  GLS.Material;
+  GLS.Material,
+  GLS.Utils,
+  PasGLTF;
 
 type
-  (* The GLB binary glTF format is a runtime asset delivery format
+  (* The glTF format is a runtime asset delivery format
     for GL APIs: WebGL, OpenGL ES OpenGL and Vulkan. *)
-  TGLTFVectorFile = class(TGLVectorFile)
+  TGLglTFVectorFile = class(TGLVectorFile)
   public
     class function Capabilities: TGLDataFileCapabilities; override;
     procedure LoadFromStream(aStream: TStream); override;
     procedure SaveToStream(aStream: TStream); override;
   end;
+
+
+{$IFDEF USE_MULTITHREAD}
+  threadvar
+{$ELSE}
+  var
+{$ENDIF}
+  glTFUseEmbeddedColors: Boolean;
 
 // ------------------------------------------------------------------
 implementation
@@ -39,12 +48,13 @@ implementation
 // ------------------ TGLTFVectorFile ------------------
 // ------------------
 
-class function TGLTFVectorFile.Capabilities: TGLDataFileCapabilities;
+
+class function TGLglTFVectorFile.Capabilities: TGLDataFileCapabilities;
 begin
   Result := [dfcRead, dfcWrite];
 end;
 
-procedure TGLTFVectorFile.LoadFromStream(aStream: TStream);
+procedure TGLglTFVectorFile.LoadFromStream(aStream: TStream);
 
   procedure AllocateMaterial(const name: String);
   var
@@ -86,17 +96,26 @@ var
   faceGroup: TFGVertexNormalTexIndexList;
   v: TAffineVector;
 
-  boneIDs: TVertexBoneWeightDynArray;
+  boneIDs: TGLVertexBoneWeightDynArray;
   weightCount: Integer;
 begin
   sl := TStringList.Create;
   tl := TStringList.Create;
   try
     sl.LoadFromStream(aStream);
-    if sl[0] <> 'version 1' then
-      raise Exception.Create('SMD version 1 required');
+    /// then reading glTF/GLB files to assign in TGLSkeletonMeshObject
+    if sl[0] <> 'gltf' then 
+      raise Exception.Create('GLB extention required');
     if sl[1] <> 'nodes' then
       raise Exception.Create('nodes not found');
+
+(*
+    if sl[1] <> 'glb' then  // needs also .bin and .png files for anim and textures 
+      raise Exception.Create('GLTF extention required');
+    if sl[1] <> 'nodes' then
+      raise Exception.Create('nodes not found');
+*)
+
     if sl.IndexOf('triangles') >= 0 then
     begin
       mesh := TGLSkeletonMeshObject.CreateOwned(Owner.MeshObjects);
@@ -105,7 +124,7 @@ begin
     else if Owner.MeshObjects.Count > 0 then
       mesh := (Owner.MeshObjects[0] as TGLSkeletonMeshObject)
     else
-      raise Exception.Create('SMD is an animation, load model SMD first.');
+      raise Exception.Create('Cant load glTF with an animation');
     // read skeleton nodes
     i := 2;
     if Owner.Skeleton.RootBones.Count = 0 then
@@ -134,6 +153,7 @@ begin
       while sl[i] <> 'end' do
         Inc(i);
     end;
+	
     Inc(i);
     if sl[i] <> 'skeleton' then
       raise Exception.Create('skeleton not found');
@@ -156,10 +176,10 @@ begin
           frame.Position.Add(NullVector);
           frame.Rotation.Add(NullVector);
         end;
-        frame.Position.Add(StrToFloatDef(tl[1],0),
-          StrToFloatDef(tl[2],0), StrToFloatDef(tl[3],0));
-        v := AffineVectorMake(StrToFloatDef(tl[4],0),
-          StrToFloatDef(tl[5],0), StrToFloatDef(tl[6],0));
+        frame.Position.Add(GLStrToFloatDef(tl[1],0),
+          GLStrToFloatDef(tl[2],0), GLStrToFloatDef(tl[3],0));
+        v := AffineVectorMake(GLStrToFloatDef(tl[4],0),
+          GLStrToFloatDef(tl[5],0), GLStrToFloatDef(tl[6],0));
         frame.Rotation.Add(v);
         Inc(i);
       end;
@@ -216,16 +236,16 @@ begin
               for j := 0 to weightCount - 1 do
               begin
                 boneIDs[j].boneID := StrToInt(tl[10 + j * 2]);
-                boneIDs[j].Weight := StrToFloatDef(tl[11 + j * 2],0);
+                boneIDs[j].Weight := GLStrToFloatDef(tl[11 + j * 2],0);
               end;
 
               nVert := FindOrAdd(boneIDs,
-                AffineVectorMake(StrToFloatDef(tl[1],0),
-                StrToFloatDef(tl[2],0), StrToFloatDef(tl[3],0)),
-                AffineVectorMake(StrToFloatDef(tl[4],0),
-                StrToFloatDef(tl[5],0), StrToFloatDef(tl[6],0)));
+                AffineVectorMake(GLStrToFloatDef(tl[1],0),
+                GLStrToFloatDef(tl[2],0), GLStrToFloatDef(tl[3],0)),
+                AffineVectorMake(GLStrToFloatDef(tl[4],0),
+                GLStrToFloatDef(tl[5],0), GLStrToFloatDef(tl[6],0)));
               nTex := TexCoords.FindOrAdd
-                (AffineVectorMake(StrToFloatDef(tl[7],0), StrToFloatDef(tl[8],0),0));
+                (AffineVectorMake(GLStrToFloatDef(tl[7],0), GLStrToFloatDef(tl[8],0),0));
               faceGroup.Add(nVert, nVert, nTex);
               Inc(i);
             end
@@ -234,12 +254,12 @@ begin
               // simple format
               boneID := StrToInt(tl[0]);
               nVert := FindOrAdd(boneID,
-                AffineVectorMake(StrToFloatDef(tl[1],0),
-                StrToFloatDef(tl[2],0), StrToFloatDef(tl[3],0)),
-                AffineVectorMake(StrToFloatDef(tl[4],0),
-                StrToFloatDef(tl[5],8), StrToFloatDef(tl[6],0)));
+                AffineVectorMake(GLStrToFloatDef(tl[1],0),
+                GLStrToFloatDef(tl[2],0), GLStrToFloatDef(tl[3],0)),
+                AffineVectorMake(GLStrToFloatDef(tl[4],0),
+                GLStrToFloatDef(tl[5],8), GLStrToFloatDef(tl[6],0)));
               nTex := TexCoords.FindOrAdd
-                (AffineVectorMake(StrToFloatDef(tl[7],0), StrToFloatDef(tl[8],0), 0));
+                (AffineVectorMake(GLStrToFloatDef(tl[7],0), GLStrToFloatDef(tl[8],0), 0));
               faceGroup.Add(nVert, nVert, nTex);
               Inc(i);
             end;
@@ -254,7 +274,7 @@ begin
   end;
 end;
 
-procedure TGLTFVectorFile.SaveToStream(aStream: TStream);
+procedure TGLglTFVectorFile.SaveToStream(aStream: TStream);
 var
   str, nodes: TStrings;
   i, j, k, l, b: Integer;
@@ -344,9 +364,11 @@ end;
 
 // ------------------------------------------------------------------
 initialization
-
 // ------------------------------------------------------------------
 
-RegisterVectorFileFormat('glb', 'Binary glTF files', TGLTFVectorFile);
+glTFUseEmbeddedColors := False;
+
+RegisterVectorFileFormat('gltf', 'ASCII glTF files', TGLglTFVectorFile);
+RegisterVectorFileFormat('glb', 'Binary glTF files', TGLglTFVectorFile);
 
 end.

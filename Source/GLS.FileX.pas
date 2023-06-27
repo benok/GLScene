@@ -1,14 +1,13 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.FileX;
 
-(* Support of X format files (Microsoft's favorite format) *)
+(* Support of X format files for Microsoft's favorite format *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   System.Classes,
@@ -22,7 +21,7 @@ uses
   GLS.VectorLists,
   GLS.Material,
 
-  FormatX;
+  Formats.X;
 
 type
   TGLXVectorFile = class(TGLVectorFile)
@@ -47,8 +46,8 @@ var
   procedure RecursDXFile(DXNode: TDXNode);
   var
     i, j, k, l, vertcount: integer;
-    mo: TMeshObject;
-    mat: TMatrix;
+    mo: TGLMeshObject;
+    mat: TGLMatrix;
     libmat: TGLLibMaterial;
     fg: TFGVertexNormalTexIndexList;
     str: String;
@@ -63,7 +62,7 @@ var
 
     if DXNode is TDXMesh then
     begin
-      mo := TMeshObject.CreateOwned(Owner.MeshObjects);
+      mo := TGLMeshObject.CreateOwned(Owner.MeshObjects);
       mo.Mode := momFaceGroups;
       mo.Vertices.Assign(TDXMesh(DXNode).Vertices);
       mo.Vertices.TransformAsPoints(mat);

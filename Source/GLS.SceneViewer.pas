@@ -1,14 +1,13 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.SceneViewer;
 
-(* Windows specific Scene viewer *)
+(* Component for windows specific Scene viewer *)
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   WinApi.Windows,
@@ -23,8 +22,6 @@ uses
   GLS.WindowsContext,
   GLS.Context;
 
-
-
 type
   TTouchEvent = procedure(X, Y, TouchWidth, TouchHeight : integer; TouchID : Cardinal;
                           TouchCount : integer; FromPen : boolean) of object;
@@ -36,7 +33,7 @@ type
      It is primarily a windowed component, but it can handle full-screen
      operations : simply make this component fit the whole screen (use a
      borderless form).
-     This viewer also allows to define rendering options such a fog, face culling,
+     This viewer also allows to define rendering options such as fog, face culling,
      depth testing, etc. and can take care of framerate calculation.  *)
   TGLSceneViewer = class(TWinControl)
   private

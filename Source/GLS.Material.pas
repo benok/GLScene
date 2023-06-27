@@ -1,5 +1,5 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
 
 unit GLS.Material;
@@ -8,7 +8,7 @@ unit GLS.Material;
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   System.Classes,
@@ -19,6 +19,9 @@ uses
   GLS.OpenGLTokens,
   GLS.VectorTypes,
   GLS.VectorGeometry,
+  GLS.TextureFormat,
+  GLS.Strings,
+
   GLS.RenderContextInfo,
   GLS.BaseClasses,
   GLS.Context,
@@ -27,12 +30,10 @@ uses
   GLS.Coordinates,
   GLS.PersistentClasses,
   GLS.State,
-  GLS.TextureFormat, 
   GLS.XOpenGL,
   GLS.ApplicationFileIO,
   GLS.Graphics,
   GLS.Utils,
-  GLS.Strings,
   GLS.Logger;
 
 {$UNDEF USE_MULTITHREAD}
@@ -460,7 +461,7 @@ type
     FTextureRotate: Single;
     FTextureMatrixIsIdentity: Boolean;
     FTextureOverride: Boolean;
-    FTextureMatrix: TMatrix;
+    FTextureMatrix: TGLMatrix;
     FTexture2Name: TGLLibMaterialName;
     FShader: TGLShader;
     libMatTexture2: TGLLibMaterial; // internal cache
@@ -469,7 +470,7 @@ type
     procedure SetMaterial(const val: TGLMaterial);
     procedure SetTextureOffset(const val: TGLCoordinates);
     procedure SetTextureScale(const val: TGLCoordinates);
-    procedure SetTextureMatrix(const Value: TMatrix);
+    procedure SetTextureMatrix(const Value: TGLMatrix);
     procedure SetTexture2Name(const val: TGLLibMaterialName);
     procedure SetShader(const val: TGLShader);
     procedure SetTextureRotate(Value: Single);
@@ -487,7 +488,7 @@ type
     { Restore non-standard material states that were altered}
     function UnApply(var ARci: TGLRenderContextInfo): Boolean; override;
     procedure NotifyUsersOfTexMapChange;
-    property TextureMatrix: TMatrix read FTextureMatrix write SetTextureMatrix;
+    property TextureMatrix: TGLMatrix read FTextureMatrix write SetTextureMatrix;
     property TextureMatrixIsIdentity: boolean read FTextureMatrixIsIdentity;
     procedure NotifyTexMapChange(Sender: TObject);
     function Blended: Boolean; override;
@@ -596,8 +597,8 @@ type
     constructor Create(AOwner: TComponent); override;
     destructor Destroy; override;
     procedure DestroyHandles;
-    procedure WriteToFiler(writer: TVirtualWriter);
-    procedure ReadFromFiler(reader: TVirtualReader);
+    procedure WriteToFiler(writer: TGLVirtualWriter);
+    procedure ReadFromFiler(reader: TGLVirtualReader);
     procedure SaveToStream(aStream: TStream); virtual;
     procedure LoadFromStream(aStream: TStream); virtual;
     procedure AddMaterialsFromStream(aStream: TStream);
@@ -1839,14 +1840,14 @@ begin
   begin
     // no multitexturing ("standard" mode)
     if not FTextureMatrixIsIdentity then
-        ARci.GLStates.SetGLTextureMatrix(FTextureMatrix);
+        ARci.GLStates.SetTextureMatrix(FTextureMatrix);
     Material.Apply(ARci);
   end
   else
   begin
     // multitexturing is ON
     if not FTextureMatrixIsIdentity then
-      ARci.GLStates.SetGLTextureMatrix(FTextureMatrix);
+      ARci.GLStates.SetTextureMatrix(FTextureMatrix);
     Material.Apply(ARci);
 
     if not libMatTexture2.FTextureMatrixIsIdentity then
@@ -1904,7 +1905,7 @@ begin
     Material.UnApply(ARci);
     if not Material.Texture.Disabled then
       if not FTextureMatrixIsIdentity then
-        ARci.GLStates.ResetGLTextureMatrix;
+        ARci.GLStates.ResetTextureMatrix;
     if Assigned(FShader) then
     begin
       case Shader.ShaderStyle of
@@ -1968,9 +1969,9 @@ begin
   CalculateTextureMatrix;
 end;
 
-procedure TGLLibMaterial.SetTextureMatrix(const Value: TMatrix);
+procedure TGLLibMaterial.SetTextureMatrix(const Value: TGLMatrix);
 begin
-  FTextureMatrixIsIdentity := CompareMem(@Value.V[0], @IdentityHmgMatrix.V[0], SizeOf(TMatrix));
+  FTextureMatrixIsIdentity := CompareMem(@Value.V[0], @IdentityHmgMatrix.V[0], SizeOf(TGLMatrix));
   FTextureMatrix := Value;
   FTextureOverride := True;
   NotifyUsers;
@@ -2404,7 +2405,7 @@ begin
   Result := (FMaterials.Count > 0);
 end;
 
-procedure TGLMaterialLibrary.WriteToFiler(writer: TVirtualWriter);
+procedure TGLMaterialLibrary.WriteToFiler(writer: TGLVirtualWriter);
 var
   i, j: Integer;
   libMat: TGLLibMaterial;
@@ -2574,7 +2575,7 @@ begin
   end;
 end;
 
-procedure TGLMaterialLibrary.ReadFromFiler(reader: TVirtualReader);
+procedure TGLMaterialLibrary.ReadFromFiler(reader: TGLVirtualReader);
 var
   archiveVersion: Integer;
   libMat: TGLLibMaterial;

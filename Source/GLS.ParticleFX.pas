@@ -1,7 +1,6 @@
 //
-// This unit is part of the GLScene Engine, http://glscene.org
+// The graphics engine GLScene https://github.com/glscene
 //
-
 unit GLS.ParticleFX;
 
 (*
@@ -14,7 +13,7 @@ unit GLS.ParticleFX;
 
 interface
 
-{$I GLScene.inc}
+{$I GLS.Scene.inc}
 
 uses
   Winapi.OpenGL,
@@ -58,7 +57,7 @@ type
      The class implements properties for position, velocity and time, whatever
      you need in excess of that will have to be placed in subclasses (this
      class should remain as compact as possible). *)
-  TGLParticle = class(TPersistentObject)
+  TGLParticle = class(TGLPersistentObject)
   private
     FID, FTag: Integer;
     FManager: TGLParticleFXManager; // NOT persistent
@@ -74,8 +73,8 @@ type
   public
     constructor Create; override;
     destructor Destroy; override;
-    procedure WriteToFiler(writer: TVirtualWriter); override;
-    procedure ReadFromFiler(reader: TVirtualReader); override;
+    procedure WriteToFiler(writer: TGLVirtualWriter); override;
+    procedure ReadFromFiler(reader: TGLVirtualReader); override;
     property Manager: TGLParticleFXManager read FManager write FManager;
     // Particle's ID, given at birth. ID is a value unique per manager.
     property ID: Integer read FID;
@@ -106,10 +105,10 @@ type
   (* List of particles.
    This list is managed with particles and performance in mind, make sure to
    check methods doc. *)
-  TGLParticleList = class(TPersistentObject)
+  TGLParticleList = class(TGLPersistentObject)
   private
     FOwner: TGLParticleFXManager; // NOT persistent
-    FItemList: TPersistentObjectList;
+    FItemList: TGLPersistentObjectList;
     FDirectList: PGLParticleArray; // NOT persistent
   protected
     function GetItems(index: Integer): TGLParticle;
@@ -118,8 +117,8 @@ type
   public
     constructor Create; override;
     destructor Destroy; override;
-    procedure WriteToFiler(writer: TVirtualWriter); override;
-    procedure ReadFromFiler(reader: TVirtualReader); override;
+    procedure WriteToFiler(writer: TGLVirtualWriter); override;
+    procedure ReadFromFiler(reader: TGLVirtualReader); override;
     // Refers owner manager
     property Owner: TGLParticleFXManager read FOwner write FOwner;
     property Items[index: Integer]: TGLParticle read GetItems write SetItems; default;
@@ -497,12 +496,12 @@ type
     procedure InitializeRendering(var rci: TGLRenderContextInfo); override;
     procedure FinalizeRendering(var rci: TGLRenderContextInfo); override;
     function MaxParticleAge: Single; override;
-    procedure ComputeColors(var lifeTime: Single; var inner, outer: TColorVector);
-    procedure ComputeInnerColor(var lifeTime: Single; var inner: TColorVector);
-    procedure ComputeOuterColor(var lifeTime: Single; var outer: TColorVector);
+    procedure ComputeColors(var lifeTime: Single; var inner, outer: TGLColorVector);
+    procedure ComputeInnerColor(var lifeTime: Single; var inner: TGLColorVector);
+    procedure ComputeOuterColor(var lifeTime: Single; var outer: TGLColorVector);
     function ComputeSizeScale(var lifeTime: Single; var sizeScale: Single): Boolean;
     function ComputeRotateAngle(var lifeTime, rotateAngle: Single): Boolean;
-    procedure RotateVertexBuf(buf: TAffineVectorList; lifeTime: Single;
+    procedure RotateVertexBuf(buf: TGLAffineVectorList; lifeTime: Single;
       const axis: TAffineVector; offsetAngle: Single);
   public
     constructor Create(aOwner: TComponent); override;
@@ -572,8 +571,8 @@ type
   private
     FNbSides: Integer;
     Fvx, Fvy: TAffineVector; // NOT persistent
-    FVertices: TAffineVectorList; // NOT persistent
-    FVertBuf: TAffineVectorList; // NOT persistent
+    FVertices: TGLAffineVectorList; // NOT persistent
+    FVertBuf: TGLAffineVectorList; // NOT persistent
   protected
     procedure SetNbSides(const val: Integer);
     function TexturingMode: Cardinal; override;
@@ -609,8 +608,8 @@ type
   private
     FTexHandle: TGLTextureHandle;
     Fvx, Fvy, Fvz: TAffineVector; // NOT persistent
-    FVertices: TAffineVectorList; // NOT persistent
-    FVertBuf: TAffineVectorList; // NOT persistent
+    FVertices: TGLAffineVectorList; // NOT persistent
+    FVertBuf: TGLAffineVectorList; // NOT persistent
     FAspectRatio: Single;
     FRotation: Single;
     FShareSprites: TGLBaseSpritePFXManager;
@@ -763,7 +762,7 @@ procedure RndVector(const dispersion: TGLSourcePFXDispersionMode;
 
 var
   f2: Single;
-  p: TVector;
+  p: TGLVector;
 begin
   f2 := 2 * f;
   if Assigned(dispersionRange) then
@@ -817,7 +816,7 @@ begin
     FVelocity.V[Index] := aValue;
 end;
 
-procedure TGLParticle.WriteToFiler(writer: TVirtualWriter);
+procedure TGLParticle.WriteToFiler(writer: TGLVirtualWriter);
 begin
   inherited WriteToFiler(writer);
   with writer do
@@ -830,7 +829,7 @@ begin
   end;
 end;
 
-procedure TGLParticle.ReadFromFiler(reader: TVirtualReader);
+procedure TGLParticle.ReadFromFiler(reader: TGLVirtualReader);
 var
   archiveVersion: integer;
 begin
@@ -855,7 +854,7 @@ end;
 constructor TGLParticleList.Create;
 begin
   inherited Create;
-  FItemList := TPersistentObjectList.Create;
+  FItemList := TGLPersistentObjectList.Create;
   FitemList.GrowthDelta := 64;
   FDirectList := nil;
 end;
@@ -866,7 +865,7 @@ begin
   inherited Destroy;
 end;
 
-procedure TGLParticleList.WriteToFiler(writer: TVirtualWriter);
+procedure TGLParticleList.WriteToFiler(writer: TGLVirtualWriter);
 begin
   inherited WriteToFiler(writer);
   with writer do
@@ -876,7 +875,7 @@ begin
   end;
 end;
 
-procedure TGLParticleList.ReadFromFiler(reader: TVirtualReader);
+procedure TGLParticleList.ReadFromFiler(reader: TGLVirtualReader);
 var
   archiveVersion: integer;
 begin
@@ -1917,7 +1916,7 @@ var
   list: PGLParticleArray;
   doFriction, doPack: Boolean;
   frictionScale: Single;
-  //pos4: TVector;
+  //pos4: TGLVector;
 begin
   maxAge := MaxParticleAge;
   accelVector := Acceleration.AsAffineVector;
@@ -2054,7 +2053,7 @@ begin
   Result := LifeColors.MaxLifeTime;
 end;
 
-procedure TGLLifeColoredPFXManager.ComputeColors(var lifeTime: Single; var inner, outer: TColorVector);
+procedure TGLLifeColoredPFXManager.ComputeColors(var lifeTime: Single; var inner, outer: TGLColorVector);
 var
   i, k, n: Integer;
   f: Single;
@@ -2100,7 +2099,7 @@ begin
   end;
 end;
 
-procedure TGLLifeColoredPFXManager.ComputeInnerColor(var lifeTime: Single; var inner: TColorVector);
+procedure TGLLifeColoredPFXManager.ComputeInnerColor(var lifeTime: Single; var inner: TGLColorVector);
 var
   i, k, n: Integer;
   f: Single;
@@ -2143,7 +2142,7 @@ begin
   end;
 end;
 
-procedure TGLLifeColoredPFXManager.ComputeOuterColor(var lifeTime: Single; var outer: TColorVector);
+procedure TGLLifeColoredPFXManager.ComputeOuterColor(var lifeTime: Single; var outer: TGLColorVector);
 var
   i, k, n: Integer;
   f: Single;
@@ -2282,11 +2281,11 @@ begin
   end;
 end;
 
-procedure TGLLifeColoredPFXManager.RotateVertexBuf(buf: TAffineVectorList;
+procedure TGLLifeColoredPFXManager.RotateVertexBuf(buf: TGLAffineVectorList;
   lifeTime: Single; const axis: TAffineVector; offsetAngle: Single);
 var
   rotateAngle: Single;
-  rotMatrix: TMatrix;
+  rotMatrix: TGLMatrix;
   diff: Single;
   lifeRotationApplied: Boolean;
 begin
@@ -2421,7 +2420,7 @@ end;
 procedure TGLPolygonPFXManager.InitializeRendering(var rci: TGLRenderContextInfo);
 var
   i: Integer;
-  matrix: TMatrix;
+  matrix: TGLMatrix;
   s, c: Single;
 begin
   inherited;
@@ -2431,14 +2430,14 @@ begin
     Fvx.V[i] := matrix.V[i].X * FParticleSize;
     Fvy.V[i] := matrix.V[i].Y * FParticleSize;
   end;
-  FVertices := TAffineVectorList.Create;
+  FVertices := TGLAffineVectorList.Create;
   FVertices.Capacity := FNbSides;
   for i := 0 to FNbSides - 1 do
   begin
     SinCosine(i * c2PI / FNbSides, s, c);
     FVertices.Add(VectorCombine(FVx, Fvy, c, s));
   end;
-  FVertBuf := TAffineVectorList.Create;
+  FVertBuf := TGLAffineVectorList.Create;
   FVertBuf.Count := FVertices.Count;
 end;
 
@@ -2451,7 +2450,7 @@ procedure TGLPolygonPFXManager.RenderParticle(var rci: TGLRenderContextInfo; aPa
 var
   i: Integer;
   lifeTime, sizeScale: Single;
-  inner, outer: TColorVector;
+  inner, outer: TGLColorVector;
   pos: TAffineVector;
   vertexList: PAffineVectorArray;
 begin
@@ -2629,7 +2628,7 @@ end;
 procedure TGLBaseSpritePFXManager.InitializeRendering(var rci: TGLRenderContextInfo);
 var
   i: Integer;
-  matrix: TMatrix;
+  matrix: TGLMatrix;
   s, c, w, h: Single;
 begin
   inherited;
@@ -2645,7 +2644,7 @@ begin
     Fvz.V[i] := matrix.V[i].Z;
   end;
 
-  FVertices := TAffineVectorList.Create;
+  FVertices := TGLAffineVectorList.Create;
   for i := 0 to 3 do
   begin
     SinCosine(i * cPIdiv2 + cPIdiv4, s, c);
@@ -2657,7 +2656,7 @@ begin
     FVertices.TransformAsPoints(matrix);
   end;
 
-  FVertBuf := TAffineVectorList.Create;
+  FVertBuf := TGLAffineVectorList.Create;
   FVertBuf.Count := FVertices.Count;
 end;
 
@@ -2686,7 +2685,7 @@ const
     ((S: 0.5; T: 0.5), (S: 0.0; T: 0.5), (S: 0.0; T: 0.0), (S: 0.5; T: 0.0)));
 var
   lifeTime, sizeScale: Single;
-  inner, outer: TColorVector;
+  inner, outer: TGLColorVector;
   pos: TAffineVector;
   vertexList: PAffineVectorArray;
   i: Integer;
@@ -2852,7 +2851,7 @@ var
   s: Integer;
   x, y, d, h2: Integer;
   ih2, f, fy: Single;
-  scanLine1, scanLine2: PPixel32Array;
+  scanLine1, scanLine2: PGLPixel32Array;
 begin
   s := (1 shl TexMapSize);
   bmp32.Width := s;
