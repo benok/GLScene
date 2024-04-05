@@ -4,20 +4,22 @@ uses
   Forms,
   fGLForm in 'Source\fGLForm.pas' {GLForm},
   fGLDialog in 'Source\fGLDialog.pas' {GLDialog},
-  fMain in 'Source\fMain.pas' {MainForm},
+  fGLSViewer in 'Source\fGLSViewer.pas' {FormGLSViewer},
   uGlobals in 'Source\uGlobals.pas',
   uSettings in 'Source\uSettings.pas',
-  dGLSViewer in 'Source\dGLSViewer.pas' {dmGLSViewer: TDataModule},
+  dImages in 'Source\dImages.pas' {dmGLSViewer: TDataModule},
   fGLAbout in 'Source\fGLAbout.pas' {GLAbout},
   fGLOptions in 'Source\fGLOptions.pas' {GLOptions},
-  gnugettext in 'Locale\gnugettext.pas';
+  gnugettext in 'Locale\gnugettext.pas',
+  dDialogs in 'Source\dDialogs.pas' {dmDialogs: TDataModule};
 
 {$R *.res}
 
 begin
   Application.Initialize;
   Application.Title := 'GLSViewer';
-  Application.CreateForm(TMainForm, MainForm);
+  Application.CreateForm(TFormGLSViewer, FormGLSViewer);
   Application.CreateForm(TdmGLSViewer, dmGLSViewer);
+  Application.CreateForm(TdmDialogs, dmDialogs);
   Application.Run;
 end.

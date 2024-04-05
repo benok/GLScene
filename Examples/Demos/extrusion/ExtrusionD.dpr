@@ -2,7 +2,7 @@ program ExtrusionD;
 
 uses
   Vcl.Forms,
-  fExtrusionD in 'fExtrusionD.pas' {frmExtrusionD},
+  fdExtrusion in 'fdExtrusion.pas' {FormExtrusion},
   fBendingD in 'bendingcyl\fBendingD.pas' {FormBendingCyl},
   fCutoutStarD in 'cutoutstar\fCutoutStarD.pas' {FormCutoutStar},
   fNutsnBoltsD in 'nutsnbolts\fNutsnBoltsD.pas' {FormNutsnBolts},
@@ -14,6 +14,6 @@ uses
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.CreateForm(TfrmExtrusionD, frmExtrusionD);
+  Application.CreateForm(TFormExtrusion, FormExtrusion);
   Application.Run;
 end.

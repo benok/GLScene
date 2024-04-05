@@ -7,9 +7,9 @@
 USEFORM("points\fPointsC.cpp", FormPoints);
 USEFORM("projection\fProjectionC.cpp", FormProjection);
 USEFORM("splines\fSplinesC.cpp", FormSplines);
-USEFORM("heightfield\fHeightfieldC.cpp", Form1);
-USEFORM("fGraphC.cpp", FormGraph);
+USEFORM("fcGraph.cpp", FormGraph);
 USEFORM("fxy\fFxyC.cpp", FormPlot);
+USEFORM("heightfield\fHeightfieldC.cpp", FormHeightField);
 //---------------------------------------------------------------------------
 int WINAPI _tWinMain(HINSTANCE, HINSTANCE, LPTSTR, int)
 {
@@ -18,6 +18,7 @@ int WINAPI _tWinMain(HINSTANCE, HINSTANCE, LPTSTR, int)
 		Application->Initialize();
 		Application->MainFormOnTaskBar = true;
 		Application->CreateForm(__classid(TFormGraph), &FormGraph);
+		Application->CreateForm(__classid(TFormHeightField), &FormHeightField);
 		Application->Run();
 	}
 	catch (Exception &exception)

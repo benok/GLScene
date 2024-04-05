@@ -2,7 +2,7 @@ program GraphD;
 
 uses
   Vcl.Forms,
-  fGraphD in 'fGraphD.pas' {FormGraphD},
+  fdGraph in 'fdGraph.pas' {FormGraph},
   fFxyD in 'fxy\fFxyD.pas' {FormFxy},
   fHeightFieldD in 'heightfield\fHeightFieldD.pas' {FormHeightField},
   fPointsD in 'points\fPointsD.pas' {FormPoints},
@@ -14,6 +14,6 @@ uses
 begin
   Application.Initialize;
   Application.MainFormOnTaskbar := True;
-  Application.CreateForm(TFormGraphD, FormGraphD);
+  Application.CreateForm(TFormGraph, FormGraph);
   Application.Run;
 end.

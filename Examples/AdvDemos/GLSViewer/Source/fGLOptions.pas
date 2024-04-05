@@ -3,22 +3,23 @@ unit fGLOptions;
 interface
 
 uses
-  Winapi.Windows, 
+  Winapi.Windows,
   Winapi.Messages,
   System.SysUtils,
   System.UITypes,
-  System.Variants, 
-  System.Classes, 
+  System.Variants,
+  System.Classes,
   System.IniFiles,
-  Vcl.Graphics, 
-  Vcl.Controls, 
-  Vcl.Forms, 
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
   Vcl.Dialogs,
-  Vcl.StdCtrls, 
+  Vcl.StdCtrls,
   Vcl.ExtCtrls,
 
   //
-  dGLSViewer, 
+  dImages,
+  dDialogs,
   fGLForm, 
   fGLDialog;
 
@@ -46,13 +47,14 @@ type
 var
   GLOptions: TGLOptions;
 
+//---------------------------------------------------------------------------
 implementation
 
 {$R *.dfm}
 
 uses
   GnuGettext,
-  fMain;
+  fGLSViewer;
 
 
 procedure TGLOptions.FormCreate(Sender: TObject);
@@ -122,19 +124,19 @@ end;
 procedure TGLOptions.CheckBoxAxisClick(Sender: TObject);
 begin
   if CheckBoxAxis.Checked then
-    MainForm.DCAxis.Visible := True
+    FormGLSViewer.DCAxis.Visible := True
   else
-    MainForm.DCAxis.Visible := False;
+    FormGLSViewer.DCAxis.Visible := False;
 end;
 
 
 procedure TGLOptions.PanelBackgroundClick(Sender: TObject);
 begin
-   dmGLSViewer.ColorDialog.Color := PanelBackground.Color;
-   if dmGLSViewer.ColorDialog.Execute then
+   dmDialogs.ColorDialog.Color := PanelBackground.Color;
+   if dmDialogs.ColorDialog.Execute then
    begin
-     PanelBackground.Color :=  dmGLSViewer.ColorDialog.Color;
-     MainForm.ApplyBgColor;
+     PanelBackground.Color :=  dmDialogs.ColorDialog.Color;
+     FormGLSViewer.ApplyBgColor;
    end;
 end;
 
